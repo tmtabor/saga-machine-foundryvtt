@@ -4,7 +4,7 @@
   "description": "A system for the Saga Machine family of games: Age of Ambition, Shadows Over Sol, Against the Dark Yogi and Dime Adventures.",
   "version": "0.1.0",
   "minimumCoreVersion":"0.8.8",
-  "templateVersion": 1
+  "templateVersion": 1,
   "author": "Thorin Tabor",
   "esmodules": [
     "scripts/main.js"
