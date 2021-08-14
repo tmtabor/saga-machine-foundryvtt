@@ -52,10 +52,13 @@
           "cutting": 0,
           "other": 0
         },
-        "hp": 0,
+        "hp": {
+          "value": 0,
+          "max": 0
+        },
         "move": 0,
         "size": 0,
-        "luck"
+        "luck": 0
       }  
     },
     "hero": {
