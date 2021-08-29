@@ -1,0 +1,119 @@
+{
+  "Actor": {
+    "types": ["hero", "npc"],
+    "templates": {
+      "stats": {
+        "strength": {
+          "min": 0,
+          "value": 5,
+          "max": 30
+        },
+        "dexterity": {
+          "min": 0,
+          "value": 5,
+          "max": 30
+        },
+        "speed": {
+          "min": 0,
+          "value": 5,
+          "max": 30
+        },
+        "endurance": {
+          "min": 0,
+          "value": 5,
+          "max": 30
+        },
+        "intelligence": {
+          "min": 0,
+          "value": 5,
+          "max": 30
+        },
+        "perception": {
+          "min": 0,
+          "value": 5,
+          "max": 30
+        },
+        "charisma": {
+          "min": 0,
+          "value": 5,
+          "max": 30
+        },
+        "determination": {
+          "min": 0,
+          "value": 5,
+          "max": 30
+        }
+      },
+      "scores": {
+        "attack": 0,
+        "defense": 0,
+        "willpower": 0,
+        "armor": {
+          "cutting": 0,
+          "other": 0
+        },
+        "hp": {
+          "value": 0,
+          "max": 0
+        },
+        "move": 0,
+        "size": 0,
+        "luck": 0
+      }  
+    },
+    "hero": {
+      "templates": ["stats", "scores"],
+      "people": "",
+      "status": {
+        "strata": "",
+        "standing": "",
+        "title": ""
+      }  
+    },
+    "npc": {
+      "templates": ["stats", "scores"],
+      "bestial": false
+    }
+  },
+  "Item": {
+    "types": ["people", "weapon", "armor", "item"],
+    "templates": {
+      "equipment": {
+        "cost": 0,
+        "availability": "",
+        "properties": []
+      }
+    },
+    "people": {
+      "description": "",
+      "group": "",
+      "stats": {
+        "high": "",
+        "low": ""
+      },
+      "size": 0
+    },
+    "weapon": {
+      "templates": ["equipment"],
+      "damage": {
+        "strength": 0,
+        "increment": 0,
+        "base": [0, 0, 0, 0, 0],
+        "type": ""
+      },
+      "parry": 0
+
+    },
+    "armor": {
+      "templates": ["equipment"],
+      "armor": {
+        "cutting": 0,
+        "other": 0
+      }
+    },
+    "item": {
+      "templates": ["equipment"],
+      "category": ""
+    },
+  }
+}

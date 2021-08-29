@@ -1,0 +1,710 @@
+<form class="flexcol sheet {{cssClass}}" autocomplete="off">
+
+    {{!-- Sheet Header --}}
+    <header class="sheet-header">
+        <img class="profile-img" src="{{data.img}}" data-edit="img" title="{{data.name}}" height="100" width="100" />
+        <div class="header-fields">
+<!--            <h1 class="charname">-->
+<!--                <input name="name" type="text" value="{{data.name}}" placeholder="Name" />-->
+<!--            </h1>-->
+            <div class="sheet-name-line">
+                <label class="sheet-basics-label">Name</label>
+                <input type="text" name="name" class="sheet-line-input sheet-name-input" value="{{data.name}}" placeholder="Name" />
+            </div>
+            <div class="sheet-people-line">
+                <input class="sheet-arrow-toggle" type="checkbox" />
+                <span class="sheet-arrow-label">&#9658;</span>
+                <label class="sheet-basics-label sheet-people-label">People</label>
+                <input type="text" name="data.people.name" class="sheet-line-input sheet-people-input" value="{{system.people.name}}" />
+                <div class="sheet-skill-notes">
+                    <textarea class="sheet-people-notes-input" name="data.people.notes" placeholder="Notes">{{system.people.notes}}</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="sheet-current-luck-box sheet-stats-box">
+            <label class="sheet-stat-label">Luck</label>
+            <input type="number" name="data.luck.base" class="sheet-stat-input" step="1" value="{{system.luck.base}}" />
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs sheet-tabs-hr" data-group="primary">
+        <a class="item sheet-tab" data-tab="basics">Basics</a>
+        <a class="item sheet-tab" data-tab="skills">Skills</a>
+        <a class="item sheet-tab" data-tab="traits">Traits</a>
+        <a class="item sheet-tab" data-tab="combat">Combat</a>
+        <a class="item sheet-tab" data-tab="social">Social</a>
+        <a class="item sheet-tab" data-tab="inventory">Inventory</a>
+        <a class="item sheet-tab" data-tab="lifepath">Lifepath</a>
+        <div class="sheet-tabs-hr"></div>
+    </nav>
+
+    {{!-- Stats --}}
+    <div class="stats-section">
+        <div class="strength-box sheet-stats-box">
+            <label class="stat-label">Strength</label>
+            <input type="number" name="data.stats.strength.value" value="{{system.stats.strength.value}}" class="sheet-stat-input" step="1" />
+        </div>
+        <div class="dexterity-box sheet-stats-box">
+            <label class="stat-label">Dexterity</label>
+            <input type="number" name="data.stats.dexterity.value" value="{{system.stats.dexterity.value}}" class="sheet-stat-input" step="1" />
+        </div>
+        <div class="speed-box sheet-stats-box">
+            <label class="stat-label">Speed</label>
+            <input type="number" name="data.stats.speed.value" value="{{system.stats.speed.value}}" class="sheet-stat-input" step="1" />
+        </div>
+        <div class="endurance-box sheet-stats-box">
+            <label class="stat-label">Endurance</label>
+            <input type="number" name="data.stats.endurance.value" value="{{system.stats.endurance.value}}" class="sheet-stat-input" step="1" />
+        </div>
+        <div class="intelligence-box sheet-stats-box">
+            <label class="stat-label">Intelligence</label>
+            <input type="number" name="data.stats.intelligence.value" value="{{system.stats.intelligence.value}}" class="sheet-stat-input" step="1" />
+        </div>
+        <div class="perception-box sheet-stats-box">
+            <label class="stat-label">Perception</label>
+            <input type="number" name="data.stats.perception.value" value="{{system.stats.perception.value}}" class="sheet-stat-input" step="1" />
+        </div>
+        <div class="charisma-box sheet-stats-box">
+            <label class="stat-label">Charisma</label>
+            <input type="number" name="data.stats.charisma.value" value="{{system.stats.charisma.value}}" class="sheet-stat-input" step="1" />
+        </div>
+        <div class="determination-box sheet-stats-box">
+            <label class="stat-label">Determination</label>
+            <input type="number" name="data.stats.determination.value" value="{{system.stats.determination.value}}" class="sheet-stat-input" step="1" />
+        </div>
+    </div>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+
+        {{!-- Basics Tab --}}
+        <div class="tab basics sheet-basics-section" data-group="primary" data-tab="basics">
+            <div class="sheet-creed-line">
+                <label class="sheet-basics-label">Creed</label>
+                <input type="text" name="data.basics.creed" class="sheet-line-input sheet-creed-input" value="{{system.basics.creed}}" />
+            </div>
+            <div class="sheet-idiosyncrasy-line">
+                <label class="sheet-basics-label">Idiosyncrasy</label>
+                <input type="text" name="data.basics.idiosyncrasy" class="sheet-line-input sheet-idiosyncrasy-input" value="{{system.basics.idiosyncrasy}}" />
+            </div>
+
+            <hr class="sheet-basics-divider" />
+
+            <div class="sheet-ambitions-box">
+                <h3 class="sheet-traits-header">Ambitions</h3>
+                <div class="sheet-ambition-line">
+                    <label class="sheet-basics-label">Long-Term</label>
+                    <input type="text" name="data.ambitions.longterm" class="sheet-line-input sheet-ambition-input"  value="{{system.ambitions.longterm}}" />
+                </div>
+                <div class="sheet-ambition-line">
+                    <label class="sheet-basics-label">Short-Term</label>
+                    <input type="text" name="data.ambitions.shortterm1" class="sheet-line-input sheet-ambition-input"  value="{{system.ambitions.shortterm1}}" />
+                </div>
+                <div class="sheet-ambition-line">
+                    <label class="sheet-basics-label">Short-Term</label>
+                    <input type="text" name="data.ambitions.shortterm2" class="sheet-line-input sheet-ambition-input"  value="{{system.ambitions.shortterm2}}" />
+                </div>
+                <div class="sheet-ambition-line">
+                    <label class="sheet-basics-label">Party</label>
+                    <input type="text" name="data.ambitions.party" class="sheet-line-input sheet-ambition-input"  value="{{system.ambitions.party}}" />
+                </div>
+            </div>
+
+            <hr class="sheet-basics-divider" />
+
+            <div class="experiences-box">
+                <h3 class="sheet-traits-header">Experiences</h3>
+                <div class="sheet-column-2">
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience1.name" value="{{system.experiences.experience1.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience1.exhausted" {{checked system.experiences.experience1.exhausted}} />
+                    </div>
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience2.name" value="{{system.experiences.experience2.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience2.exhausted" {{checked system.experiences.experience2.exhausted}} />
+                    </div>
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience3.name" value="{{system.experiences.experience3.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience3.exhausted" {{checked system.experiences.experience3.exhausted}} />
+                    </div>
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience4.name" value="{{system.experiences.experience4.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience4.exhausted" {{checked system.experiences.experience4.exhausted}} />
+                    </div>
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience5.name" value="{{system.experiences.experience5.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience5.exhausted" {{checked system.experiences.experience5.exhausted}} />
+                    </div>
+                </div>
+                <div class="sheet-column-2">
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience6.name" value="{{system.experiences.experience6.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience6.exhausted" {{checked system.experiences.experience6.exhausted}} />
+                    </div>
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience7.name" value="{{system.experiences.experience7.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience7.exhausted" {{checked system.experiences.experience7.exhausted}} />
+                    </div>
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience8.name" value="{{system.experiences.experience8.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience8.exhausted" {{checked system.experiences.experience8.exhausted}} />
+                    </div>
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience9.name" value="{{system.experiences.experience9.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience9.exhausted" {{checked system.experiences.experience9.exhausted}} />
+                    </div>
+                    <div class="sheet-experience-line">
+                        <input type="text" class="sheet-line-input sheet-experience-input" name="data.experiences.experience10.name" value="{{system.experiences.experience10.name}}" />
+                        <input type="checkbox" class="sheet-line-input sheet-influence-spent" name="data.experiences.experience10.exhausted" {{checked system.experiences.experience10.exhausted}} />
+                    </div>
+                </div>
+                <div class="sheet-spacer"></div>
+            </div>
+
+            <hr class="sheet-basics-divider" />
+
+            <h3 class="sheet-traits-header">Notes</h3>
+            <textarea class="sheet-traits-input" name="data.basics.notes">{{system.basics.notes}}</textarea>
+        </div>
+
+        {{!-- Skills Tab --}}
+        <div class="tab skills sheet-skills-section" data-group="primary" data-tab="skills">
+            <div class="sheet-skill-column">
+                <h3 class="sheet-skill-header">Skills</h3>
+                <fieldset class="repeating_skills">
+                    <input class="arrow-toggle" type="checkbox" />
+                    <span class="arrow-label">&#9658;</span>
+                    <div class="skill-line">
+                        <input type="text" class="skill-input line-input" name="attr_Name" />
+                        <select class="skill-rank" name="attr_Rank">
+                            <option value="untrained">&ominus;&nbsp;&nbsp;&nbsp;&nbsp;Untrained</option>
+                            <option value="proficient" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proficient</option>
+                            <option value="adept">&oplus;&nbsp;&nbsp;&nbsp;&nbsp;Adept</option>
+                            <option value="master">&oplus;&oplus;&nbsp;Master</option>
+                        </select>
+                    </div>
+                    <div class="skill-notes">
+                        <textarea class="skill-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="sheet-skill-column">
+                <h3 class="sheet-skill-header">Fighting Styles</h3>
+                <fieldset class="repeating_fightingstyles">
+                    <input class="arrow-toggle" type="checkbox" />
+                    <span class="arrow-label">&#9658;</span>
+                    <div class="skill-line">
+                        <input type="text" class="skill-input line-input" name="attr_Name" />
+                        <select class="skill-rank" name="attr_Rank">
+                            <option value="untrained">&ominus;&nbsp;&nbsp;&nbsp;&nbsp;Untrained</option>
+                            <option value="proficient" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proficient</option>
+                            <option value="adept">&oplus;&nbsp;&nbsp;&nbsp;&nbsp;Adept</option>
+                            <option value="master">&oplus;&oplus;&nbsp;Master</option>
+                        </select>
+                    </div>
+                    <div class="skill-notes">
+                        <textarea class="skill-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="sheet-skill-column">
+                <h3 class="sheet-skill-header">Arcane Lores</h3>
+                <fieldset class="repeating_lores">
+                    <input class="arrow-toggle" type="checkbox" />
+                    <span class="arrow-label">&#9658;</span>
+                    <div class="skill-line">
+                        <input type="text" class="skill-input line-input" name="attr_Name" />
+                        <select class="skill-rank" name="attr_Rank">
+                            <option value="untrained">&ominus;&nbsp;&nbsp;&nbsp;&nbsp;Untrained</option>
+                            <option value="proficient" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proficient</option>
+                            <option value="adept">&oplus;&nbsp;&nbsp;&nbsp;&nbsp;Adept</option>
+                            <option value="master">&oplus;&oplus;&nbsp;Master</option>
+                        </select>
+                    </div>
+                    <div class="skill-notes">
+                        <textarea class="skill-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+
+        {{!-- Owned Items Tab --}}
+        <div class="tab items" data-group="primary" data-tab="items">
+<!--            <ol class="item-list">-->
+<!--                {{#each data.items as |item id|}}-->
+<!--                <li class="item flexrow" data-item-id="{{item._id}}">-->
+<!--                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24" />-->
+<!--                    <h4 class="item-name">{{item.name}}</h4>-->
+<!--                    {{!&#45;&#45; Iterate through all attributes on the item and output buttons for any that are formula. &#45;&#45;}}-->
+<!--                    <div class="item-buttons">-->
+<!--                        {{#each item.data.attributes as |itemAttr key|}}-->
+<!--                        {{#if itemAttr.dtype}}-->
+<!--                            {{#if itemAttr.isFormula}}-->
+<!--                                {{!&#45;&#45; Use the items.name.key format for shorthand. &#45;&#45;}}-->
+<!--                                {{#if ../../shorthand}}-->
+<!--                                <button class="item-button rollable" data-roll="@items.{{slugify item.name}}.{{key}}" data-label="{{ itemAttr.label }}"-->
+<!--                                    title="{{itemAttr.value}}">{{itemAttr.label}}</button>-->
+<!--                                {{!&#45;&#45; Use the items.name.attributes.key.value format otherwise. &#45;&#45;}}-->
+<!--                                {{else}}-->
+<!--                                <button class="item-button rollable"-->
+<!--                                    data-roll="@items.{{slugify item.name}}.attributes.{{key}}.value" data-label="{{ itemAttr.label }}"-->
+<!--                                    title="{{itemAttr.value}}">{{itemAttr.label}}</button>-->
+<!--                                {{/if}}-->
+<!--                            {{/if}}-->
+<!--                        {{else}}-->
+<!--                            {{#each itemAttr as |itemGroupedAttr groupedKey|}}-->
+<!--                                {{#if itemGroupedAttr.isFormula}}-->
+<!--                                    {{!&#45;&#45; Use the items.name.key format for shorthand. &#45;&#45;}}-->
+<!--                                    {{#if ../../../shorthand}}-->
+<!--                                    <button class="item-button rollable" data-roll="@items.{{slugify item.name}}.{{key}}.{{groupedKey}}" data-label="{{ itemGroupedAttr.label }}"-->
+<!--                                        title="{{itemGroupedAttr.value}}">{{itemGroupedAttr.label}}</button>-->
+<!--                                    {{!&#45;&#45; Use the items.name.attributes.key.value format otherwise. &#45;&#45;}}-->
+<!--                                    {{else}}-->
+<!--                                    <button class="item-button rollable"-->
+<!--                                        data-roll="@items.{{slugify item.name}}.attributes.{{key}}.{{groupedKey}}.value" data-label="{{ itemGroupedAttr.label }}"-->
+<!--                                        title="{{itemGroupedAttr.value}}">{{itemGroupedAttr.label}}</button>-->
+<!--                                    {{/if}}-->
+<!--                                {{/if}}-->
+<!--                            {{/each}}-->
+<!--                        {{/if}}-->
+<!--                        {{/each}}-->
+<!--                    </div>-->
+<!--                    <div class="item-controls">-->
+<!--                        <a class="item-control" title="{{ localize "SIMPLE.ItemEdit" }}" data-action="edit"><i class="fas fa-edit"></i></a>-->
+<!--                        <a class="item-control" title="{{ localize "SIMPLE.ItemDelete" }}" data-action="delete"><i class="fas fa-trash"></i></a>-->
+<!--                    </div>-->
+<!--                </li>-->
+<!--                {{/each}}-->
+<!--            </ol>-->
+<!--            <p>-->
+<!--                <a class="item-control" title="{{ localize "SIMPLE.ItemCreate" }}" data-action="create"><i class="fas fa-plus"></i> {{ localize "SIMPLE.ItemCreate" }}</a>-->
+<!--            </p>-->
+        </div>
+
+        {{!-- Attributes Tab --}}
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
+<!--            <header class="attributes-header flexrow">-->
+<!--                <span class="attribute-key">{{localize "SIMPLE.AttributeKey"}}</span>-->
+<!--                <span class="attribute-value">{{localize "SIMPLE.AttributeValue"}}</span>-->
+<!--                <span class="attribute-label">{{localize "SIMPLE.AttributeLabel"}}</span>-->
+<!--                <span class="attribute-dtype">{{localize "SIMPLE.AttributeDtype"}}</span>-->
+<!--                <a class="attribute-control" data-action="create" data-group="{{group}}"><i class="fas fa-plus"></i></a>-->
+<!--            </header>-->
+
+<!--            {{!&#45;&#45; Render the attribute list partial. &#45;&#45;}}-->
+<!--            {{> "systems/saga-machine/templates/parts/sheet-attributes.html" attributes=systemData.ungroupedAttributes dtypes=dtypes}}-->
+
+<!--            {{!&#45;&#45; Render the grouped attributes partial and control. &#45;&#45;}}-->
+<!--            <div class="groups">-->
+<!--                {{> "systems/saga-machine/templates/parts/sheet-groups.html" attributes=systemData.groupedAttributes groups=systemData.groups dtypes=dtypes}}-->
+
+<!--                <div class="group-controls flexrow">-->
+<!--                    <input class="group-prefix" type="text" value=""/>-->
+<!--                    <a class="button group-control" data-action="create-group"><i class="fas fa-plus"></i>Add Attribute Group</a>-->
+<!--                </div>-->
+<!--            </div>-->
+        </div>
+    </section>
+</form>
+
+<form class="section tabs-wrapper" class="flexcol {{cssClass}}" autocomplete="off">
+
+
+
+
+
+    <div class="skills-section">
+        <div class="skill-column">
+            <h3 class="skill-header">Skills</h3>
+            <fieldset class="repeating_skills">
+                <input class="arrow-toggle" type="checkbox" />
+                <span class="arrow-label">&#9658;</span>
+                <div class="skill-line">
+                    <input type="text" class="skill-input line-input" name="attr_Name" />
+                    <select class="skill-rank" name="attr_Rank">
+                        <option value="untrained">&ominus;&nbsp;&nbsp;&nbsp;&nbsp;Untrained</option>
+                        <option value="proficient" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proficient</option>
+                        <option value="adept">&oplus;&nbsp;&nbsp;&nbsp;&nbsp;Adept</option>
+                        <option value="master">&oplus;&oplus;&nbsp;Master</option>
+                    </select>
+                </div>
+                <div class="skill-notes">
+                    <textarea class="skill-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="skill-column">
+            <h3 class="skill-header">Fighting Styles</h3>
+            <fieldset class="repeating_fightingstyles">
+                <input class="arrow-toggle" type="checkbox" />
+                <span class="arrow-label">&#9658;</span>
+                <div class="skill-line">
+                    <input type="text" class="skill-input line-input" name="attr_Name" />
+                    <select class="skill-rank" name="attr_Rank">
+                        <option value="untrained">&ominus;&nbsp;&nbsp;&nbsp;&nbsp;Untrained</option>
+                        <option value="proficient" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proficient</option>
+                        <option value="adept">&oplus;&nbsp;&nbsp;&nbsp;&nbsp;Adept</option>
+                        <option value="master">&oplus;&oplus;&nbsp;Master</option>
+                    </select>
+                </div>
+                <div class="skill-notes">
+                    <textarea class="skill-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="skill-column">
+            <h3 class="skill-header">Arcane Lores</h3>
+            <fieldset class="repeating_lores">
+                <input class="arrow-toggle" type="checkbox" />
+                <span class="arrow-label">&#9658;</span>
+                <div class="skill-line">
+                    <input type="text" class="skill-input line-input" name="attr_Name" />
+                    <select class="skill-rank" name="attr_Rank">
+                        <option value="untrained">&ominus;&nbsp;&nbsp;&nbsp;&nbsp;Untrained</option>
+                        <option value="proficient" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proficient</option>
+                        <option value="adept">&oplus;&nbsp;&nbsp;&nbsp;&nbsp;Adept</option>
+                        <option value="master">&oplus;&oplus;&nbsp;Master</option>
+                    </select>
+                </div>
+                <div class="skill-notes">
+                    <textarea class="skill-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="traits-section">
+        <h3 class="traits-header">General Traits</h3>
+        <textarea class="traits-input" name="attr_Traits"></textarea>
+        <h3 class="traits-header">Weakness Traits</h3>
+        <textarea class="traits-input" name="attr_Weaknesses"></textarea>
+    </div>
+
+    <div class="combat-section">
+        <h3 class="traits-header">Combat Scores</h3>
+        <div class="combat-scores-box">
+            <div class="attack-box sheet-stats-box">
+                <label class="stat-label">Attack</label>
+                <input type="number" name="attr_Attack" class="sheet-stat-input" step="1" value="floor((@{Dexterity}+@{Intelligence})/2)+@{Attack_Mod}" disabled />
+            </div>
+            <div class="defense-box sheet-stats-box">
+                <label class="stat-label">Defense</label>
+                <input type="number" name="attr_Defense" class="sheet-stat-input" step="1" value="floor((@{Speed}+@{Perception})/2)+@{Defense_Mod}+@{Defense_Card}" disabled />
+            </div>
+            <div class="willpower-box sheet-stats-box">
+                <label class="stat-label">Willpower</label>
+                <input type="number" name="attr_Willpower" class="sheet-stat-input" step="1" value="floor((@{Charisma}+@{Determination})/2)+@{Willpower_Mod}+@{Defense_Card}" disabled />
+            </div>
+            <div class="armor-box sheet-stats-box">
+                <label class="stat-label">Armor</label>
+                <input type="text" name="attr_Armor" class="sheet-stat-input" pattern = "[0-9]+([/][0-9]+)?" />
+            </div>
+            <div class="health-current-box sheet-stats-box">
+                <label class="stat-label">HP</label>
+                <input type="number" name="attr_HP" class="sheet-stat-input" step="1" />
+            </div>
+            <div class="health-max-box sheet-stats-box">
+                <label class="stat-label">Max HP</label>
+                <input type="number" name="attr_HP|max" class="sheet-stat-input" step="1" value="@{Strength}+@{Endurance}+@{HP_Mod}" disabled />
+            </div>
+            <div class="move-box sheet-stats-box">
+                <label class="stat-label">Move</label>
+                <input type="number" name="attr_Move" class="sheet-stat-input" step="1" value="floor((@{Speed}+@{Endurance})/2)+@{Move_Mod}" disabled />
+            </div>
+            <div class="defense-card-box sheet-stats-box">
+                <label class="stat-label">Defense Card</label>
+                <input type="number" name="attr_Defense_Card" class="sheet-stat-input" step="1" value="0" />
+            </div>
+        </div>
+
+        <div class="combat-modifiers-box">
+            <input class="arrow-toggle" type="checkbox" />
+            <span class="arrow-label">&#9658;</span>
+            <div class="combat-mod-header">Combat Score Modifiers</div>
+            <div class="skill-notes">
+                <div class="attack-box sheet-stats-box">
+                    <label class="stat-label">Modifier</label>
+                    <input type="number" name="attr_Attack_Mod" class="sheet-stat-input" step="1" value="0" />
+                </div>
+                <div class="defense-box sheet-stats-box">
+                    <label class="stat-label">Modifier</label>
+                    <input type="number" name="attr_Defense_Mod" class="sheet-stat-input" step="1" value="0" />
+                </div>
+                <div class="willpower-box sheet-stats-box">
+                    <label class="stat-label">Modifier</label>
+                    <input type="number" name="attr_Willpower_Mod" class="sheet-stat-input" step="1" value="0" />
+                </div>
+                <div class="armor-box sheet-stats-box invisible-box"></div>
+                <div class="health-current-box sheet-stats-box invisible-box"></div>
+                <div class="health-max-box sheet-stats-box">
+                    <label class="stat-label">Modifier</label>
+                    <input type="number" name="attr_HP_Mod" class="sheet-stat-input" step="1" value="0" />
+                </div>
+                <div class="move-box sheet-stats-box">
+                    <label class="stat-label">Modifier</label>
+                    <input type="number" name="attr_Move_Mod" class="sheet-stat-input" step="1" value="0" />
+                </div>
+                <div class="defense-card-box sheet-stats-box invisible-box"></div>
+            </div>
+        </div>
+
+        <h3 class="traits-header">Attacks</h3>
+        <label class="attack-label attack-input">Attack</label>
+        <label class="attack-label attack-properties">Properties</label>
+        <label class="attack-label attack-array">1-2</label>
+        <label class="attack-label attack-array">3-4</label>
+        <label class="attack-label attack-array">5-6</label>
+        <label class="attack-label attack-array">7-8</label>
+        <label class="attack-label attack-array">9-10</label>
+        <label class="attack-label attack-damage">Damage</label>
+        <fieldset class="repeating_attacks">
+            <input class="arrow-toggle" type="checkbox" />
+            <span class="arrow-label">&#9658;</span>
+            <div class="attack-line">
+                <input type="text" class="attack-input line-input" name="attr_Name" placeholder="Attack" />
+                <input type="text" class="attack-properties line-input" name="attr_Properties" placeholder="Properties" />
+                <input type="number" class="attack-array line-input" name="attr_Damage12" value="0" />
+                <input type="number" class="attack-array line-input" name="attr_Damage34" value="0" />
+                <input type="number" class="attack-array line-input" name="attr_Damage56" value="0" />
+                <input type="number" class="attack-array line-input" name="attr_Damage78" value="0" />
+                <input type="number" class="attack-array line-input" name="attr_Damage910" value="0" />
+                <select class="attack-damage" name="attr_Damage">
+                    <option value="none" selected></option>
+                    <option value="burning">Burning</option>
+                    <option value="corrosive">Corrosive</option>
+                    <option value="cutting">Cutting</option>
+                    <option value="freezing">Fatigue</option>
+                    <option value="freezing">Freezing</option>
+                    <option value="piercing">Piercing</option>
+                    <option value="smashing">Smashing</option>
+                    <option value="toxic">Toxic</option>
+                </select>
+            </div>
+            <div class="skill-notes">
+                <textarea class="item-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+            </div>
+        </fieldset>
+
+        <h3 class="traits-header">Consequences and Notes</h3>
+        <textarea class="traits-input" name="attr_Consequences"></textarea>
+    </div>
+
+    <div class="social-section">
+        <div class="social-box">
+            <h3 class="traits-header">Influence</h3>
+            <div class="influence-header">
+                <div class="influence-source">Source</div>
+                <div class="influence-spent">Spent</div>
+            </div>
+            <div class="status-box">
+                <input class="arrow-toggle" type="checkbox" />
+                <span class="arrow-label">&#9658;</span>
+                <div class="bond-line">
+                    <input type="text" class="line-input title-input" name="attr_Title" placeholder="Title" />
+                    <select name="attr_Strata" class="strata-input">
+                        <option value="common">Common</option>
+                        <option value="gentle">Gentle</option>
+                        <option value="noble">Noble</option>
+                    </select>
+                    <input type="number" class="standing-input line-input" name="attr_Standing" placeholder="Standing" />
+                    <input type="checkbox" class="line-input influence-spent" name="attr_Standing_Spent" />
+                </div>
+                <div class="skill-notes">
+                    <textarea class="item-notes-input" name="attr_Status_Notes" placeholder="Notes"></textarea>
+                </div>
+            </div>
+            <fieldset class="repeating_influence">
+                <input class="arrow-toggle" type="checkbox" />
+                <span class="arrow-label">&#9658;</span>
+                <div class="bond-line">
+                    <input type="text" class="line-input influence-input" name="attr_Source" placeholder="Source" />
+                    <input type="checkbox" class="line-input influence-spent" name="attr_Spent" />
+                </div>
+                <div class="skill-notes">
+                    <textarea class="item-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                </div>
+            </fieldset>
+        </div>
+        <div class="social-box">
+            <h3 class="traits-header">Bonds</h3>
+            <div class="influence-header">
+                <div class="bond-target">Bond</div>
+                <div class="bond-type">Type</div>
+                <div class="bond-exhausted">Exhaust</div>
+            </div>
+            <fieldset class="repeating_bonds">
+                <input class="arrow-toggle" type="checkbox" />
+                <span class="arrow-label">&#9658;</span>
+                <div class="bond-line">
+                    <input type="text" class="bond-input line-input" name="attr_Name" placeholder="Name" />
+                    <select class="bond-type line-input" name="attr_Type">
+                        <option>Ally</option>
+                        <option>Contact</option>
+                        <option>Enemy</option>
+                        <option>Favor</option>
+                        <option>Membership</option>
+                        <option>Obligation</option>
+                        <option>Patron</option>
+                        <option>Rival</option>
+                        <option>Special</option>
+                    </select>
+                    <input type="checkbox" class="line-input sheet-bond-exhausted" name="attr_Exhausted" />
+                </div>
+                <div class="skill-notes">
+                    <textarea class="item-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+
+    <div class="inventory-section">
+        <h3 class="traits-header">Quick Inventory</h3>
+        <textarea class="inventory-quick" name="attr_Inventory"></textarea>
+        <h3 class="traits-header">Equipment</h3>
+        <fieldset class="repeating_items">
+            <input class="arrow-toggle" type="checkbox" />
+            <span class="arrow-label">&#9658;</span>
+            <div class="item-line">
+                <input type="text" class="item-name line-input" name="attr_Item" placeholder="Item" />
+                <input type="text" class="item-properties line-input" name="attr_Properties" placeholder="Properties" />
+                <input type="text" class="item-number line-input" name="attr_Numbers" placeholder="#" />
+                <input type="text" class="item-page line-input" name="attr_Reference" placeholder="Page" />
+            </div>
+            <div class="skill-notes">
+                <textarea class="item-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+            </div>
+        </fieldset>
+
+        <div class="social-box">
+            <h3 class="traits-header">Wealth</h3>
+            <div class="inventory-wealth-box">
+                <div class="gp-box wealth-box">
+                    <label class="wealth-label">Gold</label>
+                    <input type="number" name="attr_GP" class="wealth-input" step="1" value="0" />
+                </div>
+                <div class="sp-box wealth-box">
+                    <label class="wealth-label">Silver</label>
+                    <input type="number" name="attr_SP" class="wealth-input" step="1" value="0" />
+                </div>
+                <div class="bp-box wealth-box">
+                    <label class="wealth-label">Bronze</label>
+                    <input type="number" name="attr_BP" class="wealth-input" step="1" value="0" />
+                </div>
+                 <div class="bits-box wealth-box">
+                    <label class="wealth-label">Bits</label>
+                    <input type="number" name="attr_Bits" class="wealth-input" step="1" value="0" />
+                </div>
+            </div>
+        </div>
+
+        <div class="social-box">
+            <h3 class="traits-header">Encumbrance</h3>
+            <div class="inventory-wealth-box">
+                <div class="wealth-box">
+                    <label class="wealth-label">Current</label>
+                    <input type="number" name="attr_Encumbrance" class="wealth-input" step="1" value="0" />
+                </div>
+                <div class="wealth-box">
+                    <label class="wealth-label">Max</label>
+                    <input type="number" name="attr_Encumbrance|max" class="wealth-input" value="floor((@{Strength}+@{Dexterity})/2)+@{Encumbrance_Mod}" disabled />
+                </div>
+                <div class="wealth-box">
+                    <label class="wealth-label">Mod</label>
+                    <input type="number" name="attr_Encumbrance_Mod" class="wealth-input" step="1" value="0" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="lifepath-section">
+        <div class="social-box">
+            <h3 class="traits-header">Training Boxes</h3>
+            <div class="training-boxes">
+                <input type="checkbox" name="attr_Training_Box1" />
+                <input type="checkbox" name="attr_Training_Box2" />
+                <input type="checkbox" name="attr_Training_Box3" />
+                <input type="checkbox" name="attr_Training_Box4" />
+                <input type="checkbox" name="attr_Training_Box5" />
+                &nbsp;
+                <input type="checkbox" name="attr_Training_Box6" />
+                <input type="checkbox" name="attr_Training_Box7" />
+                <input type="checkbox" name="attr_Training_Box8" />
+                <input type="checkbox" name="attr_Training_Box9" />
+                <input type="checkbox" name="attr_Training_Box10" />
+            </div>
+            <h3 class="traits-header">Birth Fortune</h3>
+            <textarea class="lifepath-textarea" name="attr_Birth_Fortune" placeholder="Birth Fortune"></textarea>
+            <h3 class="traits-header">Origin</h3>
+            <input type="text" name="attr_Origin" class="line-input lifepath-input" placeholder="Origin" />
+            <input type="text" name="attr_People" class="line-input lifepath-input" placeholder="People" />
+            <input type="text" name="attr_Religion" class="line-input lifepath-input" placeholder="Family Religion" />
+            <textarea class="lifepath-textarea" name="attr_Foundational_Event"placeholder="Foundational Event"></textarea>
+            <h3 class="traits-header">Coming of Age</h3>
+            <input type="text" name="attr_character_name" class="line-input lifepath-input" placeholder="Name" />
+            <h4 class="traits-header">Assign Stats: [ 7, 6, 6, 5, 5, 4, 4, 3 ]</h4>
+            <input type="text" name="attr_Ambition1" class="line-input lifepath-input" placeholder="Adolescent Ambition" />
+
+            <h3 class="traits-header">Finishing Touches</h3>
+            <textarea class="lifepath-textarea" name="attr_Gather_Party" placeholder="Gathering the Party"></textarea>
+            <h4 class="traits-header">Hearth & Coin</h4>
+            <input type="number" name="attr_Age" class="line-input lifepath-age" step="1" placeholder="Age" />
+            <select name="attr_Strata" class="strata-input">
+                <option value="common">Common</option>
+                <option value="gentle">Gentle</option>
+                <option value="noble">Noble</option>
+            </select>
+            <input type="number" class="standing-input line-input" name="attr_Standing" placeholder="Standing" />
+            <div class="lifepath-wealth-box">
+                <div class="gp-box wealth-box">
+                    <label class="wealth-label">Gold</label>
+                    <input type="number" name="attr_GP" class="wealth-input" step="1" value="0" />
+                </div>
+                <div class="sp-box wealth-box">
+                    <label class="wealth-label">Silver</label>
+                    <input type="number" name="attr_SP" class="wealth-input" step="1" value="0" />
+                </div>
+                <div class="bp-box wealth-box">
+                    <label class="wealth-label">Bronze</label>
+                    <input type="number" name="attr_BP" class="wealth-input" step="1" value="0" />
+                </div>
+                 <div class="bits-box wealth-box">
+                    <label class="wealth-label">Bits</label>
+                    <input type="number" name="attr_Bits" class="wealth-input" step="1" value="0" />
+                </div>
+            </div>
+            <h4 class="traits-header">Personal Traits</h4>
+            <input type="text" name="attr_Creed" class="line-input lifepath-input" placeholder="Creed" />
+            <input type="text" name="attr_Idiosyncrasy" class="line-input lifepath-input" placeholder="Idiosyncrasy" />
+            <textarea class="lifepath-textarea" name="attr_Weaknesses" placeholder="Weaknesses"></textarea>
+            <h4 class="traits-header">Ambitions</h4>
+            <input type="text" name="attr_Ambition1" class="line-input lifepath-input" placeholder="Long-Term Ambition" />
+            <input type="text" name="attr_Ambition2" class="line-input lifepath-input" placeholder="Short-Term Ambition" />
+            <input type="text" name="attr_Ambition3" class="line-input lifepath-input" placeholder="Short-Term Ambition" />
+            <input type="text" name="attr_Ambition4" class="line-input lifepath-input" placeholder="Party Ambition" />
+        </div>
+        <div class="social-box">
+            <h3 class="traits-header">Careers</h3>
+            <fieldset class="repeating_careers">
+                <div class="attempt">
+                    <input type="number" name="attr_Age" class="line-input career-age" step="1" placeholder="Age" />
+                    <input type="text" name="attr_Career" class="line-input lifepath-career" placeholder="Career" />
+                    <input type="text" name="attr_Training" class="line-input lifepath-input" placeholder="Training" />
+                    <textarea class="lifepath-textarea" name="attr_Event" placeholder="Event"></textarea>
+                    <input type="text" name="attr_Advancement" class="line-input lifepath-input" placeholder="Advancement" />
+                    <input type="text" name="attr_Title" class="line-input lifepath-title" placeholder="Title" />
+                    <select name="attr_Strata" class="strata-input career-strata">
+                        <option value="common">Common</option>
+                        <option value="gentle">Gentle</option>
+                        <option value="noble">Noble</option>
+                    </select>
+                    <input type="number" class="standing-input line-input" name="attr_Standing" placeholder="Standing" />
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</form>

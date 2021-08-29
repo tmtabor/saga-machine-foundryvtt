@@ -59,16 +59,76 @@
         "move": 0,
         "size": 0,
         "luck": 0
-      }  
+      }
     },
     "hero": {
       "templates": ["stats", "scores"],
-      "people": "",
+      "people": {
+        "name": "",
+        "notes": ""
+      },
+      "basics": {
+        "creed": "",
+        "idiosyncrasy": "",
+        "notes": ""
+      },
+      "luck": {
+        "current": 5,
+        "base": 5
+      },
+      "ambitions": {
+        "longterm": "",
+        "shortterm1": "",
+        "shortterm2": "",
+        "party": ""
+      },
+      "experiences": {
+        "experience1": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience2": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience3": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience4": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience5": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience6": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience7": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience8": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience9": {
+          "name": "",
+          "exhausted": false
+        },
+        "experience10": {
+          "name": "",
+          "exhausted": false
+        }
+      },
       "status": {
         "strata": "",
-        "standing": "",
+        "standing": 0,
         "title": ""
-      }  
+      }
     },
     "npc": {
       "templates": ["stats", "scores"],
@@ -76,44 +136,15 @@
     }
   },
   "Item": {
-    "types": ["people", "weapon", "armor", "item"],
-    "templates": {
-      "equipment": {
-        "cost": 0,
-        "availability": "",
-        "properties": []
-      }
-    },
-    "people": {
-      "description": "",
-      "group": "",
-      "stats": {
-        "high": "",
-        "low": ""
-      },
-      "size": 0
-    },
-    "weapon": {
-      "templates": ["equipment"],
-      "damage": {
-        "strength": 0,
-        "increment": 0,
-        "base": [0, 0, 0, 0, 0],
-        "type": ""
-      },
-      "parry": 0
-
-    },
-    "armor": {
-      "templates": ["equipment"],
-      "armor": {
-        "cutting": 0,
-        "other": 0
-      }
-    },
+    "types": [
+      "item"
+    ],
     "item": {
-      "templates": ["equipment"],
-      "category": ""
-    },
+      "description": "",
+      "quantity": 1,
+      "weight": 0,
+      "attributes": {},
+      "groups": {}
+    }
   }
 }
