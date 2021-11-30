@@ -59,10 +59,18 @@
         "move": 0,
         "size": 0,
         "luck": 0
+      },
+      "skills": {
+        "skills": [
+          {"name":  "athletics", "rank":  0},
+          {"name":  "awareness", "rank":  0}
+        ],
+        "fightingstyles": [],
+        "arcanelores": []
       }
     },
     "hero": {
-      "templates": ["stats", "scores"],
+      "templates": ["stats", "scores", "skills"],
       "people": {
         "name": "",
         "notes": ""

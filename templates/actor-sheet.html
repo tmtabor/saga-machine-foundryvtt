@@ -172,22 +172,24 @@
         <div class="tab skills sheet-skills-section" data-group="primary" data-tab="skills">
             <div class="sheet-skill-column">
                 <h3 class="sheet-skill-header">Skills</h3>
-                <fieldset class="repeating_skills">
-                    <input class="arrow-toggle" type="checkbox" />
-                    <span class="arrow-label">&#9658;</span>
-                    <div class="skill-line">
-                        <input type="text" class="skill-input line-input" name="attr_Name" />
-                        <select class="skill-rank" name="attr_Rank">
-                            <option value="untrained">&ominus;&nbsp;&nbsp;&nbsp;&nbsp;Untrained</option>
-                            <option value="proficient" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proficient</option>
-                            <option value="adept">&oplus;&nbsp;&nbsp;&nbsp;&nbsp;Adept</option>
-                            <option value="master">&oplus;&oplus;&nbsp;Master</option>
-                        </select>
-                    </div>
-                    <div class="skill-notes">
-                        <textarea class="skill-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
-                    </div>
-                </fieldset>
+                {{#each data.skills}}
+                    <fieldset class="repeating_skills">
+                        <input class="arrow-toggle" type="checkbox" />
+                        <span class="arrow-label">&#9658;</span>
+                        <div class="skill-line">
+                            <input type="text" class="skill-input line-input" name="attr_Name" />
+                            <select class="skill-rank" name="attr_Rank">
+                                <option value="untrained">&ominus;&nbsp;&nbsp;&nbsp;&nbsp;Untrained</option>
+                                <option value="proficient" selected>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Proficient</option>
+                                <option value="adept">&oplus;&nbsp;&nbsp;&nbsp;&nbsp;Adept</option>
+                                <option value="master">&oplus;&oplus;&nbsp;Master</option>
+                            </select>
+                        </div>
+                        <div class="skill-notes">
+                            <textarea class="skill-notes-input" name="attr_Notes" placeholder="Notes"></textarea>
+                        </div>
+                    </fieldset>
+                {{/each}}
             </div>
 
             <div class="sheet-skill-column">
