@@ -1,29 +1,32 @@
 {
-  "name": "saga-machine",
-  "title": "Saga Machine",
-  "description": "A system for the Saga Machine family of games: Age of Ambition, Shadows Over Sol, Against the Dark Yogi and Dime Adventures.",
-  "version": "0.1.0",
-  "minimumCoreVersion": "0.8.4",
-  "compatibleCoreVersion": "0.8.8",
-  "templateVersion": 1,
-  "author": "Thorin Tabor",
-  "esmodules": ["scripts/main.js"],
-  "styles": ["styles/main.css"],
-  "packs": [],
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "lang/en.json"
-    }
-  ],
-  "socket": false,
-  "gridDistance": 1,
-  "gridUnits": "yd",
-  "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": "power",
-  "url": "https://github.com/tmtabor/saga-machine-foundryvtt",
-  "manifest": "https://raw.githubusercontent.com/tmtabor/saga-machine-foundryvtt/main/system.json",
-  "download": "https://github.com/tmtabor/saga-machine-foundryvtt/archive/refs/tags/0.1.0.zip",
-  "license": "LICENSE"
+    "id": "saga-machine",
+    "title": "Saga Machine",
+    "description": "FoundryVTT implementation of Saga Machine Unified, with partial backwards support for Age of Ambition, Shadows Over Sol, Against the Dark Yogi and Dime Adventures.",
+    "version": "0.3.0",
+    "compatibility": {
+        "minimum": "10",
+        "verified": "11",
+        "maximum": "11"
+    },
+    "templateVersion": 1,
+    "author": "Thorin Tabor",
+    "esmodules": ["scripts/main.js"],
+    "styles": ["styles/main.css"],
+    "packs": [],
+    "languages": [
+      {
+        "lang": "en",
+        "name": "English",
+        "path": "lang/en.json"
+      }
+    ],
+    "socket": true,
+    "gridDistance": 1,
+    "gridUnits": "yd",
+    "primaryTokenAttribute": "health",
+    "secondaryTokenAttribute": "luck",
+    "url": "https://github.com/tmtabor/saga-machine-foundryvtt",
+    "manifest": "https://raw.githubusercontent.com/tmtabor/saga-machine-foundryvtt/main/system.json",
+    "download": "https://github.com/tmtabor/saga-machine-foundryvtt/archive/refs/tags/0.3.0.zip",
+    "license": "LICENSE.txt"
 }

@@ -8,8 +8,8 @@ CONFIG.debug.hooks = true;
 /**
  * Init hook.
  */
-Hooks.once("init", async function() {
-    console.log(`Initializing Saga Machine System`);
+Hooks.once("init", async () => {
+    console.log(`Initializing Saga Machine`);
 
   // game['saga-machine'] = {
   //   SagaMachineActor: SagaMachineActor
@@ -21,21 +21,6 @@ Hooks.once("init", async function() {
   CONFIG.Item.documentClass = SimpleItem;
 
   // Register sheet application classes
-  Actors.unregisterSheet("core", ActorSheet);
-  Items.unregisterSheet("core", ItemSheet);
   Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });
   Items.registerSheet("saga-machine", SimpleItemSheet, { makeDefault: true });
-
-  /**
-   * Slugify a string.
-   */
-  // Handlebars.registerHelper('slugify', function(value) {
-  //   return value.slugify({strict: true});
-  // });
-
-  // Preload template partials
-  await loadTemplates([
-    "systems/saga-machine/templates/parts/sheet-attributes.html",
-    "systems/saga-machine/templates/parts/sheet-groups.html"
-  ]);
 });

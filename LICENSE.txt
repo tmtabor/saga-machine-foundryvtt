@@ -1,6 +1,6 @@
 BSD 3-Clause License
 
-Copyright (c) 2021, Thorin Tabor
+Copyright (c) 2023, Thorin Tabor
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

@@ -1,6 +1,6 @@
 {
   "Actor": {
-    "types": ["hero", "npc"],
+    "types": ["pc", "npc"],
     "templates": {
       "stats": {
         "strength": {
@@ -45,97 +45,53 @@
         }
       },
       "scores": {
-        "attack": 0,
-        "defense": 0,
-        "willpower": 0,
-        "armor": {
-          "cutting": 0,
-          "other": 0
+      	"armor": {
+      	  "value": 0,
+      	  "properties": [],
+      	  "custom": false
+      	},
+      	"defense": {
+      	  "value": 0,
+      	  "tn": 0, 
+      	  "custom": false
+      	},
+      	"encumbrance": {
+      	  "value": 0,
+      	  "custom": false
+      	},
+      	"health": {
+      	  "value": 0,
+      	  "total": 0, 
+      	  "custom": false
+      	},
+      	"luck": {
+          "value": 5,
+          "starting": 5,
+          "custom": false
         },
-        "hp": {
-          "value": 0,
-          "max": 0
+        "move": {
+          "value": 5,
+          "custom": false
         },
-        "move": 0,
-        "size": 0,
-        "luck": 0
+        "willpower": {
+      	  "value": 0,
+      	  "tn": 0, 
+      	  "custom": false
+      	}
       },
-      "skills": {
-        "skills": [
-          {"name":  "athletics", "rank":  0},
-          {"name":  "awareness", "rank":  0}
-        ],
-        "fightingstyles": [],
-        "arcanelores": []
-      }
+      "skills": [],
+      "traits": [],
+      "consequences": [],
+      "equipment": []
     },
-    "hero": {
-      "templates": ["stats", "scores", "skills"],
-      "people": {
-        "name": "",
-        "notes": ""
-      },
-      "basics": {
-        "creed": "",
-        "idiosyncrasy": "",
-        "notes": ""
-      },
-      "luck": {
-        "current": 5,
-        "base": 5
-      },
-      "ambitions": {
-        "longterm": "",
-        "shortterm1": "",
-        "shortterm2": "",
-        "party": ""
-      },
+    "pc": {
+      "templates": ["stats", "scores", "skills", "traits", "consequences", "equipment"],
+      "ambitions": {},
       "experiences": {
-        "experience1": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience2": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience3": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience4": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience5": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience6": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience7": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience8": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience9": {
-          "name": "",
-          "exhausted": false
-        },
-        "experience10": {
-          "name": "",
-          "exhausted": false
-        }
-      },
-      "status": {
-        "strata": "",
-        "standing": 0,
-        "title": ""
+        "total": 0,
+        "spent": 0,
+        "unspent": 0,
+        "level": {}
       }
     },
     "npc": {
@@ -144,15 +100,38 @@
     }
   },
   "Item": {
-    "types": [
-      "item"
-    ],
+    "types": ["skill", "trait", "consequence", "item"],
+    "templates": {
+      "basics": {
+        "full_name": "",
+        "description": "",
+        "specialization": "",
+        "specialized": false,
+        "ranked": false,
+        "rank": 0
+      }
+    },
+    "skill": {
+      "templates": ["basics"],
+      "default": "",
+      "ranked": true
+    },
+    "trait": {
+      "templates": ["basics"],
+      "rank": 1,
+      "requirements": [],
+      "cost": 0
+    },
+    "consequence": {
+      "templates": ["basics"],
+      "rank": 1
+    },
     "item": {
-      "description": "",
+      "templates": ["basics"],
       "quantity": 1,
-      "weight": 0,
-      "attributes": {},
-      "groups": {}
+      "properties": [],
+      "groups": [],
+      "cost": 0
     }
   }
 }

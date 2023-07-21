@@ -1,627 +1,423 @@
-/*
- * Universal
- */
-
-.actor > .window-content {
-    background: white;
-    position: relative;
-}
-
-.sheet {
-    margin-bottom: 15px;
-    width: 836px;
-}
-
-.sheet-line-input {
-    display: inline-block;
-    border-top: none;
-    border-right: none;
-    border-left: none;
-    border-bottom: solid gray 1px;
-}
-
-.sheet input[type=number]::-webkit-outer-spin-button,
-.sheet input[type=number]::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-.sheet input[type=number] {
-    -moz-appearance:textfield;
-}
-
-.sheet input.sheet-arrow-toggle {
-    position: absolute;
-    opacity: 0;
-    width: 22px;
-    height: 22px;
-    cursor: pointer;
-    z-index: 1;
-}
-
-.sheet-arrow-label {
-    position: absolute;
-    width: 18px;
-    height: 18px;
-    line-height: 22px;
-    margin: 0;
-    padding: 0;
-    text-align: center;
-    display: inline-block;
-    vertical-align: middle;
-    font-size: 18px;
-}
-
-input.sheet-arrow-toggle:checked ~ .sheet-arrow-label {
-    display: inline-block;
-    transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-
-}
-
-input.sheet-arrow-toggle:not(:checked) ~ .sheet-skill-notes {
-    display: none;
-}
-
-/*
- * Basics Section
- */
-
-.sheet header.sheet-header {
-    width: 813px;
-}
-
-.sheet header.sheet-header img {
-    flex: 0 0 80px;
-    height: 80px;
-}
-
-.sheet header.sheet-header > .sheet-current-luck-box {
-    flex: 0 99px;
-}
-
-.sheet header.sheet-header .sheet-skill-notes {
-    width: 600px;
-}
-
-.sheet-basics-section {
-    margin-top: 10px;
-}
-
-.sheet-basics-label {
-    display: inline-block;
-    width: 15%;
-    text-align: right;
-    font-size: 1em;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-input.sheet-name-input,
-input.sheet-people-input,
-input.sheet-ambition-input,
-input.sheet-creed-input,
-input.sheet-idiosyncrasy-input {
-    display: inline-block;
-    width: 80%;
-    height: 24px;
-}
-
-hr.sheet-basics-divider {
-    margin: 10px 0px 10px 0px;
-    width: 818px;
-}
-
-.sheet-people-notes-input {
-    width: 504px;
-    height: 50px;
-    margin-left: 97px;
-    resize: vertical;
-    border: 0 none;
-    border-bottom: solid 1px gray;
-}
-
-.sheet-luck-box {
-    width: 415px;
-    display: inline-block;
-    vertical-align: top;
-    text-align: center;
-}
-
-.sheet-experiences-box {
-    width: 415px;
-    display: inline-block;
-    vertical-align: top;
-}
-
-input.sheet-experience-input {
-    width: 360px;
-}
-
-select.sheet-experience-stat {
-    width: 100px;
-    border: none;
-    border-bottom: solid 1px gray;
-    font-weight: bold;
-    padding: 0;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-}
-
-select.sheet-experience-stat::-ms-expand {
-    display: none;
-}
-
-.sheet-column-2 {
-    width: 410px;
-    float: left;
-}
-
-.sheet-spacer {
-    clear: both;
-}
-
-/*
- * Stats Section
- */
-
-.sheet-stats-section {
-    margin-top: 10px;
-}
-
-.sheet-stats-box {
-    display: inline-block;
-    width: 99px;
-    border: solid gray 1px;
-    padding-top: 5px;
-    text-align: center;
-}
-
-.sheet-stat-label {
-    text-align: center;
-    font-weight: bold;
-    font-size: 1em;
-}
-
-input[type=number].sheet-stat-input,
-input[type=text].sheet-stat-input{
-    position: relative;
-    width: 100%;
-    text-align: center;
-    font-size: 3em;
-    font-weight: bold;
-    border: none;
-    background: white;
-    height: auto;
-}
-
-/*
- * Tabs section
- */
-
-.sheet nav.sheet-tabs {
-    border-top: none;
-    border-bottom: none;
-    width: 814px;
-}
-
-.item.sheet-tab {
-    display: inline-block;
-    position: relative;
-    width: 78px;
-    height: 23px;
-    padding: 0 0 0 0;
-    cursor: pointer;
-    border: 1px solid lightgray;
-    border-bottom: none;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    font-size: 1em;
-    text-align: center;
-    font-weight: bold;
-    line-height: 23px;
-    color: lightgray;
-    text-shadow: none;
-}
-
-.item.sheet-tab.active {
-    border: 1px solid gray;
-    border-bottom-color: white;
-    color: #333;
-    text-shadow: none;
-}
-
-.sheet-tabs-hr {
-    border-bottom: solid gray 1px;
-    margin-top: -6px;
-    width: 100%;
-    flex: unset;
-    height: 4px;
-}
-
-/*
- * Skills section
- */
-
-.sheet-skill-column {
-    width: 32%;
-    margin-top: 10px;
-    margin-right: 10px;
-    display: inline-block;
-    float: left;
-}
-
-.sheet-skill-header {
-    text-align: center;
-    border-bottom: solid 1px gray;
-    margin-bottom: 10px;
-}
-
-.sheet-skill-input {
-    margin-left: 22px;
-    width: 210px;
-}
-
-select.sheet-skill-rank {
-    width: 30px;
-    height: 24px;
-    font-size: 0.9em;
-    border: none;
-    border-bottom: solid 1px gray;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    position: relative;
-    top: 3px;
-}
-
-.sheet-skill-notes-input {
-    width: 260px;
-    height: 50px;
-    resize: vertical;
-    border: 0 none;
-    border-bottom: solid 1px gray;
-}
-
-/*
- * Traits section
- */
-
-.sheet-traits-section {
-    padding-top: 10px;
-}
-
-.sheet-traits-header {
-    text-align: center;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
-
-.sheet-traits-input {
-    width: 805px;
-    height: 200px;
-    resize: vertical;
-    border: solid 1px gray;
-    margin: 10px;
-}
-
-/*
- * Combat section
- */
-
-.sheet-combat-section {
-    padding-top: 10px;
-}
-
-.sheet-combat-modifiers-box {
-    margin-top: 10px;
-    margin-bottom: 5px;
-}
-
-.sheet-combat-mod-header {
-    font-weight: bold;
-    margin-left: 25px;
-    font-size: 1.2em
-}
-
-.sheet-invisible-box {
-    visibility: hidden;
+.rollable:hover, .rollable:focus {
+  color: #000;
+  text-shadow: 0 0 10px red;
+  cursor: pointer;
 }
 
-.sheet-attack-label {
-    display: inline-block;
-    padding-right: 0;
+.grid,
+.grid-2col {
+  display: grid;
+  grid-column: span 2/span 2;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 10px 0;
+  padding: 0;
 }
 
-.sheet-attack-input {
-    margin-left: 22px;
-    width: 180px;
+.grid-3col {
+  grid-column: span 3/span 3;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.sheet-attack-properties {
-    width: 390px;
+.grid-4col {
+  grid-column: span 4/span 4;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-label.sheet-attack-array {
-    width: 25px;
-    text-align: center;
-    font-size: 0.9em;
+.grid-5col {
+  grid-column: span 5/span 5;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-input[type="number"].sheet-attack-array {
-    width: 25px;
-    text-align: center;
+.grid-6col {
+  grid-column: span 6/span 6;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
-.sheet-attack-damage {
-    text-align: center;
-    width: 90px;
+.grid-7col {
+  grid-column: span 7/span 7;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 
-select.sheet-attack-damage {
-    width: 90px;
-    font-size: 0.9em;
-    text-align: center;
-    border: none;
-    border-bottom: solid 1px gray;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+.grid-8col {
+  grid-column: span 8/span 8;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
-.sheet-attack-damage::-ms-expand {
-    display: none;
+.grid-9col {
+  grid-column: span 9/span 9;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
 }
 
-/*
- * Social section
- */
-
-.sheet-social-section {
-    margin-top: 10px;
-}
-
-.sheet-social-box {
-    width: 403px;
-    display: inline-block;
-    padding-right: 10px;
-    vertical-align: top;
+.grid-10col {
+  grid-column: span 10/span 10;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
 }
 
-.sheet-influence-header {
-    font-weight: bold;
-    font-size: 1.1em;
+.grid-11col {
+  grid-column: span 11/span 11;
+  grid-template-columns: repeat(11, minmax(0, 1fr));
 }
 
-.sheet-influence-source {
-    display: inline-block;
-    width: 345px;
+.grid-12col {
+  grid-column: span 12/span 12;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
-.sheet-influence-spent {
-    display: inline-block;
-    width: 50px;
-    text-align: center;
+.grid-start-2 {
+  grid-column-start: 2;
 }
 
-input[type=text].sheet-title-input {
-    width: 160px;
+.grid-start-3 {
+  grid-column-start: 3;
 }
 
-select.sheet-strata-input {
-    border: none;
-    border-bottom: solid 1px gray;
-    font-weight: bold;
-    width: 80px;
-    padding: 0;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+.grid-start-4 {
+  grid-column-start: 4;
 }
 
-select.sheet-strata-input::-ms-expand {
-    display: none;
+.grid-start-5 {
+  grid-column-start: 5;
 }
 
-input.sheet-standing-input[type=number] {
-    width: 72px;
-    text-align: center;
-    font-weight: bold;
+.grid-start-6 {
+  grid-column-start: 6;
 }
 
-.sheet-standing-influence {
-    width: 75px;
-    text-align: center;
+.grid-start-7 {
+  grid-column-start: 7;
 }
 
-.sheet-influence-input {
-    width: 320px;
+.grid-start-8 {
+  grid-column-start: 8;
 }
 
-.sheet-bond-target {
-    display: inline-block;
-    width: 187px;
-    margin-left: 25px;
+.grid-start-9 {
+  grid-column-start: 9;
 }
 
-.sheet-bond-type {
-    display: inline-block;
-    width: 105px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+.grid-start-10 {
+  grid-column-start: 10;
 }
 
-select.sheet-bond-type::-ms-expand {
-    display: none;
+.grid-start-11 {
+  grid-column-start: 11;
 }
 
-.sheet-bond-exhausted {
-    display: inline-block;
-    text-align: center;
-    width: 75px;
+.grid-start-12 {
+  grid-column-start: 12;
 }
 
-.sheet-bond-line {
-    margin-left: 25px;
-    width: 100%;
+.grid-span-2 {
+  grid-column-end: span 2;
 }
 
-.sheet-bond-input {
-    width: 187px;
+.grid-span-3 {
+  grid-column-end: span 3;
 }
 
-.sheet-social-divider {
-    margin: 5px;
+.grid-span-4 {
+  grid-column-end: span 4;
 }
 
-/*
- * Inventory section
- */
-
-.sheet-inventory-section {
-    margin-top: 10px;
-}
-
-.sheet-inventory-wealth-box {
-    margin-top: 10px;
-    margin-bottom: 10px;
-    text-align: center;
+.grid-span-5 {
+  grid-column-end: span 5;
 }
 
-.sheet-inventory-wealth-label {
-    display: inline-block;
-    width: 100px;
+.grid-span-6 {
+  grid-column-end: span 6;
 }
 
-.sheet-wealth-label {
-    text-align: center;
+.grid-span-7 {
+  grid-column-end: span 7;
 }
 
-.sheet-wealth-box {
-    display: inline-block;
-    width: 95px;
-    height: 60px;
-    border: solid gray 1px;
-    padding-top: 5px;
-    text-align: center;
+.grid-span-8 {
+  grid-column-end: span 8;
 }
 
-.sheet-wealth-input {
-    position: relative;
-    width: 100%;
-    text-align: center;
-    font-size: 1.5em;
-    font-weight: bold;
-    border: none;
-    background: white;
+.grid-span-9 {
+  grid-column-end: span 9;
 }
 
-.sheet-inventory-quick {
-    width: 100%;
-    height: 100px;
-    resize: vertical;
-    border: solid 1px gray;
+.grid-span-10 {
+  grid-column-end: span 10;
 }
 
-.sheet-item-name {
-    width: 275px;
-    margin-left: 25px;
+.grid-span-11 {
+  grid-column-end: span 11;
 }
 
-.sheet-item-properties {
-    width: 420px;
+.grid-span-12 {
+  grid-column-end: span 12;
 }
 
-.sheet-item-number {
-    width: 50px;
-    text-align: center;
+.flex-group-center,
+.flex-group-left,
+.flex-group-right {
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  text-align: center;
 }
 
-.sheet-item-page {
-    width: 50px;
-    text-align: center;
+.flex-group-left {
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  text-align: left;
 }
 
-.sheet-item-notes-input {
-    width: 100%;
-    height: 50px;
-    resize: vertical;
-    border: 0 none;
-    border-bottom: solid 1px gray;
+.flex-group-right {
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  text-align: right;
 }
-
-/*
- * Lifepath section
- */
 
-.sheet-lifepath-section {
-    margin-top: 10px;
+.flexshrink {
+  -webkit-box-flex: 0;
+  -ms-flex: 0;
+  flex: 0;
 }
 
-.sheet-training-boxes {
-    text-align: center;
-    padding-bottom: 10px;
+.flex-between {
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
 }
 
-.sheet-lifepath-input {
-    width: 100%;
-    margin-bottom: 10px;
+.flexlarge {
+  -webkit-box-flex: 2;
+  -ms-flex: 2;
+  flex: 2;
 }
 
-.sheet-lifepath-textarea {
-    height: 50px;
-    width: 393px;
-    border: solid 1px gray;
+.align-left {
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  text-align: left;
 }
 
-.sheet-attempt {
-    border: solid 1px gray;
-    margin-bottom: 10px;
-    padding: 5px;
+.align-right {
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  text-align: right;
 }
 
-.sheet-attempt > textarea.sheet-lifepath-textarea {
-    width: 381px;
+.align-center {
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  text-align: center;
 }
 
-.sheet-career-age {
-    margin-right: 20px;
-    text-align: center;
-    margin-bottom: 10px;
+/* Styles limited to boilerplate sheets */
+.saga-machine {
+  /* ----------------------------------------- */
+  /*  Items Lists                              */
+  /* ----------------------------------------- */
+  /* Example style for Boilerplate (can be removed if not needed) */
 }
-
-.sheet-lifepath-career {
-    width: 320px;
-    margin-bottom: 10px;
+.saga-machine .item-form {
+  font-family: "Roboto", sans-serif;
 }
-
-select.sheet-career-strata {
-    width: 100px;
+.saga-machine .sheet-header {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 auto;
+  flex: 0 auto;
+  overflow: hidden;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: start;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
-
-.sheet-lifepath-title {
-    width: 208px;
+.saga-machine .sheet-header .profile-img {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 100px;
+  flex: 0 0 100px;
+  height: 100px;
+  margin-right: 10px;
 }
-
-.sheet-lifepath-age {
-    margin-right: 30px;
-    position: relative;
-    text-align: center;
-    margin-bottom: 10px;
-    top: 5px;
+.saga-machine .sheet-header .header-fields {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
 }
-
-.sheet-lifepath-wealth-box {
-    font-size: 0.8em;
-    text-align: center;
-    margin-bottom: 10px;
+.saga-machine .sheet-header h1.charname {
+  height: 50px;
+  padding: 0px;
+  margin: 5px 0;
+  border-bottom: 0;
+}
+.saga-machine .sheet-header h1.charname input {
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
-
-.sheet-lifepath-wealth-box .sheet-wealth-box {
-    width: 95px;
-    height: 45px;
+.saga-machine .sheet-tabs {
+  -webkit-box-flex: 0;
+  -ms-flex: 0;
+  flex: 0;
 }
-
-.sheet-lifepath-wealth-box label {
-    text-align: center;
-    margin: 0;
+.saga-machine .sheet-body,
+.saga-machine .sheet-body .tab,
+.saga-machine .sheet-body .tab .editor {
+  height: 100%;
+}
+.saga-machine .tox .tox-editor-container {
+  background: #fff;
+}
+.saga-machine .tox .tox-edit-area {
+  padding: 0 8px;
+}
+.saga-machine .items-header {
+  height: 28px;
+  margin: 2px 0;
+  padding: 0;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  border: 2px groove #eeede0;
+  font-weight: bold;
+}
+.saga-machine .items-header > * {
+  font-size: 14px;
+  text-align: center;
+}
+.saga-machine .items-header .item-name {
+  font-weight: bold;
+  padding-left: 5px;
+  text-align: left;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.saga-machine .items-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  color: #444;
+}
+.saga-machine .items-list .item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.saga-machine .items-list .item-name {
+  -webkit-box-flex: 2;
+  -ms-flex: 2;
+  flex: 2;
+  margin: 0;
+  overflow: hidden;
+  font-size: 13px;
+  text-align: left;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.saga-machine .items-list .item-name h3, .saga-machine .items-list .item-name h4 {
+  margin: 0;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+.saga-machine .items-list .item-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 100px;
+  flex: 0 0 100px;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+.saga-machine .items-list .item-controls a {
+  font-size: 12px;
+  text-align: center;
+  margin: 0 6px;
+}
+.saga-machine .items-list .item {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0 2px;
+  border-bottom: 1px solid #c9c7b8;
+}
+.saga-machine .items-list .item:last-child {
+  border-bottom: none;
+}
+.saga-machine .items-list .item .item-name {
+  color: #191813;
+}
+.saga-machine .items-list .item .item-name .item-image {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 30px;
+  flex: 0 0 30px;
+  height: 30px;
+  background-size: 30px;
+  border: none;
+  margin-right: 5px;
+}
+.saga-machine .items-list .item-prop {
+  text-align: center;
+  border-left: 1px solid #c9c7b8;
+  border-right: 1px solid #c9c7b8;
+  font-size: 12px;
+}
+.saga-machine .items-list .items-header {
+  height: 28px;
+  margin: 2px 0;
+  padding: 0;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  border: 2px groove #eeede0;
+  font-weight: bold;
+}
+.saga-machine .items-list .items-header > * {
+  font-size: 12px;
+  text-align: center;
+}
+.saga-machine .items-list .items-header .item-name {
+  padding-left: 5px;
+  text-align: left;
+}
+.saga-machine .item-formula {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 200px;
+  flex: 0 0 200px;
+  padding: 0 8px;
+}
+.saga-machine .effects .item .effect-source,
+.saga-machine .effects .item .effect-duration,
+.saga-machine .effects .item .effect-controls {
+  text-align: center;
+  border-left: 1px solid #c9c7b8;
+  border-right: 1px solid #c9c7b8;
+  font-size: 12px;
+}
+.saga-machine .effects .item .effect-controls {
+  border: none;
 }
