@@ -1,0 +1,43 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <div class="item-box">
+        <label class="item-label">Name</label>
+        <input class="item-input" type="text" name="name" value="{{ data.name }}" />
+    </div>
+    
+    <div class="item-box">
+        <label class="item-label">Description</label>
+        <input class="item-input" type="text" name="system.description" value="{{ data.system.description }}" />
+    </div>
+    
+    <div class="item-box">
+        <label class="item-label">Specialized</label>
+        <input class="item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
+    </div>
+    
+    <div class="item-box">
+        <label class="item-label">Specialization</label>
+        <input class="item-input" type="text" name="system.specialization" value="{{ data.system.specialization }}" />
+    </div>
+    
+    <div class="item-box">
+        <label class="item-label">Rank</label>
+        <input class="item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
+    </div>
+
+	<div class="item-box">
+		<label class="item-label">Default Stat</label>
+		<select class="item-input" name="system.default">
+			{{#select data.system.default}}
+				<option value="" data-val="0">--</option>
+				<option value="strength">Strength</option>
+				<option value="dexterity">Dexterity</option>
+				<option value="speed">Speed</option>
+				<option value="endurance">Endurance</option>
+				<option value="intelligence">Intelligence</option>
+				<option value="perception">Perception</option>
+				<option value="charisma">Charisma</option>
+				<option value="determination">Determination</option>
+			{{/select}}
+		</select>
+	</div>
+</form>

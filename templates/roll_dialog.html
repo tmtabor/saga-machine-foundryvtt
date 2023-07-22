@@ -1,0 +1,52 @@
+<form class="flexcol {{cssClass}}" autocomplete="off">
+
+	<div class="dialog-box">
+		<label>Stat</label>
+		<select class="dialog-select" name="stat">
+			{{#select stat}}
+				<option value="" data-val="0">--</option>
+				<option value="strength" data-val="{{ data.system.stats.strength.value }}">Strength</option>
+				<option value="dexterity" data-val="{{ data.system.stats.dexterity.value }}">Dexterity</option>
+				<option value="speed" data-val="{{ data.system.stats.speed.value }}">Speed</option>
+				<option value="endurance" data-val="{{ data.system.stats.endurance.value }}">Endurance</option>
+				<option value="intelligence" data-val="{{ data.system.stats.intelligence.value }}">Intelligence</option>
+				<option value="perception" data-val="{{ data.system.stats.perception.value }}">Perception</option>
+				<option value="charisma" data-val="{{ data.system.stats.charisma.value }}">Charisma</option>
+				<option value="determination" data-val="{{ data.system.stats.determination.value }}">Determination</option>
+			{{/select}}
+		</select>
+	</div>
+	
+	<div class="dialog-box">
+		<label>Skill</label>
+		<select class="dialog-select" name="skill">
+			<option value="" data-val="0">--</option>
+			{{#select skill}}
+				{{#each data.system.skills as |sk|}}
+					<option data-id="{{ sk._id }}" value="{{ sk.system.full_name }}" data-val="{{ sk.system.rank }}">{{ sk.system.full_name }}</option>
+				{{/each}}
+			{{/select}}
+		</select>
+	</div>
+	
+	<div class="dialog-box">
+		<label>Boons</label>
+		<input class="dialog-input" type="number" name="boons" value="0" step="1" />
+	</div>
+	
+	<div class="dialog-box">
+		<label>Banes</label>
+		<input class="dialog-input" type="number" name="banes" value="0" step="1" />
+	</div>
+	
+	<div class="dialog-box">
+		<label>Modifier</label>
+		<input class="dialog-input" type="number" name="modifier" value="0" step="1" />
+	</div>
+	
+	<div class="dialog-box">
+		<label>TN</label>
+		<input class="dialog-input" type="number" name="tn" value="" step="1" />
+	</div>
+	
+</form>
