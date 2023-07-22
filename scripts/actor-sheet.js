@@ -50,6 +50,11 @@ export class SagaMachineActorSheet extends ActorSheet {
         return -1;
     });
 
+      context.data.system.ambitions = context.data.items.filter( item => item.type === 'ambition').sort((a, b) =>  {
+        if ( a.system.type > b.system.type ) return 1;
+        return -1;
+    });
+
     return context;
   }
 

@@ -25,6 +25,9 @@ export class SagaMachineActor extends Actor {
       const encumbrance = this.system.stats.strength.value;
       await this.update({'system.scores.encumbrance.value': encumbrance});
 
+      const unspent_experiences = this.system.experiences.total - this.system.experiences.spent;
+      await this.update({'system.experiences.unspent': unspent_experiences});
+
   //   // this.data.data.groups = this.data.data.groups || {};
   //   // this.data.data.attributes = this.data.data.attributes || {};
   }

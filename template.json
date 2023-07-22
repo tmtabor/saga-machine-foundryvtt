@@ -82,11 +82,12 @@
       "skills": [],
       "traits": [],
       "consequences": [],
-      "equipment": []
+      "equipment": [],
+      "notes": ""
     },
     "pc": {
       "templates": ["stats", "scores", "skills", "traits", "consequences", "equipment"],
-      "ambitions": {},
+      "ambitions": [],
       "experiences": {
         "total": 0,
         "spent": 0,
@@ -100,7 +101,7 @@
     }
   },
   "Item": {
-    "types": ["skill", "trait", "consequence", "item"],
+    "types": ["skill", "trait", "consequence", "item", "ambition"],
     "templates": {
       "basics": {
         "full_name": "",
@@ -110,6 +111,9 @@
         "ranked": false,
         "rank": 0
       }
+    },
+    "ambition": {
+      "type": ""
     },
     "skill": {
       "templates": ["basics"],

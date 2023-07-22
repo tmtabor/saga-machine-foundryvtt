@@ -421,3 +421,16 @@
 .saga-machine .effects .item .effect-controls {
   border: none;
 }
+
+.saga-machine .character-notes {
+  height: fit-content;
+}
+
+.saga-machine .character-notes > .editor {
+  min-height: 200px;
+}
+
+.saga-machine .character-notes > .editor > .tox.tox-tinymce {
+  height: 100%;
+  min-height: 200px;
+}

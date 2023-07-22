@@ -1,0 +1,17 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <div class="item-box">
+        <label class="item-label">Name</label>
+        <input class="item-input" type="text" name="name" value="{{ data.name }}" />
+    </div>
+    
+	<div class="item-box">
+		<label class="item-label">Type</label>
+		<select class="item-input" name="system.type">
+			{{#select data.system.type}}
+				<option value="Long-term">Long-term</option>
+				<option value="Short-term">Short-term</option>
+				<option value="Party">Party</option>
+			{{/select}}
+		</select>
+	</div>
+</form>

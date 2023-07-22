@@ -93,7 +93,48 @@
     <section class="sheet-body">
     
     	<div class="tab basics" data-group="primary" data-tab="basics">
-    		BASICS
+    		<div class="grid grid-2col">
+                <div class="flex-group-left">
+                    <h3>Ambitions</h3>
+                    <ol class="items-list">
+                        <li class="item flexrow items-header">
+                            <div class="item-name">Ambition</div>
+                            <div class="item-properties">Type</div>
+                            <div class="item-controls">
+                                <a class="item-control item-create" title="Create item" data-type="ambition"><i class="fas fa-plus"></i> Add Ambition</a>
+                            </div>
+                        </li>
+
+                        {{#each data.system.ambitions as |ambition|}}
+                            <li class="item flexrow" data-id="{{ ambition._id }}">
+                                <h4 class="item-name">{{ ambition.name }}</h4>
+                                <div class="item-properties">{{ ambition.system.type }}</div>
+                                <div class="item-controls">
+                                    <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                                    <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                                </div>
+                            </li>
+                        {{/each}}
+                    </ol>
+                </div>
+
+                <div class="flex-group-left">
+                    <h3>Experiences</h3>
+                    <div class="experiences grid grid-2col">
+                        <label>Total</label>
+                        <input class="experiences-input" type="number" name="system.experiences.total" value="{{ data.system.experiences.total }}" step="1" />
+                        <label>Spent</label>
+                        <input class="experiences-input" type="number" name="system.experiences.spent" value="{{ data.system.experiences.spent }}" step="1" />
+                        <label>Unspent</label>
+                        <input class="experiences-input" type="number" name="system.experiences.unspent" value="{{ data.system.experiences.unspent }}" step="1" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="character-notes">
+                <h3>Notes</h3>
+                {{editor data.system.notes target="system.notes" button=true owner=owner editable=editable}}
+            </div>
     	</div>
     
 		<div class="tab skills" data-group="primary" data-tab="skills">
