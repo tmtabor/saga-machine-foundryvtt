@@ -101,7 +101,7 @@
     }
   },
   "Item": {
-    "types": ["skill", "trait", "consequence", "item", "ambition"],
+    "types": ["skill", "trait", "weakness", "origin", "path","consequence", "item", "ambition"],
     "templates": {
       "basics": {
         "full_name": "",
@@ -110,6 +110,11 @@
         "specialized": false,
         "ranked": false,
         "rank": 0
+      },
+      "trait": {
+        "rank": 1,
+        "requirements": [],
+        "cost": 0
       }
     },
     "ambition": {
@@ -121,10 +126,24 @@
       "ranked": true
     },
     "trait": {
+      "templates": ["basics", "trait"]
+    },
+    "weakness": {
+      "templates": ["basics", "trait"]
+    },
+    "origin": {
+      "templates": ["basics", "trait"],
+      "stats": {},
+      "skills": {},
+      "traits": {},
+      "equipment": {}
+    },
+    "path": {
       "templates": ["basics"],
-      "rank": 1,
-      "requirements": [],
-      "cost": 0
+      "stats": {},
+      "skills": {},
+      "traits": {},
+      "equipment": {}
     },
     "consequence": {
       "templates": ["basics"],

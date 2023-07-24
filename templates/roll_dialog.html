@@ -15,6 +15,15 @@
 				<option value="determination" data-val="{{ data.system.stats.determination.value }}">Determination</option>
 			{{/select}}
 		</select>
+        or
+		<select class="dialog-select" name="score">
+			{{#select score}}
+				<option value="" data-val="0">--</option>
+				<option value="1d10" data-val="0">1d10</option>
+				<option value="defense" data-val="{{ data.system.scores.defense.value }}">Defense</option>
+				<option value="willpower" data-val="{{ data.system.scores.willpower.value }}">Willpower</option>
+			{{/select}}
+		</select>
 	</div>
 	
 	<div class="dialog-box">

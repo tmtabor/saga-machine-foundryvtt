@@ -1,0 +1,41 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <div class="item-box">
+        <label class="item-label">Name</label>
+        <input class="item-input" type="text" name="name" value="{{ data.name }}" />
+    </div>
+    
+    <div class="item-box">
+        <label class="item-label">Description</label>
+        <input class="item-input" type="text" name="system.description" value="{{ data.system.description }}" />
+    </div>
+    
+    <div class="item-box">
+        <label class="item-label">Requirements</label>
+        <input class="item-input" type="text" name="system.requirements" value="{{ data.system.requirements }}" />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Cost</label>
+        <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Stats</label>
+        <input class="item-input" type="text" name="system.stats" value="{{ data.system.stats }}" />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Skills</label>
+        <input class="item-input" type="text" name="system.skills" value="{{ data.system.skills }}" />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Traits</label>
+        <input class="item-input" type="text" name="system.traits" value="{{ data.system.traits }}" />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Equipment</label>
+        <input class="item-input" type="text" name="system.equipment" value="{{ data.system.equipment }}" />
+    </div>
+</form>

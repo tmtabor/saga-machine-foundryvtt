@@ -3,9 +3,28 @@
     {{!-- Sheet Header --}}
     <header class="sheet-header">
 		<img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
-		<div class="header-fields">
+		<ol class="header-fields">
 			<h1 class="charname"><input name="name" type="text" value="{{ data.name }}" placeholder="Name"/></h1>
-			<div class="resources grid grid-2col">{{!-- resources here --}}</div>                      
+			<ol class="origins grid grid-4col">
+				{{#each data.system.origins as |origin|}}
+					<li class="item flexrow" data-id="{{ origin._id }}">
+						<h4 class="item-name">{{ origin.system.full_name }}</h4>
+						<div class="item-controls">
+							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+						</div>
+					</li>
+				{{/each}}
+				{{#each data.system.paths as |path|}}
+					<li class="item flexrow" data-id="{{ path._id }}">
+						<h4 class="item-name">{{ path.system.full_name }}</h4>
+						<div class="item-controls">
+							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+						</div>
+					</li>
+				{{/each}}
+            </ol>
 		</div>
     </header>
     
@@ -54,11 +73,11 @@
 				</div>
 			</div>
 			<div class="score flex-group-center">
-				<label class="score-label">Defense</label>
+				<label class="score-label rollable" data-score="defense">Defense</label>
 				<input class="score-input" type="number" name="system.scores.defense.value" value="{{ data.system.scores.defense.value }}" step="1" />
 			</div> 
 			<div class="score flex-group-center">
-				<label class="score-label">Willpower</label>
+				<label class="score-label rollable" data-score="willpower">Willpower</label>
 				<input class="score-input" type="number" name="system.scores.willpower.value" value="{{ data.system.scores.willpower.value }}" step="1" />
 			</div>
 			<div class="score flex-group-center">
@@ -163,6 +182,7 @@
 		</div>
 	
 		<div class="tab traits" data-group="primary" data-tab="traits">
+            <h3>Traits</h3>
 			<ol class="items-list">
 				<li class="item flexrow items-header">
 					<div class="item-name">Name</div>
@@ -174,6 +194,26 @@
 				{{#each data.system.traits as |trait|}}
 					<li class="item flexrow" data-id="{{ trait._id }}">
 						<h4 class="item-name">{{ trait.system.full_name }}</h4>
+						<div class="item-controls">
+							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+						</div>
+					</li>
+				{{/each}}
+			</ol>
+
+            <h3>Weaknesses</h3>
+			<ol class="items-list">
+				<li class="item flexrow items-header">
+					<div class="item-name">Name</div>
+					<div class="item-controls">
+						<a class="item-control item-create" title="Create item" data-type="weakness"><i class="fas fa-plus"></i> Add Weakness</a>
+					</div>
+				</li>
+
+				{{#each data.system.weaknesses as |weakness|}}
+					<li class="item flexrow" data-id="{{ weakness._id }}">
+						<h4 class="item-name">{{ weakness.system.full_name }}</h4>
 						<div class="item-controls">
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
 							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
