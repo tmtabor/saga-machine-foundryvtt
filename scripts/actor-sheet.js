@@ -109,12 +109,6 @@ export class SagaMachineActorSheet extends ActorSheet {
 
 			const update = { _id: box.data("id"), 'system.rank': Number(ev.currentTarget.value) };
 			this.actor.updateEmbeddedDocuments("Item", [update] );
-
-
-			//setTimeout(() => {
-			//	item.system.rank = Number(ev.currentTarget.value)
-			//	ev.currentTarget.value = item.system.rank;
-			//}, 100);
 		});
 
 
@@ -143,11 +137,11 @@ export class SagaMachineActorSheet extends ActorSheet {
 		return word.charAt(0).toUpperCase() + word.slice(1);
 	}
 
-	_test_syntax(stat, skill, tn) {
+	_test_syntax(stat, skill, tn, append_test=true) {
 		const stat_label = stat ? this._capitalize(stat) : '1d10';
 		const skill_label = skill ? `/${skill}` : '';
 		const tn_label = tn ? `-${tn}` : '';
-		return stat_label + skill_label + tn_label;
+		return stat_label + skill_label + tn_label + (append_test ? ' Test' : '');
 	}
 
 	_dice_roll(boons, banes) {
@@ -234,18 +228,21 @@ export class SagaMachineActorSheet extends ActorSheet {
 					label: "Make Test",
 					callback: async (html) => {
 						const stat = html.find('select[name=stat] > option:selected').data('val');
+						const score = html.find('select[name=score] > option:selected').data('val');
 						const skill = html.find('select[name=skill] > option:selected').data('val');
 						const modifier = html.find('input[name=modifier]').val();
 						const boons = html.find('input[name=boons]').val();
 						const banes = html.find('input[name=banes]').val();
 						const tn = html.find('input[name=tn]').val();
+						const stat_label = html.find('select[name=stat]').val() || html.find('select[name=score]').val();
 
-						const label = this._test_syntax(html.find('select[name=stat]').val(), html.find('select[name=skill]').val(), tn) + ' Test';
+						const label = this._test_syntax(stat_label, html.find('select[name=skill]').val(), tn, true);
 						const dice = this._dice_roll(boons, banes);
 						let roll = await new Roll(dice, this.actor.system);
 						let results = await roll.evaluate();
 						let pairs = this._make_pairs(results, boons, banes);
-						let total = pairs.total + Number(stat) + Number(skill) + Number(modifier);
+						let total = pairs.total + Number(stat || score) + Number(skill) + Number(modifier);
+						if (stat_label === 'defense' || stat_label === 'willpower') this._update_defense(pairs.total)
 						const margin = this._calc_margin(Number(tn), total);
 						const pairs_message = pairs.pairs ? `<br><strong>Pair of ${pairs.pairs}'s!</strong>` : '';
 						let message = await results.toMessage({
@@ -256,7 +253,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 							<div class="dice-roll">
 								<div class="dice-result">
 									<div class="dice-formula">
-										${results.formula} + <span title="Stat">${stat}</span> + <span title="Skill">${skill}</span> + <span title="Modifier">${modifier}</span> 
+										${results.formula} + <span title="Stat">${stat || score}</span> + <span title="Skill">${skill}</span> + <span title="Modifier">${modifier}</span> 
 										${pairs_message}
 									</div>
 									<div class="dice-tooltip">
@@ -283,6 +280,11 @@ export class SagaMachineActorSheet extends ActorSheet {
 			},
 			default: "roll"
 		}).render(true);
+	}
+
+	_update_defense(die) {
+		this.actor.update({'system.scores.defense.tn': this.actor.data.system.scores.defense.value + die});
+		this.actor.update({'system.scores.willpower.tn': this.actor.data.system.scores.willpower.value + die});
 	}
 
 	async _onItemCreate(event) {
