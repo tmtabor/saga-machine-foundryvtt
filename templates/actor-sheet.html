@@ -226,6 +226,21 @@
 		</div>
 		
 		<div class="tab combat" data-group="primary" data-tab="combat">
+            <h3>Attacks</h3>
+			<ol class="items-list">
+				<li class="item flexrow items-header">
+					<div class="item-name">Weapon</div>
+					<div class="item-name">Properties</div>
+				</li>
+
+				{{#each data.system.attacks as |attack|}}
+					<li class="item flexrow" data-id="{{ attack._id }}">
+						<h4 class="item-name rollable" data-stat="{{ attack.system.attack.stat }}" data-skill="{{ attack.system.attack.skill }}" data-tn="{{ attack.system.attack.targets }}" data-damage="{{#if attack.system.attack.damage_str}}{{ ../data.system.stats.strength.value }}+{{/if}}{{ attack.system.attack.damage }}">{{ attack.system.full_name }}</h4>
+						<div class="item-name">{{ attack.system.properties }}</div>
+					</li>
+				{{/each}}
+			</ol>
+
 			<h3>Consequences</h3>
 			<ol class="items-list">
 				<li class="item flexrow items-header">

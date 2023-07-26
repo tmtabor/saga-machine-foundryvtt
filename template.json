@@ -153,7 +153,17 @@
       "templates": ["basics"],
       "quantity": 1,
       "properties": [],
-      "groups": [],
+      "group": "",
+      "attack": {
+        "has_attack": false,
+        "damage": 0,
+        "damage_str": false,
+        "stat": "strength",
+        "skill": "Melee",
+        "targets": "Defense"
+      },
+      "carried": true,
+      "equipped": false,
       "cost": 0
     }
   }

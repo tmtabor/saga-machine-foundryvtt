@@ -55,7 +55,24 @@
 	
 	<div class="dialog-box">
 		<label>TN</label>
-		<input class="dialog-input" type="number" name="tn" value="" step="1" />
+		<input class="dialog-input" type="text" name="tn" value="{{ tn }}" list="tn-targets" />
+        <datalist id="tn-targets">
+            <option value="Defense">vs. Defense</option>
+            <option value="Willpower">vs. Willpower</option>
+            <option value="6">Trivial (TN 6)</option>
+            <option value="8">Easy (TN 8)</option>
+            <option value="10">Average (TN 10)</option>
+            <option value="12">Difficult (TN 12)</option>
+            <option value="14">Daunting (TN 14)</option>
+            <option value="16">Desperate (TN 16)</option>
+            <option value="18">Absurd (TN 18)</option>
+            <option value="20">Impossible (TN 20)</option>
+        </datalist>
+	</div>
+
+    <div class="dialog-box">
+		<label>Damage</label>
+		<input class="dialog-input" type="text" name="damage" value="{{ damage }}" />
 	</div>
 	
 </form>

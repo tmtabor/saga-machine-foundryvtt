@@ -65,6 +65,11 @@ export class SagaMachineActorSheet extends ActorSheet {
 			return -1;
 		});
 
+		context.data.system.attacks = context.data.items.filter( item => item.type === 'item' && item.system.attack.has_attack).sort((a, b) =>  {
+			if ( a.name > b.name ) return 1;
+			return -1;
+		});
+
 		context.data.system.ambitions = context.data.items.filter( item => item.type === 'ambition').sort((a, b) =>  {
 			if ( a.system.type > b.system.type ) return 1;
 			return -1;
@@ -140,7 +145,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	_test_syntax(stat, skill, tn, append_test=true) {
 		const stat_label = stat ? this._capitalize(stat) : '1d10';
 		const skill_label = skill ? `/${skill}` : '';
-		const tn_label = tn ? `-${tn}` : '';
+		const tn_label = tn ? (isNaN(tn) ? ` vs. ${tn}` : `-${tn}`) : '';
 		return stat_label + skill_label + tn_label + (append_test ? ' Test' : '');
 	}
 
@@ -199,7 +204,24 @@ export class SagaMachineActorSheet extends ActorSheet {
 		}
 	}
 
-	_calc_margin(tn, total) {
+	_calc_damage(margin, damage_str) {
+		const damage = Function(`'use strict'; return (${damage_str})`)();
+		return margin + damage;
+	}
+
+	_lookup_tn(raw_tn) {
+		if (!isNaN(raw_tn)) return Number(raw_tn);
+
+		const is_defense = raw_tn.toLowerCase() === 'defense';
+		const is_willpower = raw_tn.toLowerCase() === 'willpower';
+		if (!is_defense && !is_willpower) return false;
+
+		const scores = game?.user?.targets?.values()?.next()?.value?.actor?.system?.scores;
+		if (!scores) return false;
+		return is_defense ? scores.defense.tn : scores.willpower.tn;
+	}
+
+	_calc_margin(tn, total, raw_damage) {
 		// Handle unknown TN
 		if (!tn) return {
 			message: ''
@@ -209,11 +231,24 @@ export class SagaMachineActorSheet extends ActorSheet {
 		const success = margin >= 0;
 		margin = Math.abs(margin);
 		const critical = margin >= tn || total < tn/2;
-		const message = `<div><small>${critical ? 'Critical ' : ''}${success ? 'Success' : 'Failure'}! Margin ${margin}</small></div>`;
+
+		let damage = null;
+		let success_message = 'Success';
+		let failure_message = 'Failure';
+		let extra_message = `Margin ${margin}`;
+		if (success && raw_damage) {
+			damage = this._calc_damage(margin, raw_damage);
+			success_message = 'Hit';
+			failure_message = 'Miss';
+			extra_message = `Damage ${damage}`;
+		}
+
+		const message = `<div><small>${critical ? 'Critical ' : ''}${success ? success_message : failure_message}! ${extra_message}</small></div>`;
 		return {
 			success: success,
 			critical: critical,
 			margin: margin,
+			damage: damage,
 			message: message
 		};
 	}
@@ -234,6 +269,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 						const boons = html.find('input[name=boons]').val();
 						const banes = html.find('input[name=banes]').val();
 						const tn = html.find('input[name=tn]').val();
+						const damage = html.find('input[name=damage]').val();
 						const stat_label = html.find('select[name=stat]').val() || html.find('select[name=score]').val();
 
 						const label = this._test_syntax(stat_label, html.find('select[name=skill]').val(), tn, true);
@@ -242,8 +278,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 						let results = await roll.evaluate();
 						let pairs = this._make_pairs(results, boons, banes);
 						let total = pairs.total + Number(stat || score) + Number(skill) + Number(modifier);
-						if (stat_label === 'defense' || stat_label === 'willpower') this._update_defense(pairs.total)
-						const margin = this._calc_margin(Number(tn), total);
+						if (stat_label === 'defense' || stat_label === 'willpower') this._update_defense(pairs.total);
+						const margin = this._calc_margin(this._lookup_tn(tn), total, damage);
 						const pairs_message = pairs.pairs ? `<br><strong>Pair of ${pairs.pairs}'s!</strong>` : '';
 						let message = await results.toMessage({
 							speaker: ChatMessage.getSpeaker({ actor: this.actor }),

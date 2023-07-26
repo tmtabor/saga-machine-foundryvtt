@@ -40,13 +40,60 @@
     </div>
     
     <div class="item-box">
-        <label class="item-label">Groups</label>
-        <input class="item-input" type="text" name="system.groups" value="{{ data.system.groups }}" />
+        <label class="item-label">Group</label>
+        <input class="item-input" type="text" name="system.group" value="{{ data.system.group }}" />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Equipped</label>
+        <input class="item-input" type="checkbox" name="system.equipped" {{ checked data.system.equipped }} />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Carried</label>
+        <input class="item-input" type="checkbox" name="system.carried" {{ checked data.system.carried }} />
     </div>
     
     <div class="item-box">
         <label class="item-label">Cost</label>
         <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
     </div>
+
+    <div class="item-box">
+        <label class="item-label">Has Attack</label>
+        <input class="item-input" type="checkbox" name="system.attack.has_attack" {{ checked data.system.attack.has_attack }} />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Damage</label>
+        <input class="item-input" type="number" name="system.attack.damage" value="{{ data.system.attack.damage }}" step="1" />
+    </div>
+
+    <div class="item-box">
+        <label class="item-label">Strength Adds</label>
+        <input class="item-input" type="checkbox" name="system.attack.damage_str" {{ checked data.system.attack.damage_str }} />
+    </div>
+
+	<div class="item-box">
+		<label class="item-label">Attack Stat</label>
+		<select class="item-input" name="system.attack.stat">
+			{{#select data.system.attack.stat}}
+				<option value="">--</option>
+				<option value="strength">Strength</option>
+				<option value="dexterity">Dexterity</option>
+				<option value="speed">Speed</option>
+				<option value="endurance">Endurance</option>
+				<option value="intelligence">Intelligence</option>
+				<option value="perception">Perception</option>
+				<option value="charisma">Charisma</option>
+				<option value="determination">Determination</option>
+			{{/select}}
+		</select>
+	</div>
+
+	<div class="item-box">
+		<label>Attack Skill</label>
+		<input class="item-input" type="text" name="system.attack.skill" value="{{ data.system.attack.skill }}" />
+	</div>
       
 </form>
