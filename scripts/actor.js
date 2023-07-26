@@ -13,7 +13,7 @@ export class SagaMachineActor extends Actor {
       await this.update({'system.scores.defense.value': defense});
       
       const health = this.system.stats.strength.value + this.system.stats.endurance.value;
-      await this.update({'system.scores.health.value': health});
+      await this.update({'system.scores.health.max': health});
       
       const move = Math.floor((this.system.stats.speed.value + this.system.stats.endurance.value)/2);
       await this.update({'system.scores.move.value': move});
@@ -28,8 +28,19 @@ export class SagaMachineActor extends Actor {
       const unspent_experiences = this.system.experiences.total - this.system.experiences.spent;
       await this.update({'system.experiences.unspent': unspent_experiences});
 
+      const wound_total = this.wound_total();
+      await this.update({'system.scores.health.value': wound_total});
+
   //   // this.data.data.groups = this.data.data.groups || {};
   //   // this.data.data.attributes = this.data.data.attributes || {};
+  }
+
+  wound_total() {
+      const wounds = this.items.filter( item => item.type === 'consequence' &&
+          (item.name.toLowerCase() === 'wound' ||
+           item.name.toLowerCase() === 'grave wound' ||
+           item.name.toLowerCase() === 'fatigue'));
+      return wounds.map(a => a.system.rank).reduce((a, b) => a + b, 0);
   }
   
   median(arr) {

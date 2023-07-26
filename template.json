@@ -4,44 +4,28 @@
     "templates": {
       "stats": {
         "strength": {
-          "min": 0,
-          "value": 5,
-          "max": 30
+          "value": 5
         },
         "dexterity": {
-          "min": 0,
-          "value": 5,
-          "max": 30
+          "value": 5
         },
         "speed": {
-          "min": 0,
-          "value": 5,
-          "max": 30
+          "value": 5
         },
         "endurance": {
-          "min": 0,
-          "value": 5,
-          "max": 30
+          "value": 5
         },
         "intelligence": {
-          "min": 0,
-          "value": 5,
-          "max": 30
+          "value": 5
         },
         "perception": {
-          "min": 0,
-          "value": 5,
-          "max": 30
+          "value": 5
         },
         "charisma": {
-          "min": 0,
-          "value": 5,
-          "max": 30
+          "value": 5
         },
         "determination": {
-          "min": 0,
-          "value": 5,
-          "max": 30
+          "value": 5
         }
       },
       "scores": {
@@ -61,12 +45,12 @@
       	},
       	"health": {
       	  "value": 0,
-      	  "total": 0, 
+      	  "max": 0,
       	  "custom": false
       	},
       	"luck": {
           "value": 5,
-          "starting": 5,
+          "max": 5,
           "custom": false
         },
         "move": {

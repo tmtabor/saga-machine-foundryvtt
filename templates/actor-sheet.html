@@ -69,7 +69,7 @@
 				<label class="score-label">Luck</label>
 				<div class="flexrow">
 					<input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" /> &nbsp;/&nbsp;
-					<input class="score-input" type="number" name="system.scores.luck.starting" value="{{ data.system.scores.luck.starting }}" step="1" />
+					<input class="score-input" type="number" name="system.scores.luck.max" value="{{ data.system.scores.luck.max }}" step="1" />
 				</div>
 			</div>
 			<div class="score flex-group-center">
@@ -88,7 +88,8 @@
 			</div>
 			<div class="score flex-group-center">
 				<label class="score-label">Health</label>
-				<input class="score-input" type="number" name="system.scores.health.value" value="{{ data.system.scores.health.value }}" step="1" />
+				<input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" />
+                <div class="score-secondary" name="system.scores.health.value">Wounds {{ data.system.scores.health.value }}</div>
 			</div>
 			<div class="score flex-group-center">
 				<label class="score-label">Move</label>
