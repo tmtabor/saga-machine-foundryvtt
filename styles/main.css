@@ -280,7 +280,7 @@
   height: 100%;
 }
 .saga-machine .tox .tox-editor-container {
-  background: #fff;
+  /*background: #fff;*/
 }
 .saga-machine .tox .tox-edit-area {
   padding: 0 8px;
@@ -437,4 +437,18 @@
 
 .saga-machine .hidden {
   display: none;
+}
+
+.saga-machine .toggle-check:checked~.toggle-visible {
+  visibility: visible;
+}
+
+.saga-machine .toggle-visible {
+  visibility: hidden;
+}
+
+.saga-machine textarea.item-input {
+  min-height: 100px;
+  height: auto;
+  resize: none;
 }
