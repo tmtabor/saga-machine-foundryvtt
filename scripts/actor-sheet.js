@@ -315,7 +315,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 				}
 			},
 			default: "roll"
-		}).render(true);
+		}).render(true, {width: 450});
 	}
 
 	_update_defense(die) {

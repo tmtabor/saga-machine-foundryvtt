@@ -1,76 +1,80 @@
 <form class="flexcol {{cssClass}}" autocomplete="off">
+    <fieldset>
+        <legend>Test Basics</legend>
 
-	<div class="dialog-box">
-		<label>Stat</label>
-		<select class="dialog-select" name="stat">
-			{{#select stat}}
-				<option value="" data-val="0">--</option>
-				<option value="strength" data-val="{{ data.system.stats.strength.value }}">Strength</option>
-				<option value="dexterity" data-val="{{ data.system.stats.dexterity.value }}">Dexterity</option>
-				<option value="speed" data-val="{{ data.system.stats.speed.value }}">Speed</option>
-				<option value="endurance" data-val="{{ data.system.stats.endurance.value }}">Endurance</option>
-				<option value="intelligence" data-val="{{ data.system.stats.intelligence.value }}">Intelligence</option>
-				<option value="perception" data-val="{{ data.system.stats.perception.value }}">Perception</option>
-				<option value="charisma" data-val="{{ data.system.stats.charisma.value }}">Charisma</option>
-				<option value="determination" data-val="{{ data.system.stats.determination.value }}">Determination</option>
-			{{/select}}
-		</select>
-        or
-		<select class="dialog-select" name="score">
-			{{#select score}}
-				<option value="" data-val="0">--</option>
-				<option value="1d10" data-val="0">1d10</option>
-				<option value="defense" data-val="{{ data.system.scores.defense.value }}">Defense</option>
-				<option value="willpower" data-val="{{ data.system.scores.willpower.value }}">Willpower</option>
-			{{/select}}
-		</select>
-	</div>
-	
-	<div class="dialog-box">
-		<label>Skill</label>
-		<select class="dialog-select" name="skill">
-			<option value="" data-val="0">--</option>
-			{{#select skill}}
-				{{#each data.system.skills as |sk|}}
-					<option data-id="{{ sk._id }}" value="{{ sk.system.full_name }}" data-val="{{ sk.system.rank }}">{{ sk.system.full_name }}</option>
-				{{/each}}
-			{{/select}}
-		</select>
-	</div>
-	
-	<div class="dialog-box">
-		<label>Boons</label>
-		<input class="dialog-input" type="number" name="boons" value="0" step="1" />
-	</div>
-	
-	<div class="dialog-box">
-		<label>Banes</label>
-		<input class="dialog-input" type="number" name="banes" value="0" step="1" />
-	</div>
-	
-	<div class="dialog-box">
-		<label>Modifier</label>
-		<input class="dialog-input" type="number" name="modifier" value="0" step="1" />
-	</div>
-	
-	<div class="dialog-box">
-		<label>TN</label>
-		<input class="dialog-input" type="text" name="tn" value="{{ tn }}" list="tn-targets" />
-        <datalist id="tn-targets">
-            <option value="Defense">vs. Defense</option>
-            <option value="Willpower">vs. Willpower</option>
-            <option value="6">Trivial (TN 6)</option>
-            <option value="8">Easy (TN 8)</option>
-            <option value="10">Average (TN 10)</option>
-            <option value="12">Difficult (TN 12)</option>
-            <option value="14">Daunting (TN 14)</option>
-            <option value="16">Desperate (TN 16)</option>
-            <option value="18">Absurd (TN 18)</option>
-            <option value="20">Impossible (TN 20)</option>
-        </datalist>
-	</div>
+        <div class="grid grid-6col dialog-box">
+            <label>Stat</label>
+            <select class="grid-start-2 grid-span-2 dialog-select" name="stat">
+                {{#select stat}}
+                    <option value="" data-val="0">--</option>
+                    <option value="strength" data-val="{{ data.system.stats.strength.value }}">Strength</option>
+                    <option value="dexterity" data-val="{{ data.system.stats.dexterity.value }}">Dexterity</option>
+                    <option value="speed" data-val="{{ data.system.stats.speed.value }}">Speed</option>
+                    <option value="endurance" data-val="{{ data.system.stats.endurance.value }}">Endurance</option>
+                    <option value="intelligence" data-val="{{ data.system.stats.intelligence.value }}">Intelligence</option>
+                    <option value="perception" data-val="{{ data.system.stats.perception.value }}">Perception</option>
+                    <option value="charisma" data-val="{{ data.system.stats.charisma.value }}">Charisma</option>
+                    <option value="determination" data-val="{{ data.system.stats.determination.value }}">Determination</option>
+                {{/select}}
+            </select>
+            <label>or Score</label>
+            <select class="grid-start-5 grid-span-2 dialog-select" name="score">
+                {{#select score}}
+                    <option value="" data-val="0">--</option>
+                    <option value="1d10" data-val="0">1d10</option>
+                    <option value="defense" data-val="{{ data.system.scores.defense.value }}">Defense</option>
+                    <option value="willpower" data-val="{{ data.system.scores.willpower.value }}">Willpower</option>
+                {{/select}}
+            </select>
+        </div>
 
-    <div class="dialog-box">
+        <div class="grid grid-6col dialog-box">
+            <label>Skill</label>
+            <select class="grid-start-2 grid-span-5 dialog-select" name="skill">
+                <option value="" data-val="0">--</option>
+                {{#select skill}}
+                    {{#each data.system.skills as |sk|}}
+                        <option data-id="{{ sk._id }}" value="{{ sk.system.full_name }}" data-val="{{ sk.system.rank }}">{{ sk.system.full_name }}</option>
+                    {{/each}}
+                {{/select}}
+            </select>
+        </div>
+
+	    <div class="grid grid-6col dialog-box">
+            <label>TN</label>
+            <input class="grid-start-2 grid-span-5 dialog-input" type="text" name="tn" value="{{ tn }}" list="tn-targets" />
+            <datalist id="tn-targets">
+                <option value="Defense">vs. Defense</option>
+                <option value="Willpower">vs. Willpower</option>
+                <option value="6">Trivial (TN 6)</option>
+                <option value="8">Easy (TN 8)</option>
+                <option value="10">Average (TN 10)</option>
+                <option value="12">Difficult (TN 12)</option>
+                <option value="14">Daunting (TN 14)</option>
+                <option value="16">Desperate (TN 16)</option>
+                <option value="18">Absurd (TN 18)</option>
+                <option value="20">Impossible (TN 20)</option>
+            </datalist>
+	    </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Test Modifiers</legend>
+
+        <div class="grid grid-6col dialog-box">
+            <label>Boons</label>
+            <input class="grid-start-2 grid-span-2 dialog-input" type="number" name="boons" value="0" step="1" />
+            <label>Banes</label>
+            <input class="grid-start-5 grid-span-2 dialog-input" type="number" name="banes" value="0" step="1" />
+        </div>
+
+        <div class="grid grid-6col dialog-box">
+            <label>Modifier</label>
+            <input class="grid-start-2 grid-span-5 dialog-input" type="number" name="modifier" value="0" step="1" />
+        </div>
+    </fieldset>
+
+    <div class="dialog-box hidden">
 		<label>Damage</label>
 		<input class="dialog-input" type="text" name="damage" value="{{ damage }}" />
 	</div>
