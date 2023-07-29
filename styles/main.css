@@ -443,8 +443,16 @@
   visibility: visible;
 }
 
+.saga-machine .toggle-check:checked~.toggle-display {
+  display: grid;
+}
+
 .saga-machine .toggle-visible {
   visibility: hidden;
+}
+
+.saga-machine .toggle-display {
+  display: none;
 }
 
 .saga-machine textarea.item-input {

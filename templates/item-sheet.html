@@ -1,99 +1,78 @@
 <form class="{{cssClass}}" autocomplete="off">
-    <div class="item-box">
-        <label class="item-label">Name</label>
-        <input class="item-input" type="text" name="name" value="{{ data.name }}" />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Description</label>
-        <input class="item-input" type="text" name="system.description" value="{{ data.system.description }}" />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Specialized</label>
-        <input class="item-input" type="checkbox" name="system.specialized" {{ checked data.system.specialized }} />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Specialization</label>
-        <input class="item-input" type="text" name="system.specialization" value="{{ data.system.specialization }}" />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Ranked</label>
-        <input class="item-input" type="checkbox" name="system.ranked" {{ checked data.system.ranked }} />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Rank</label>
-        <input class="item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Quantity</label>
-        <input class="item-input" type="number" name="system.quantity" value="{{ data.system.quantity }}" step="1" />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Properties</label>
-        <input class="item-input" type="text" name="system.properties" value="{{ data.system.properties }}" />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Group</label>
-        <input class="item-input" type="text" name="system.group" value="{{ data.system.group }}" />
-    </div>
+    <fieldset>
+        <legend>Item Basics</legend>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Name</label>
+            <input class="grid-start-2 grid-span-3 item-input" type="text" name="name" value="{{ data.name }}" />
+            <label class="item-label">Quantity</label>
+            <input class="item-input" type="number" name="system.quantity" value="{{ data.system.quantity }}" step="1" />
+        </div>
 
-    <div class="item-box">
-        <label class="item-label">Equipped</label>
-        <input class="item-input" type="checkbox" name="system.equipped" {{ checked data.system.equipped }} />
-    </div>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Group</label>
+            <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.group" value="{{ data.system.group }}" />
+        </div>
 
-    <div class="item-box">
-        <label class="item-label">Carried</label>
-        <input class="item-input" type="checkbox" name="system.carried" {{ checked data.system.carried }} />
-    </div>
-    
-    <div class="item-box">
-        <label class="item-label">Cost</label>
-        <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
-    </div>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Properties</label>
+            <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.properties" value="{{ data.system.properties }}" />
+        </div>
 
-    <div class="item-box">
-        <label class="item-label">Has Attack</label>
-        <input class="item-input" type="checkbox" name="system.attack.has_attack" {{ checked data.system.attack.has_attack }} />
-    </div>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Carried</label>
+            <input class="item-input" type="checkbox" name="system.carried" {{ checked data.system.carried }} />
+            <label class="item-label">Equipped</label>
+            <input class="item-input" type="checkbox" name="system.equipped" {{ checked data.system.equipped }} />
+            <label class="item-label">Cost</label>
+            <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
+        </div>
 
-    <div class="item-box">
-        <label class="item-label">Damage</label>
-        <input class="item-input" type="number" name="system.attack.damage" value="{{ data.system.attack.damage }}" step="1" />
-    </div>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Specialized</label>
+            <input class="toggle-check item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
+            <label class="toggle-visible item-label">Specialization</label>
+            <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="text" name="system.specialization" value="{{ data.system.specialization }}" />
+        </div>
 
-    <div class="item-box">
-        <label class="item-label">Strength Adds</label>
-        <input class="item-input" type="checkbox" name="system.attack.damage_str" {{ checked data.system.attack.damage_str }} />
-    </div>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Ranked</label>
+            <input class="toggle-check item-input" type="checkbox" name="system.ranked" {{checked data.system.ranked}} />
+            <label class="toggle-visible item-label">Rank</label>
+            <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
+        </div>
 
-	<div class="item-box">
-		<label class="item-label">Attack Stat</label>
-		<select class="item-input" name="system.attack.stat">
-			{{#select data.system.attack.stat}}
-				<option value="">--</option>
-				<option value="strength">Strength</option>
-				<option value="dexterity">Dexterity</option>
-				<option value="speed">Speed</option>
-				<option value="endurance">Endurance</option>
-				<option value="intelligence">Intelligence</option>
-				<option value="perception">Perception</option>
-				<option value="charisma">Charisma</option>
-				<option value="determination">Determination</option>
-			{{/select}}
-		</select>
-	</div>
+        <div class="item-box">
+            <label class="item-label">Description</label>
+            <textarea class="item-input" type="text" name="system.description">{{ data.system.description }}</textarea>
+        </div>
+    </fieldset>
 
-	<div class="item-box">
-		<label>Attack Skill</label>
-		<input class="item-input" type="text" name="system.attack.skill" value="{{ data.system.attack.skill }}" />
-	</div>
-      
+    <fieldset>
+        <legend>Attack</legend>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Has Attack</label>
+            <input class="toggle-check item-input" type="checkbox" name="system.attack.has_attack" {{ checked data.system.attack.has_attack }} />
+            <label class="toggle-display item-label">Damage</label>
+            <input class="toggle-display item-input" type="number" name="system.attack.damage" value="{{ data.system.attack.damage }}" step="1" />
+            <label class="toggle-display item-label">Strength Adds</label>
+            <input class="toggle-display item-input" type="checkbox" name="system.attack.damage_str" {{ checked data.system.attack.damage_str }} />
+
+            <label class="toggle-display item-label">Attack Stat</label>
+            <select class="toggle-display grid-start-2 grid-span-2 item-input" name="system.attack.stat">
+                {{#select data.system.attack.stat}}
+                    <option value="">--</option>
+                    <option value="strength">Strength</option>
+                    <option value="dexterity">Dexterity</option>
+                    <option value="speed">Speed</option>
+                    <option value="endurance">Endurance</option>
+                    <option value="intelligence">Intelligence</option>
+                    <option value="perception">Perception</option>
+                    <option value="charisma">Charisma</option>
+                    <option value="determination">Determination</option>
+                {{/select}}
+            </select>
+            <label class="toggle-display item-label">Attack Skill</label>
+            <input class="toggle-display grid-start-5 grid-span-2 item-input" type="text" name="system.attack.skill" value="{{ data.system.attack.skill }}" />
+        </div>
+    </fieldset>
 </form>
