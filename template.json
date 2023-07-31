@@ -125,6 +125,7 @@
     },
     "path": {
       "templates": ["basics"],
+      "requirements": [],
       "stats": {},
       "skills": {},
       "traits": {},
