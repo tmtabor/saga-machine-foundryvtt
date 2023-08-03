@@ -32,35 +32,35 @@
 		<div class="stats grid grid-8col">
 			<div class="stat flex-group-center">
 				<label class="stat-label rollable" data-stat="strength">Strength</label>
-				<input class="stat-input" type="number" name="system.stats.strength.value" value="{{ data.system.stats.strength.value }}" step="1" />
+				<input class="stat-input" type="number" name="system.stats.strength.value" value="{{ data.system.stats.strength.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
 				<label class="stat-label rollable" data-stat="dexterity">Dexterity</label>
-				<input class="stat-input" type="number" name="system.stats.dexterity.value" value="{{ data.system.stats.dexterity.value }}" step="1" />
+				<input class="stat-input" type="number" name="system.stats.dexterity.value" value="{{ data.system.stats.dexterity.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
 				<label class="stat-label rollable" data-stat="speed">Speed</label>
-				<input class="stat-input" type="number" name="system.stats.speed.value" value="{{ data.system.stats.speed.value }}" step="1" />
+				<input class="stat-input" type="number" name="system.stats.speed.value" value="{{ data.system.stats.speed.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
 				<label class="stat-label rollable" data-stat="endurance">Endurance</label>
-				<input class="stat-input" type="number" name="system.stats.endurance.value" value="{{ data.system.stats.endurance.value }}" step="1" />
+				<input class="stat-input" type="number" name="system.stats.endurance.value" value="{{ data.system.stats.endurance.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
 				<label class="stat-label rollable" data-stat="intelligence">Intelligence</label>
-				<input class="stat-input" type="number" name="system.stats.intelligence.value" value="{{ data.system.stats.intelligence.value }}" step="1" />
+				<input class="stat-input" type="number" name="system.stats.intelligence.value" value="{{ data.system.stats.intelligence.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
 				<label class="stat-label rollable" data-stat="perception">Perception</label>
-				<input class="stat-input" type="number" name="system.stats.perception.value" value="{{ data.system.stats.perception.value }}" step="1" />
+				<input class="stat-input" type="number" name="system.stats.perception.value" value="{{ data.system.stats.perception.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
 				<label class="stat-label rollable" data-stat="charisma">Charisma</label>
-				<input class="stat-input" type="number" name="system.stats.charisma.value" value="{{ data.system.stats.charisma.value }}" step="1" />
+				<input class="stat-input" type="number" name="system.stats.charisma.value" value="{{ data.system.stats.charisma.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
 				<label class="stat-label rollable" data-stat="determination">Determination</label>
-				<input class="stat-input" type="number" name="system.stats.determination.value" value="{{ data.system.stats.determination.value }}" step="1" />
+				<input class="stat-input" type="number" name="system.stats.determination.value" value="{{ data.system.stats.determination.value }}" step="1" data-dtype="Number" />
 			</div>
 		</div>
 	
@@ -68,36 +68,36 @@
 			<div class="score flex-group-center flexcol grid-start-1 grid-span-2">
 				<label class="score-label">Luck</label>
 				<div class="flexrow">
-					<input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" /> &nbsp;/&nbsp;
-					<input class="score-input" type="number" name="system.scores.luck.max" value="{{ data.system.scores.luck.max }}" step="1" />
+					<input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" data-dtype="Number" /> &nbsp;/&nbsp;
+					<input class="score-input" type="number" name="system.scores.luck.max" value="{{ data.system.scores.luck.max }}" step="1" data-dtype="Number" />
 				</div>
 			</div>
 			<div class="score flex-group-center">
 				<label class="score-label rollable" data-score="defense">Defense</label>
-				<input class="score-input" type="number" name="system.scores.defense.value" value="{{ data.system.scores.defense.value }}" step="1" />
+				<input class="score-input" type="number" name="system.scores.defense.value" value="{{ data.system.scores.defense.value }}" step="1" data-dtype="Number" />
                 <div class="score-secondary" name="system.scores.defense.tn">TN {{ data.system.scores.defense.tn }}</div>
 			</div>
 			<div class="score flex-group-center">
 				<label class="score-label rollable" data-score="willpower">Willpower</label>
-				<input class="score-input" type="number" name="system.scores.willpower.value" value="{{ data.system.scores.willpower.value }}" step="1" />
+				<input class="score-input" type="number" name="system.scores.willpower.value" value="{{ data.system.scores.willpower.value }}" step="1" data-dtype="Number" />
                 <div class="score-secondary" name="system.scores.willpower.tn">TN {{ data.system.scores.willpower.tn }}</div>
 			</div>
 			<div class="score flex-group-center">
 				<label class="score-label">Armor</label>
-				<input class="score-input" type="number" name="system.scores.armor.value" value="{{ data.system.scores.armor.value }}" step="1" />
+				<input class="score-input" type="number" name="system.scores.armor.value" value="{{ data.system.scores.armor.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="score flex-group-center">
 				<label class="score-label">Health</label>
-				<input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" />
+				<input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" data-dtype="Number" />
                 <div class="score-secondary" name="system.scores.health.value">Wounds {{ data.system.scores.health.value }}</div>
 			</div>
 			<div class="score flex-group-center">
 				<label class="score-label">Move</label>
-				<input class="score-input" type="number" name="system.scores.move.value" value="{{ data.system.scores.move.value }}" step="1" />
+				<input class="score-input" type="number" name="system.scores.move.value" value="{{ data.system.scores.move.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="score flex-group-center">
 				<label class="score-label">Encumbrance</label>
-				<input class="score-input" type="number" name="system.scores.encumbrance.value" value="{{ data.system.scores.encumbrance.value }}" step="1" />
+				<input class="score-input" type="number" name="system.scores.encumbrance.value" value="{{ data.system.scores.encumbrance.value }}" step="1" data-dtype="Number" />
 			</div>
 		</div>
 	</div>
@@ -144,18 +144,18 @@
                     <h3>Experiences</h3>
                     <div class="experiences grid grid-2col">
                         <label>Total</label>
-                        <input class="experiences-input" type="number" name="system.experiences.total" value="{{ data.system.experiences.total }}" step="1" />
+                        <input class="experiences-input" type="number" name="system.experiences.total" value="{{ data.system.experiences.total }}" step="1" data-dtype="Number" />
                         <label>Spent</label>
-                        <input class="experiences-input" type="number" name="system.experiences.spent" value="{{ data.system.experiences.spent }}" step="1" />
+                        <input class="experiences-input" type="number" name="system.experiences.spent" value="{{ data.system.experiences.spent }}" step="1" data-dtype="Number" />
                         <label>Unspent</label>
-                        <input class="experiences-input" type="number" name="system.experiences.unspent" value="{{ data.system.experiences.unspent }}" step="1" />
+                        <input class="experiences-input" type="number" name="system.experiences.unspent" value="{{ data.system.experiences.unspent }}" step="1" data-dtype="Number" />
                     </div>
                 </div>
             </div>
 
             <div class="character-notes">
                 <h3>Notes</h3>
-                {{editor data.system.notes target="system.notes" button=true owner=owner editable=editable}}
+                {{editor content=data.system.notes target="system.notes" button=true owner=owner editable=editable}}
             </div>
     	</div>
     
@@ -174,7 +174,7 @@
 						<h4 class="item-name rollable" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
 							{{ skill.system.full_name }}
 						</h4>
-						<input class="item-input item-properties" type="number" name="system.rank" value="{{ skill.system.rank }}" step="1" />
+						<input class="item-input item-properties" type="number" name="system.rank" value="{{ skill.system.rank }}" step="1" data-dtype="Number" />
 						<div class="item-controls">
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
 							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
@@ -255,7 +255,7 @@
 				{{#each data.system.consequences as |consequence|}}
 					<li class="item flexrow" data-id="{{ consequence._id }}">
 						<h4 class="item-name">{{ consequence.system.full_name }}</h4>
-						<input class="item-input item-prop" type="number" name="system.rank" value="{{ consequence.system.rank }}" step="1" />
+						<input class="item-input item-prop" type="number" name="system.rank" value="{{ consequence.system.rank }}" step="1" data-dtype="Number" />
 						<div class="item-controls">
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
 							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
@@ -280,7 +280,7 @@
 					<li class="item flexrow" data-id="{{ item._id }}">
 						<h4 class="item-name">{{ item.system.full_name }}</h4>
 						<div class="item-name">{{item.system.properties}}</div>
-						<input class="item-input item-prop" type="number" name="system.quantity" value="{{ item.system.quantity }}" step="1" />
+						<input class="item-input item-prop" type="number" name="system.quantity" value="{{ item.system.quantity }}" step="1" data-dtype="Number" />
 						<div class="item-controls">
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
 							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>

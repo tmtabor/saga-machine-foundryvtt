@@ -12,11 +12,17 @@ CONFIG.debug.hooks = true;
 Hooks.once("init", async () => {
     console.log(`Initializing Saga Machine`);
 
-  // Define custom Entity classes
-  CONFIG.Actor.documentClass = SagaMachineActor;
-  CONFIG.Item.documentClass = SagaMachineItem;
+    // Add classes to global game variable
+    game.sagamachine = {
+        SagaMachineActor,
+        SagaMachineItem
+    };
 
-  // Register sheet application classes
-  Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });
-  Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
+    // Define custom document classes
+    CONFIG.Actor.documentClass = SagaMachineActor;
+    CONFIG.Item.documentClass = SagaMachineItem;
+
+    // Register sheet application classes
+    Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });
+    Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
 });
