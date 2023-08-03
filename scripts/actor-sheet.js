@@ -295,9 +295,9 @@ export class SagaMachineActorSheet extends ActorSheet {
 				roll: {
 					label: "Make Test",
 					callback: async (html) => {
-						const stat = html.find('select[name=stat] > option:selected').data('val');
-						const score = html.find('select[name=score] > option:selected').data('val');
-						const skill = html.find('select[name=skill] > option:selected').data('val');
+						let stat = html.find('select[name=stat] > option:selected').data('val');
+						let score = html.find('select[name=score] > option:selected').data('val');
+						let skill = html.find('select[name=skill] > option:selected').data('val');
 						const modifier = html.find('input[name=modifier]').val();
 						const boons = html.find('input[name=boons]').val();
 						const banes = html.find('input[name=banes]').val();
@@ -310,7 +310,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 						let roll = await new Roll(dice, this.actor.system);
 						let results = await roll.evaluate();
 						let pairs = this._make_pairs(results, boons, banes);
-						let total = pairs.total + Number(stat || score) + Number(skill) + Number(modifier);
+						[stat, score, skill] = this.apply_unskilled(stat, score, skill);
+						let total = pairs.total + stat || score + skill + modifier;
 						if (stat_label === 'defense' || stat_label === 'willpower') this._update_defense(pairs.total);
 						const margin = this._calc_margin(this._lookup_tn(tn), total, damage);
 						const pairs_message = pairs.pairs ? `<br><strong>Pair of ${pairs.pairs}'s!</strong>` : '';
@@ -349,6 +350,19 @@ export class SagaMachineActorSheet extends ActorSheet {
 			},
 			default: "roll"
 		}).render(true, {width: 450});
+	}
+
+	/**
+	 * If skill is 0 or '0' halve the applicable stat or score
+	 *
+	 * @param stat
+	 * @param score
+	 * @param skill
+	 */
+	apply_unskilled(stat, score, skill) {
+		return skill == 0 ?
+			[Math.floor(Number(stat) / 2), Math.floor(Number(score) / 2), 0] :
+			[Number(stat), Number(score), Number(skill)];
 	}
 
 	/**
