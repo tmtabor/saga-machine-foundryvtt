@@ -1,8 +1,9 @@
 import { SagaMachineActor } from "./actor.js";
 import { SagaMachineActorSheet } from "./actor-sheet.js";
-import { SimpleItem } from "./item.js";
-import { SimpleItemSheet } from "./item-sheet.js";
+import { SagaMachineItem } from "./item.js";
+import { SagaMachineItemSheet } from "./item-sheet.js";
 
+// Turn on debugging
 CONFIG.debug.hooks = true;
 
 /**
@@ -11,16 +12,11 @@ CONFIG.debug.hooks = true;
 Hooks.once("init", async () => {
     console.log(`Initializing Saga Machine`);
 
-  // game['saga-machine'] = {
-  //   SagaMachineActor: SagaMachineActor
-  // };
-  // console.log(game);
-
   // Define custom Entity classes
   CONFIG.Actor.documentClass = SagaMachineActor;
-  CONFIG.Item.documentClass = SimpleItem;
+  CONFIG.Item.documentClass = SagaMachineItem;
 
   // Register sheet application classes
   Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });
-  Items.registerSheet("saga-machine", SimpleItemSheet, { makeDefault: true });
+  Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
 });

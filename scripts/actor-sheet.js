@@ -1,5 +1,3 @@
-import { EntitySheetHelper } from "./helper.js";
-
 /**
  * Extend the basic ActorSheet with some very simple modifications
  * @extends {ActorSheet}
@@ -14,93 +12,48 @@ export class SagaMachineActorSheet extends ActorSheet {
 			width: 850,
 			height: 600,
 			tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "basics"}],
-			// scrollY: [".biography", ".items", ".attributes"],
+			scrollY: [".basics", ".skills", ".traits", ".combat", ".inventory"]
 			// dragDrop: [{dragSelector: ".item-list .item", dropSelector: null}]
 		});
 	}
 
-	/* -------------------------------------------- */
-
 	/** @inheritdoc */
 	getData() {
 		const context = super.getData();
-		//   // EntitySheetHelper.getAttributeData(context.data);
-		//   // context.shorthand = true;
-		//   context.system = context.data.data;
-		//   // console.log(context);
-		//   // context.dtypes = ["String", "Number", "Boolean", "Formula", "Resource"];
 
-		context.data.system.skills = context.data.items.filter( item => item.type === 'skill').sort((a, b) =>  {
-			if ( a.name > b.name ) return 1;
-			return -1;
-		});
-
-		context.data.system.traits = context.data.items.filter( item => item.type === 'trait').sort((a, b) =>  {
-			if ( a.name > b.name ) return 1;
-			return -1;
-		});
-
-		context.data.system.weaknesses = context.data.items.filter( item => item.type === 'weakness').sort((a, b) =>  {
-			if ( a.name > b.name ) return 1;
-			return -1;
-		});
-
-		context.data.system.origins = context.data.items.filter( item => item.type === 'origin').sort((a, b) =>  {
-			if ( a.name > b.name ) return 1;
-			return -1;
-		});
-
-		context.data.system.paths = context.data.items.filter( item => item.type === 'path').sort((a, b) =>  {
-			if ( a.name > b.name ) return 1;
-			return -1;
-		});
-
-		context.data.system.consequences = context.data.items.filter( item => item.type === 'consequence').sort((a, b) =>  {
-			if ( a.name > b.name ) return 1;
-			return -1;
-		});
-
-		context.data.system.equipment = context.data.items.filter( item => item.type === 'item').sort((a, b) =>  {
-			if ( a.name > b.name ) return 1;
-			return -1;
-		});
-
-		context.data.system.attacks = context.data.items.filter( item => item.type === 'item' && item.system.attack.has_attack).sort((a, b) =>  {
-			if ( a.name > b.name ) return 1;
-			return -1;
-		});
-
-		context.data.system.ambitions = context.data.items.filter( item => item.type === 'ambition').sort((a, b) =>  {
-			if ( a.system.type > b.system.type ) return 1;
-			return -1;
-		});
+		// Filter and sort all item lists for the character
+		context.data.system.ambitions = this.items(context, 'ambition', null,
+			(a, b) =>  a.system.type > b.system.type ? 1 : -1);
+		context.data.system.paths = this.items(context, 'path');
+		context.data.system.origins = this.items(context, 'origin');
+		context.data.system.skills = this.items(context, 'skill');
+		context.data.system.traits = this.items(context, 'trait');
+		context.data.system.weaknesses = this.items(context, 'weakness');
+		context.data.system.consequences = this.items(context, 'consequence');
+		context.data.system.equipment = this.items(context, 'item');
+		context.data.system.attacks = this.items(context, 'item', a => a.system.attack.has_attack);
 
 		return context;
 	}
 
-	/* -------------------------------------------- */
-
-	// /** @inheritdoc */
+	/** @inheritdoc */
 	activateListeners(html) {
 		super.activateListeners(html);
-		//
+
 		// Everything below here is only needed if the sheet is editable
 		if ( !this.isEditable ) return;
-		//
-		//   // Attribute Management
-		//   html.find(".attributes").on("click", ".attribute-control", EntitySheetHelper.onClickAttributeControl.bind(this));
-		//   html.find(".groups").on("click", ".group-control", EntitySheetHelper.onClickAttributeGroupControl.bind(this));
-		//   html.find(".attributes").on("click", "a.attribute-roll", EntitySheetHelper.onAttributeRoll.bind(this));
-		//
-		// Item Controls
+
+		// Item creation
 		html.find('.item-create').click(this._onItemCreate.bind(this));
 
+		// Item editing
 		html.find('.item-edit').click(ev => {
 			const box = $(ev.currentTarget).parents(".item");
 			const item = this.actor.items.get(box.data("id"));
 			item.sheet.render(true);
 		});
 
+		// Item deletion
 		html.find('.item-delete').click(ev => {
 			const box = $(ev.currentTarget).parents(".item");
 			const item = this.actor.items.get(box.data("id"));
@@ -108,40 +61,65 @@ export class SagaMachineActorSheet extends ActorSheet {
 			box.slideUp(200, () => this.render(false));
 		});
 
+		// Dynamic updating of item rank
 		html.find('.item-input').on("change", ev => {
 			const box = $(ev.currentTarget).parents(".item");
-			const item = this.actor.items.get(box.data("id"));
-
 			const update = { _id: box.data("id"), 'system.rank': Number(ev.currentTarget.value) };
 			this.actor.updateEmbeddedDocuments("Item", [update] );
 		});
 
-
+		// Allow rollable labels to open roll dialog
 		html.find('.rollable').click(this._onRoll.bind(this));
-
-
-		//   html.find(".item-control").click(this._onItemControl.bind(this));
-		//   html.find(".items .rollable").on("click", this._onItemRoll.bind(this));
-		//
-		//   // Add draggable for Macro creation
-		//   html.find(".attributes a.attribute-roll").each((i, a) => {
-		//     a.setAttribute("draggable", true);
-		//     a.addEventListener("dragstart", ev => {
-		//       let dragData = ev.currentTarget.dataset;
-		//       ev.dataTransfer.setData('text/plain', JSON.stringify(dragData));
-		//     }, false);
-		//   });
 	}
 
+	/**
+	 * Get all items of the specified type, apply an optional secondary filter and sort (alphabetically by default)
+	 *
+	 * @param data
+	 * @param type
+	 * @param filter
+	 * @param sort
+	 * @returns {*}
+	 */
+	items(data, type, filter, sort) {
+		if (!filter) filter = a => true;
+		if (!sort) sort = (a, b) =>  a.name > b.name ? 1 : -1;
+		return data.data.items.filter( item => item.type === type && filter(item)).sort(sort);
+	}
+
+	/**
+	 * When a roll label is clicked, open the roll dialog
+	 *
+	 * @param event
+	 * @returns {Promise<void>}
+	 * @private
+	 */
 	async _onRoll(event) {
 		event.preventDefault();
 		this._rollDialog(event.currentTarget.dataset);
 	}
 
+	/**
+	 * Capitalize the first letter of the string
+	 *
+	 * @param word
+	 * @returns {string}
+	 * @private
+	 */
 	_capitalize(word) {
 		return word.charAt(0).toUpperCase() + word.slice(1);
 	}
 
+	/**
+	 * Generate the Saga Machine label for the test
+	 *
+	 * @param stat
+	 * @param skill
+	 * @param tn
+	 * @param append_test
+	 * @returns {*}
+	 * @private
+	 */
 	_test_syntax(stat, skill, tn, append_test=true) {
 		const stat_label = stat ? this._capitalize(stat) : '1d10';
 		const skill_label = skill ? `/${skill}` : '';
@@ -149,6 +127,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 		return stat_label + skill_label + tn_label + (append_test ? ' Test' : '');
 	}
 
+	/**
+	 * Generate the roll string for the test, canceling out boons and banes
+	 *
+	 * @param boons
+	 * @param banes
+	 * @returns {string}
+	 * @private
+	 */
 	_dice_roll(boons, banes) {
 		// Correct for blank and undefined values
 		if (!boons) boons = 0;
@@ -160,6 +146,13 @@ export class SagaMachineActorSheet extends ActorSheet {
 		else return `${total*-1+1}d10kl1`;
 	}
 
+	/**
+	 * Generate the expanded roll for the test, to be output as a card in chat
+	 *
+	 * @param results
+	 * @returns {string}
+	 * @private
+	 */
 	_dice_html(results) {
 		let to_return = '<ol class="dice-rolls">';
 		for (let i of results) {
@@ -171,6 +164,15 @@ export class SagaMachineActorSheet extends ActorSheet {
 		return to_return;
 	}
 
+	/**
+	 * Take the roll results and look for pairs, adding them appropriately if there were boons
+	 *
+	 * @param results
+	 * @param boons
+	 * @param banes
+	 * @returns {{total: *, html: string, pairs: boolean}}
+	 * @private
+	 */
 	_make_pairs(results, boons, banes) {
 		let pairs = false;
 		if (boons > banes) {
@@ -204,11 +206,26 @@ export class SagaMachineActorSheet extends ActorSheet {
 		}
 	}
 
+	/**
+	 * Calculate damage from the margin and damage string
+	 *
+	 * @param margin
+	 * @param damage_str
+	 * @returns {*}
+	 * @private
+	 */
 	_calc_damage(margin, damage_str) {
 		const damage = Function(`'use strict'; return (${damage_str})`)();
 		return margin + damage;
 	}
 
+	/**
+	 * Look up the Defense or Willpower TN of the targeted token
+	 *
+	 * @param raw_tn
+	 * @returns {boolean|number|*}
+	 * @private
+	 */
 	_lookup_tn(raw_tn) {
 		if (!isNaN(raw_tn)) return Number(raw_tn);
 
@@ -221,6 +238,15 @@ export class SagaMachineActorSheet extends ActorSheet {
 		return is_defense ? scores.defense.tn : scores.willpower.tn;
 	}
 
+	/**
+	 * Calculate the margin of success or failure from the TN and total, also calculate damage if necessary
+	 *
+	 * @param tn
+	 * @param total
+	 * @param raw_damage
+	 * @returns {{damage: null, margin: number, critical: boolean, success: boolean, message: string}|{message: string}}
+	 * @private
+	 */
 	_calc_margin(tn, total, raw_damage) {
 		// Handle unknown TN
 		if (!tn) return {
@@ -253,8 +279,15 @@ export class SagaMachineActorSheet extends ActorSheet {
 		};
 	}
 
+	/**
+	 * Show a roll dialog for the test provided in the dataset
+	 *
+	 * @param dataset
+	 * @returns {Promise<void>}
+	 * @private
+	 */
 	async _rollDialog(dataset) {
-		const dialog_content = await renderTemplate("systems/saga-machine/templates/roll_dialog.html", {...this.getData(), ...dataset});
+		const dialog_content = await renderTemplate("systems/saga-machine/templates/roll-dialog.html", {...this.getData(), ...dataset});
 		new Dialog({
 			title: "Make Test",
 			content: dialog_content,
@@ -318,86 +351,38 @@ export class SagaMachineActorSheet extends ActorSheet {
 		}).render(true, {width: 450});
 	}
 
+	/**
+	 * Upddate the actor's Defense and Willpower TNs after a Defense roll
+	 *
+	 * @param die
+	 * @private
+	 */
 	_update_defense(die) {
 		this.actor.update({'system.scores.defense.tn': this.actor.data.system.scores.defense.value + die});
 		this.actor.update({'system.scores.willpower.tn': this.actor.data.system.scores.willpower.value + die});
 	}
 
+	/**
+	 * Create a new item of the specified type
+	 *
+	 * @param event
+	 * @returns {Promise<*>}
+	 * @private
+	 */
 	async _onItemCreate(event) {
-		const type = $(event.currentTarget).data("type");
-
 		event.preventDefault();
+
+		const type = $(event.currentTarget).data("type");
 		const header = event.currentTarget;
-		// Grab any data associated with this control.
-		const data = duplicate(header.dataset);
-		// Initialize a default name.
-		const name = `New ${type}`;
-		// Prepare the item object.
-		const itemData = {
+		const data = duplicate(header.dataset);		// Grab any data associated with this control.
+		const name = `New ${type}`;					// Initialize a default name.
+		const itemData = {							// Prepare the item object.
 			name: name,
 			type: type,
 			system: data
 		};
-		// Remove the type from the dataset since it's in the itemData.type prop.
-		// delete itemData.system["type"];
 
 		// Finally, create the item!
 		return await Item.create(itemData, {parent: this.actor});
 	}
-
-
-	// /* -------------------------------------------- */
-	//
-	// /**
-	//  * Handle click events for Item control buttons within the Actor Sheet
-	//  * @param event
-	//  * @private
-	//  */
-	// _onItemControl(event) {
-	//   event.preventDefault();
-	//
-	//   // Obtain event data
-	//   const button = event.currentTarget;
-	//   const li = button.closest(".item");
-	//   const item = this.actor.items.get(li?.dataset.itemId);
-	//
-	//   // Handle different actions
-	//   switch ( button.dataset.action ) {
-	//     case "create":
-	//       const cls = getDocumentClass("Item");
-	//       return cls.create({name: game.i18n.localize("SIMPLE.ItemNew"), type: "item"}, {parent: this.actor});
-	//     case "edit":
-	//       return item.sheet.render(true);
-	//     case "delete":
-	//       return item.delete();
-	//   }
-	// }
-	//
-	// /* -------------------------------------------- */
-	//
-	// /**
-	//  * Listen for roll buttons on items.
-	//  * @param {MouseEvent} event    The originating left click event
-	//  */
-	// _onItemRoll(event) {
-	//   let button = $(event.currentTarget);
-	//   const li = button.parents(".item");
-	//   const item = this.actor.items.get(li.data("itemId"));
-	//   let r = new Roll(button.data('roll'), this.actor.getRollData());
-	//   return r.toMessage({
-	//     user: game.user.id,
-	//     speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-	//     flavor: `<h2>${item.name}</h2><h3>${button.text()}</h3>`
-	//   });
-	// }
-	//
-	// /* -------------------------------------------- */
-	//
-	// /** @inheritdoc */
-	// _getSubmitData(updateData) {
-	//   let formData = super._getSubmitData(updateData);
-	//   formData = EntitySheetHelper.updateAttributes(formData, this.object);
-	//   formData = EntitySheetHelper.updateGroups(formData, this.object);
-	//   return formData;
-	// }
 }

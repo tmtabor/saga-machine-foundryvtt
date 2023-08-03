@@ -1,44 +1,56 @@
-import {EntitySheetHelper} from "./helper.js";
-
 /**
- * Extend the base Item document to support attributes and groups with a custom template creation dialog.
+ * Extend the base Item class to support the Saga Machine system
+ *
  * @extends {Item}
  */
-export class SimpleItem extends Item {
+export class SagaMachineItem extends Item {
+    /** @inheritdoc */
+    async prepareDerivedData() {
+        super.prepareDerivedData();
 
-  /** @inheritdoc */
-  async prepareDerivedData() {
-      super.prepareDerivedData();
-      
-      const full_name = this.name + (this.system.specialized ? ` (${this.system.specialization})` : '');
-      await this.update({'system.full_name': full_name});
+        // Derive the full name from the base name and specialization
+        this.full_name();
 
-      if (this.type === 'item' && typeof this.system.properties === 'string') {
-          const properties_array = this.system.properties.split(',').map(t => t.trim());
-          await this.update({'system.properties': properties_array});
-      }
+        // Parse the submitted property string into an array
+        this.parse_properties();
 
-      if (this.type === 'item' && this.system.group === 'weapon') {
-          for (const item of this.system.properties) {
-              let [prop, val] = item.toLowerCase().split(' ');
-              if (prop === 'damage') {
-                  let [stat, add] = val.split('str');
-                  await this.update({'system.attack.has_attack': true});
-                  await this.update({'system.attack.damage_str': stat === ''});
-                  await this.update({'system.attack.damage': Number(stat) || Number(add) || 0});
-                  break;
-              }
-          }
-      }
-      
-      //this.data.data.groups = this.data.data.groups || {};
-      //this.data.data.attributes = this.data.data.attributes || {};
-  }
-  //
-  // /* -------------------------------------------- */
-  //
-  // /** @override */
-  // static async createDialog(data={}, options={}) {
-  //   return EntitySheetHelper.createDialog.call(this, data, options);
-  // }
+        // Derive an attack structure from the Damage property
+        this.weapon_attacks();
+    }
+
+    /**
+     * Derive the full name from the base name and specialization
+     */
+    async full_name() {
+        const full_name = this.name + (this.system.specialized ? ` (${this.system.specialization})` : '');
+        await this.update({'system.full_name': full_name});
+    }
+
+    /**
+     * Parse the submitted property string into an array
+     */
+    async parse_properties() {
+        if (this.type === 'item' && typeof this.system.properties === 'string') {
+            const properties_array = this.system.properties.split(',').map(t => t.trim());
+            await this.update({'system.properties': properties_array});
+        }
+    }
+
+    /**
+     * Derive an attack structure from the Damage property
+     */
+    async weapon_attacks() {
+        if (this.type === 'item' && this.system.group === 'weapon') {
+            for (const item of this.system.properties) {
+                let [prop, val] = item.toLowerCase().split(' ');
+                if (prop === 'damage') {
+                    let [stat, add] = val.split('str');
+                    await this.update({'system.attack.has_attack': true});
+                    await this.update({'system.attack.damage_str': stat === ''});
+                    await this.update({'system.attack.damage': Number(stat) || Number(add) || 0});
+                    break;
+                }
+            }
+        }
+    }
 }
