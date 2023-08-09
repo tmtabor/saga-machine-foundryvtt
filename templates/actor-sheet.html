@@ -41,41 +41,43 @@
         <hr />
         <h3>Scores</h3>
 		<div class="scores grid grid-4col">
-			<div class="score flex-group-center flexcol grid-start-1 grid-span-2">
-				<label class="score-label">Luck</label>
-				<div class="flexrow">
-					<input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" data-dtype="Number" /> &nbsp;/&nbsp;
-					<input class="score-input" type="number" name="system.scores.luck.max" value="{{ data.system.scores.luck.max }}" step="1" data-dtype="Number" />
-				</div>
+			<div class="score flex-group-center">
+				<label class="score-label">Move</label>
+				<input class="score-input" type="number" name="system.scores.move.value" value="{{ data.system.scores.move.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.move.custom }}disabled{{/unless}} />
 			</div>
 			<div class="score flex-group-center">
-				<label class="score-label rollable" data-score="defense">Defense</label>
-				<input class="score-input" type="number" name="system.scores.defense.value" value="{{ data.system.scores.defense.value }}" step="1" data-dtype="Number" />
+				<label class="score-label rollable" data-score="defense">Def</label>
+				<input class="score-input" type="number" name="system.scores.defense.value" value="{{ data.system.scores.defense.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.defense.custom }}disabled{{/unless}} />
                 <div class="score-secondary" name="system.scores.defense.tn">TN {{ data.system.scores.defense.tn }}</div>
 			</div>
 			<div class="score flex-group-center">
-				<label class="score-label rollable" data-score="willpower">Willpower</label>
-				<input class="score-input" type="number" name="system.scores.willpower.value" value="{{ data.system.scores.willpower.value }}" step="1" data-dtype="Number" />
+				<label class="score-label rollable" data-score="willpower">Will</label>
+				<input class="score-input" type="number" name="system.scores.willpower.value" value="{{ data.system.scores.willpower.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.willpower.custom }}disabled{{/unless}} />
                 <div class="score-secondary" name="system.scores.willpower.tn">TN {{ data.system.scores.willpower.tn }}</div>
 			</div>
 			<div class="score flex-group-center">
-				<label class="score-label">Armor</label>
-				<input class="score-input" type="number" name="system.scores.armor.value" value="{{ data.system.scores.armor.value }}" step="1" data-dtype="Number" />
-			</div>
-			<div class="score flex-group-center">
-				<label class="score-label">Health</label>
-				<input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" data-dtype="Number" />
-                <div class="score-secondary" name="system.scores.health.value">Wounds {{ data.system.scores.health.value }}</div>
-			</div>
-			<div class="score flex-group-center">
-				<label class="score-label">Move</label>
-				<input class="score-input" type="number" name="system.scores.move.value" value="{{ data.system.scores.move.value }}" step="1" data-dtype="Number" />
-			</div>
-			<div class="score flex-group-center">
-				<label class="score-label">Encumbrance</label>
-				<input class="score-input" type="number" name="system.scores.encumbrance.value" value="{{ data.system.scores.encumbrance.value }}" step="1" data-dtype="Number" />
+				<label class="score-label">Arm</label>
+				<input class="score-input" type="number" name="system.scores.armor.value" value="{{ data.system.scores.armor.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.armor.custom }}disabled{{/unless}} />
 			</div>
 		</div>
+
+        <div class="score flex-group-center flexcol grid-start-1 grid-span-2">
+            <label class="score-label">Luck</label>
+            <div class="flexrow">
+                <input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" data-dtype="Number" /> &nbsp;/&nbsp;
+                <input class="score-input" type="number" name="system.scores.luck.max" value="{{ data.system.scores.luck.max }}" step="1" data-dtype="Number" />
+            </div>
+        </div>
+        <div class="score flex-group-center">
+            <label class="score-label">Health</label>
+            <input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" data-dtype="Number" {{#unless data.system.scores.health.custom }}disabled{{/unless}} />
+            <div class="score-secondary" name="system.scores.health.value">Wounds {{ data.system.scores.health.value }}</div>
+        </div>
+        <hr />
+        <div class="score flex-group-center">
+            <label class="score-label">Encumbrance</label>
+            <input class="score-input" type="number" name="system.scores.encumbrance.value" value="{{ data.system.scores.encumbrance.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.encumbrance.custom }}disabled{{/unless}} />
+        </div>
     </aside>
 
     {{!-- Sheet Header --}}
@@ -157,7 +159,7 @@
 
             <div class="character-notes">
                 <h3>Notes</h3>
-                {{editor content=data.system.notes target="system.notes" button=true owner=owner editable=editable}}
+                {{editor data.system.notes target="system.notes" button=true owner=owner editable=editable}}
             </div>
     	</div>
     

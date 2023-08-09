@@ -18,30 +18,40 @@ export class SagaMachineActor extends Actor {
      */
     async calculate_scores() {
         // Defense
-        const defense = this.median([this.system.stats.dexterity.value,
-            this.system.stats.speed.value, this.system.stats.perception.value]);
-        await this.update({'system.scores.defense.value': defense});
+        if (!this.system.scores.defense.custom) {
+            const defense = this.median([this.system.stats.dexterity.value,
+                this.system.stats.speed.value, this.system.stats.perception.value]);
+            await this.update({'system.scores.defense.value': defense});
+        }
 
         // Willpower
-        const willpower = this.median([this.system.stats.intelligence.value,
-            this.system.stats.charisma.value, this.system.stats.determination.value]);
-        await this.update({'system.scores.willpower.value': willpower});
+        if (!this.system.scores.willpower.custom) {
+            const willpower = this.median([this.system.stats.intelligence.value,
+                this.system.stats.charisma.value, this.system.stats.determination.value]);
+            await this.update({'system.scores.willpower.value': willpower});
+        }
 
         // Health
-        const health = this.system.stats.strength.value + this.system.stats.endurance.value;
-        await this.update({'system.scores.health.max': health});
+        if (!this.system.scores.health.custom) {
+            const health = this.system.stats.strength.value + this.system.stats.endurance.value;
+            await this.update({'system.scores.health.max': health});
+        }
 
         // Wound total
         const wound_total = this.wound_total();
         await this.update({'system.scores.health.value': wound_total});
 
         // Move
-        const move = Math.floor((this.system.stats.speed.value + this.system.stats.endurance.value)/2);
-        await this.update({'system.scores.move.value': move});
+        if (!this.system.scores.move.custom) {
+            const move = Math.floor((this.system.stats.speed.value + this.system.stats.endurance.value) / 2);
+            await this.update({'system.scores.move.value': move});
+        }
 
         // Encumbrance
-        const encumbrance = this.system.stats.strength.value;
-        await this.update({'system.scores.encumbrance.value': encumbrance});
+        if (!this.system.scores.encumbrance.custom) {
+            const encumbrance = this.system.stats.strength.value;
+            await this.update({'system.scores.encumbrance.value': encumbrance});
+        }
 
         // Unspent experiences
         const unspent_experiences = this.system.experiences.total - this.system.experiences.spent;

@@ -68,6 +68,22 @@ export class SagaMachineActorSheet extends ActorSheet {
 			this.actor.updateEmbeddedDocuments("Item", [update] );
 		});
 
+		// Custom score toggle
+		html.find('.score').on('contextmenu', event => {
+			const input = $(event.currentTarget).find('input');
+			const score_name = input.attr('name');
+			const score = this._get_score(score_name);
+			if (!score) return; // If the score was not found, do nothing
+
+			// Toggle custom value
+			input.prop('disabled', !!score.custom);
+			const score_custom = this._get_score_custom(score_name);
+			const update_obj = {};
+			update_obj[score_custom] = !score.custom;
+			this.actor.update(update_obj);
+
+		});
+
 		// Allow rollable labels to open roll dialog
 		html.find('.rollable').click(this._onRoll.bind(this));
 	}
@@ -85,6 +101,20 @@ export class SagaMachineActorSheet extends ActorSheet {
 		if (!filter) filter = a => true;
 		if (!sort) sort = (a, b) =>  a.name > b.name ? 1 : -1;
 		return data.data.items.filter( item => item.type === type && filter(item)).sort(sort);
+	}
+
+	_get_score_custom(score_name) {
+		return score_name.substr(0, score_name.lastIndexOf("\.")) + '.custom';
+	}
+
+	_get_score(score_name) {
+		const path = score_name.split('.');
+		let pointer = this.actor;
+		for (const p of path) {
+			if (pointer && p !== 'value' && p !== 'max') pointer = pointer[p] ? pointer[p] : null;
+			else return pointer;
+		}
+		return pointer;
 	}
 
 	/**
