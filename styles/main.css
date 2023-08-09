@@ -218,35 +218,35 @@
 }
 
 /* Styles limited to boilerplate sheets */
-.saga-machine {
-  /* ----------------------------------------- */
-  /*  Items Lists                              */
-  /* ----------------------------------------- */
-  /* Example style for Boilerplate (can be removed if not needed) */
+form.saga-machine {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 100px 40px 1fr;
+  gap: 15px;
 }
+
+.saga-machine .sheet-sidebar {
+  grid-row-start: 1;
+  grid-row-end: 4;
+}
+
+.saga-machine label.stat-label {
+  font-weight: bold;
+}
+
+.saga-machine input[type="number"].stat-input {
+  font-size: 2em;
+  height: 1.5em;
+}
+
 .saga-machine .item-form {
   font-family: "Roboto", sans-serif;
 }
 .saga-machine .sheet-header {
-  -webkit-box-flex: 0;
-  -ms-flex: 0 auto;
-  flex: 0 auto;
+  height: 90px;
   overflow: hidden;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-orient: horizontal;
-  -webkit-box-direction: normal;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -webkit-box-pack: start;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  margin-bottom: 10px;
 }
-.saga-machine .sheet-header .profile-img {
+.saga-machine .profile-img {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 100px;
   flex: 0 0 100px;

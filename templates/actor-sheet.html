@@ -1,70 +1,46 @@
 <form class="flexcol saga-machine {{cssClass}}" autocomplete="off">
 
-    {{!-- Sheet Header --}}
-    <header class="sheet-header">
-		<img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
-		<ol class="header-fields">
-			<h1 class="charname"><input name="name" type="text" value="{{ data.name }}" placeholder="Name"/></h1>
-			<ol class="origins grid grid-4col">
-				{{#each data.system.origins as |origin|}}
-					<li class="item flexrow" data-id="{{ origin._id }}">
-						<h4 class="item-name">{{ origin.system.full_name }}</h4>
-						<div class="item-controls">
-							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
-						</div>
-					</li>
-				{{/each}}
-				{{#each data.system.paths as |path|}}
-					<li class="item flexrow" data-id="{{ path._id }}">
-						<h4 class="item-name">{{ path.system.full_name }}</h4>
-						<div class="item-controls">
-							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
-						</div>
-					</li>
-				{{/each}}
-            </ol>
-		</div>
-    </header>
-    
-	<header class="sheet-subheader">
-		<div class="stats grid grid-8col">
+    {{!-- Sheet Sidebar --}}
+    <aside class="sheet-sidebar">
+        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
+        <h3>Stats</h3>
+		<div class="stats grid grid-4col">
 			<div class="stat flex-group-center">
-				<label class="stat-label rollable" data-stat="strength">Strength</label>
-				<input class="stat-input" type="number" name="system.stats.strength.value" value="{{ data.system.stats.strength.value }}" step="1" data-dtype="Number" />
+				<label class="stat-label rollable" data-stat="strength" title="Strength">Str</label>
+				<input class="stat-input" type="number" name="system.stats.strength.value" value="{{ data.system.stats.strength.value }}" title="Strength" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
-				<label class="stat-label rollable" data-stat="dexterity">Dexterity</label>
-				<input class="stat-input" type="number" name="system.stats.dexterity.value" value="{{ data.system.stats.dexterity.value }}" step="1" data-dtype="Number" />
+				<label class="stat-label rollable" data-stat="dexterity" title="Dexterity">Dex</label>
+				<input class="stat-input" type="number" name="system.stats.dexterity.value" value="{{ data.system.stats.dexterity.value }}" title="Dexterity" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
-				<label class="stat-label rollable" data-stat="speed">Speed</label>
-				<input class="stat-input" type="number" name="system.stats.speed.value" value="{{ data.system.stats.speed.value }}" step="1" data-dtype="Number" />
+				<label class="stat-label rollable" data-stat="speed" title="Speed">Spd</label>
+				<input class="stat-input" type="number" name="system.stats.speed.value" value="{{ data.system.stats.speed.value }}" title="Speed" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
-				<label class="stat-label rollable" data-stat="endurance">Endurance</label>
-				<input class="stat-input" type="number" name="system.stats.endurance.value" value="{{ data.system.stats.endurance.value }}" step="1" data-dtype="Number" />
+				<label class="stat-label rollable" data-stat="endurance" title="Endurance">End</label>
+				<input class="stat-input" type="number" name="system.stats.endurance.value" value="{{ data.system.stats.endurance.value }}" title="Endurance" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
-				<label class="stat-label rollable" data-stat="intelligence">Intelligence</label>
+				<label class="stat-label rollable" data-stat="intelligence" title="Intelligence">Int</label>
 				<input class="stat-input" type="number" name="system.stats.intelligence.value" value="{{ data.system.stats.intelligence.value }}" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
-				<label class="stat-label rollable" data-stat="perception">Perception</label>
-				<input class="stat-input" type="number" name="system.stats.perception.value" value="{{ data.system.stats.perception.value }}" step="1" data-dtype="Number" />
+				<label class="stat-label rollable" data-stat="perception" title="Perception">Per</label>
+				<input class="stat-input" type="number" name="system.stats.perception.value" value="{{ data.system.stats.perception.value }}" title="Perception" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
-				<label class="stat-label rollable" data-stat="charisma">Charisma</label>
-				<input class="stat-input" type="number" name="system.stats.charisma.value" value="{{ data.system.stats.charisma.value }}" step="1" data-dtype="Number" />
+				<label class="stat-label rollable" data-stat="charisma" title="Charisma">Chr</label>
+				<input class="stat-input" type="number" name="system.stats.charisma.value" value="{{ data.system.stats.charisma.value }}" title="Charisma" step="1" data-dtype="Number" />
 			</div>
 			<div class="stat flex-group-center">
-				<label class="stat-label rollable" data-stat="determination">Determination</label>
-				<input class="stat-input" type="number" name="system.stats.determination.value" value="{{ data.system.stats.determination.value }}" step="1" data-dtype="Number" />
+				<label class="stat-label rollable" data-stat="determination" title="Determination">Det</label>
+				<input class="stat-input" type="number" name="system.stats.determination.value" value="{{ data.system.stats.determination.value }}" title="Determination" step="1" data-dtype="Number" />
 			</div>
 		</div>
-	
-		<div class="scores grid grid-8col">
+        <hr />
+        <h3>Scores</h3>
+		<div class="scores grid grid-4col">
 			<div class="score flex-group-center flexcol grid-start-1 grid-span-2">
 				<label class="score-label">Luck</label>
 				<div class="flexrow">
@@ -100,7 +76,34 @@
 				<input class="score-input" type="number" name="system.scores.encumbrance.value" value="{{ data.system.scores.encumbrance.value }}" step="1" data-dtype="Number" />
 			</div>
 		</div>
-	</div>
+    </aside>
+
+    {{!-- Sheet Header --}}
+    <header class="sheet-header">
+		<div class="header-fields">
+			<h1 class="charname"><input name="name" type="text" value="{{ data.name }}" placeholder="Name"/></h1>
+			<ol class="origins grid grid-4col">
+				{{#each data.system.origins as |origin|}}
+					<li class="item flexrow" data-id="{{ origin._id }}">
+						<h4 class="item-name">{{ origin.system.full_name }}</h4>
+						<div class="item-controls">
+							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+						</div>
+					</li>
+				{{/each}}
+				{{#each data.system.paths as |path|}}
+					<li class="item flexrow" data-id="{{ path._id }}">
+						<h4 class="item-name">{{ path.system.full_name }}</h4>
+						<div class="item-controls">
+							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+						</div>
+					</li>
+				{{/each}}
+            </ol>
+		</div>
+    </header>
         
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
@@ -113,7 +116,6 @@
 
     {{!-- Sheet Body --}}
     <section class="sheet-body">
-    
     	<div class="tab basics" data-group="primary" data-tab="basics">
     		<div class="grid grid-2col">
                 <div class="flex-group-left">
