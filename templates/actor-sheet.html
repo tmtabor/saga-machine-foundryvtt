@@ -61,18 +61,20 @@
 			</div>
 		</div>
 
-        <div class="score flex-group-center flexcol grid-start-1 grid-span-2">
-            <label class="score-label">Luck</label>
-            <div class="flexrow">
-                <input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" data-dtype="Number" /> &nbsp;/&nbsp;
-                <input class="score-input" type="number" name="system.scores.luck.max" value="{{ data.system.scores.luck.max }}" step="1" data-dtype="Number" />
+        <div class="scores grid grid-2col">
+            <div class="score flex-group-center">
+                <label class="score-label">Luck</label>
+                <input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" data-dtype="Number" />
+                <div class="score-secondary" name="system.scores.luck.max">Starting {{ data.system.scores.luck.max }}</div>
+            </div>
+
+            <div class="score flex-group-center">
+                <label class="score-label">Health</label>
+                <input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" data-dtype="Number" {{#unless data.system.scores.health.custom }}disabled{{/unless}} />
+                <div class="score-secondary" name="system.scores.health.value">Wounds {{ data.system.scores.health.value }}</div>
             </div>
         </div>
-        <div class="score flex-group-center">
-            <label class="score-label">Health</label>
-            <input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" data-dtype="Number" {{#unless data.system.scores.health.custom }}disabled{{/unless}} />
-            <div class="score-secondary" name="system.scores.health.value">Wounds {{ data.system.scores.health.value }}</div>
-        </div>
+
         <hr />
         <div class="score flex-group-center">
             <label class="score-label">Encumbrance</label>
@@ -127,7 +129,7 @@
                             <div class="item-name">Ambition</div>
                             <div class="item-properties">Type</div>
                             <div class="item-controls">
-                                <a class="item-control item-create" title="Create item" data-type="ambition"><i class="fas fa-plus"></i> Add Ambition</a>
+                                <a class="item-control item-create" title="Create item" data-type="ambition"><i class="fas fa-plus"></i> Add</a>
                             </div>
                         </li>
 
@@ -157,10 +159,10 @@
                 </div>
             </div>
 
-            <div class="character-notes">
-                <h3>Notes</h3>
-                {{editor data.system.notes target="system.notes" button=true owner=owner editable=editable}}
-            </div>
+            <fieldset class="character-notes">
+                <legend>Notes</legend>
+                {{editor data.system.notes target="system.notes" engine="prosemirror" button=true owner=owner editable=editable}}
+            </fieldset>
     	</div>
     
 		<div class="tab skills" data-group="primary" data-tab="skills">
@@ -169,7 +171,7 @@
 					<div class="item-name">Name</div>
 					<div class="item-properties">Rank</div>
 					<div class="item-controls">
-						<a class="item-control item-create" title="Create item" data-type="skill"><i class="fas fa-plus"></i> Add Skill</a>
+						<a class="item-control item-create" title="Create item" data-type="skill"><i class="fas fa-plus"></i> Add</a>
 					</div>
 				</li>
 
@@ -194,7 +196,7 @@
 				<li class="item flexrow items-header">
 					<div class="item-name">Name</div>
 					<div class="item-controls">
-						<a class="item-control item-create" title="Create item" data-type="trait"><i class="fas fa-plus"></i> Add Trait</a>
+						<a class="item-control item-create" title="Create item" data-type="trait"><i class="fas fa-plus"></i> Add</a>
 					</div>
 				</li>
 
@@ -214,7 +216,7 @@
 				<li class="item flexrow items-header">
 					<div class="item-name">Name</div>
 					<div class="item-controls">
-						<a class="item-control item-create" title="Create item" data-type="weakness"><i class="fas fa-plus"></i> Add Weakness</a>
+						<a class="item-control item-create" title="Create item" data-type="weakness"><i class="fas fa-plus"></i> Add</a>
 					</div>
 				</li>
 
@@ -252,7 +254,7 @@
 					<div class="item-name">Name</div>
 					<div class="item-prop">Value</div>
 					<div class="item-controls">
-						<a class="item-control item-create" title="Create item" data-type="consequence"><i class="fas fa-plus"></i> Add Consequence</a>
+						<a class="item-control item-create" title="Create item" data-type="consequence"><i class="fas fa-plus"></i> Add</a>
 					</div>
 				</li>
 
@@ -276,7 +278,7 @@
 					<div class="item-name">Properties</div>
 					<div class="item-prop">Quantity</div>
 					<div class="item-controls">
-						<a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add Item</a>
+						<a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add</a>
 					</div>
 				</li>
 

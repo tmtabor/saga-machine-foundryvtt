@@ -10,7 +10,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 			classes: ["saga-machine", "sheet", "actor"],
 			template: "systems/saga-machine/templates/actor-sheet.html",
 			width: 850,
-			height: 600,
+			height: 650,
 			tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "basics"}],
 			scrollY: [".basics", ".skills", ".traits", ".combat", ".inventory"]
 			// dragDrop: [{dragSelector: ".item-list .item", dropSelector: null}]
@@ -68,20 +68,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 			this.actor.updateEmbeddedDocuments("Item", [update] );
 		});
 
-		// Custom score toggle
+		// Handle custom score toggle, decrement and increment
 		html.find('.score').on('contextmenu', event => {
-			const input = $(event.currentTarget).find('input');
-			const score_name = input.attr('name');
-			const score = this._get_score(score_name);
-			if (!score) return; // If the score was not found, do nothing
-
-			// Toggle custom value
-			input.prop('disabled', !!score.custom);
-			const score_custom = this._get_score_custom(score_name);
-			const update_obj = {};
-			update_obj[score_custom] = !score.custom;
-			this.actor.update(update_obj);
-
+			const target = $(event.target);
+			if (target.hasClass('score-input')) this._toggle_custom(target);
+			if (target.hasClass('score-secondary')) this._adjust_score(target, -1);
+		}).on('click', event => {
+			const target = $(event.target);
+			if (target.hasClass('score-secondary')) this._adjust_score(target, 1);
 		});
 
 		// Allow rollable labels to open roll dialog
@@ -103,15 +97,38 @@ export class SagaMachineActorSheet extends ActorSheet {
 		return data.data.items.filter( item => item.type === type && filter(item)).sort(sort);
 	}
 
+	_adjust_score(target, mod) {
+		const score_name = target.attr('name');
+		const score = this._get_score(score_name, []);
+
+		// Make the adjustment
+		const update_obj = {};
+		update_obj[score_name] = score + mod;
+		this.actor.update(update_obj);
+	}
+
+	_toggle_custom(input) {
+		const score_name = input.attr('name');
+		const score = this._get_score(score_name, ['max', 'value']);
+		if (!score) return; // If the score was not found, do nothing
+
+		// Toggle custom value
+		input.prop('disabled', !!score.custom);
+		const score_custom = this._get_score_custom(score_name);
+		const update_obj = {};
+		update_obj[score_custom] = !score.custom;
+		this.actor.update(update_obj);
+	}
+
 	_get_score_custom(score_name) {
 		return score_name.substr(0, score_name.lastIndexOf("\.")) + '.custom';
 	}
 
-	_get_score(score_name) {
+	_get_score(score_name, ignore_array) {
 		const path = score_name.split('.');
 		let pointer = this.actor;
 		for (const p of path) {
-			if (pointer && p !== 'value' && p !== 'max') pointer = pointer[p] ? pointer[p] : null;
+			if (pointer && !ignore_array.includes(p)) pointer = pointer[p] ? pointer[p] : null;
 			else return pointer;
 		}
 		return pointer;
