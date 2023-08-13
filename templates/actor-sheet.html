@@ -121,8 +121,8 @@
     {{!-- Sheet Body --}}
     <section class="sheet-body">
     	<div class="tab basics" data-group="primary" data-tab="basics">
-    		<div class="grid grid-2col">
-                <div class="flex-group-left">
+    		<div class="grid grid-3col">
+                <div class="grid-span-2 flex-group-left">
                     <h3>Ambitions</h3>
                     <ol class="items-list">
                         <li class="item flexrow items-header">
@@ -159,6 +159,13 @@
                 </div>
             </div>
 
+            {{#if (isGM) }}
+                <fieldset class="gm-notes">
+                    <legend>GM Notes</legend>
+                    {{editor data.system.gmnotes target="system.gmnotes" engine="prosemirror" button=true owner=owner editable=editable}}
+                </fieldset>
+            {{/if}}
+
             <fieldset class="character-notes">
                 <legend>Notes</legend>
                 {{editor data.system.notes target="system.notes" engine="prosemirror" button=true owner=owner editable=editable}}
@@ -169,7 +176,7 @@
 			<ol class="items-list">
 				<li class="item flexrow items-header">
 					<div class="item-name">Name</div>
-					<div class="item-properties">Rank</div>
+					<div class="item-prop">Rank</div>
 					<div class="item-controls">
 						<a class="item-control item-create" title="Create item" data-type="skill"><i class="fas fa-plus"></i> Add</a>
 					</div>
@@ -180,7 +187,7 @@
 						<h4 class="item-name rollable" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
 							{{ skill.system.full_name }}
 						</h4>
-						<input class="item-input item-properties" type="number" name="system.rank" value="{{ skill.system.rank }}" step="1" data-dtype="Number" />
+						<input class="item-input item-prop" type="number" name="system.rank" value="{{ skill.system.rank }}" step="1" data-dtype="Number" />
 						<div class="item-controls">
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
 							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>

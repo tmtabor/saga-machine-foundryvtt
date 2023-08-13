@@ -25,4 +25,7 @@ Hooks.once("init", async () => {
     // Register sheet application classes
     Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });
     Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
+
+    // Register handlebars helpers
+    Handlebars.registerHelper("isGM", () => game.user.isGM);
 });

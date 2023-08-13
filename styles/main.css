@@ -386,6 +386,7 @@ form.saga-machine {
   border-left: 1px solid #c9c7b8;
   border-right: 1px solid #c9c7b8;
   font-size: 12px;
+  max-width: 50px;
 }
 .saga-machine .items-list .items-header {
   height: 28px;
@@ -428,7 +429,8 @@ form.saga-machine {
   font-size: 1.25em;
 }
 
-.saga-machine .character-notes {
+.saga-machine .character-notes,
+.saga-machine .gm-notes {
   height: 250px;
 }
 
