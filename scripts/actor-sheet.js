@@ -34,7 +34,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.attacks = this.items(context, 'item', a => a.system.attack.has_attack && a.system.equipped);
 
 		// Calculate progress bar percentages
-		context.data.system.scores.health.percent = Math.round((context.data.system.scores.health.value / context.data.system.scores.health.max) * 100)
+		if (!context.data.system.scores.health.max) context.data.system.scores.health.percent = 0;
+		else context.data.system.scores.health.percent = Math.round((context.data.system.scores.health.value / context.data.system.scores.health.max) * 100)
 
 		return context;
 	}

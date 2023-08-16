@@ -241,6 +241,10 @@ form.saga-machine {
   height: 1.5em;
 }
 
+.saga-machine progress {
+  width: 100%;
+}
+
 .saga-machine .item-form {
   font-family: "Roboto", sans-serif;
 }

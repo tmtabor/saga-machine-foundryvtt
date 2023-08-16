@@ -3,66 +3,70 @@
     "types": ["pc", "npc"],
     "templates": {
       "stats": {
-        "strength": {
-          "value": 5
-        },
-        "dexterity": {
-          "value": 5
-        },
-        "speed": {
-          "value": 5
-        },
-        "endurance": {
-          "value": 5
-        },
-        "intelligence": {
-          "value": 5
-        },
-        "perception": {
-          "value": 5
-        },
-        "charisma": {
-          "value": 5
-        },
-        "determination": {
-          "value": 5
+        "stats": {
+          "strength": {
+            "value": 5
+          },
+          "dexterity": {
+            "value": 5
+          },
+          "speed": {
+            "value": 5
+          },
+          "endurance": {
+            "value": 5
+          },
+          "intelligence": {
+            "value": 5
+          },
+          "perception": {
+            "value": 5
+          },
+          "charisma": {
+            "value": 5
+          },
+          "determination": {
+            "value": 5
+          }
         }
       },
       "scores": {
-      	"armor": {
-      	  "value": 0,
-      	  "properties": [],
-      	  "custom": false
-      	},
-      	"defense": {
-      	  "value": 0,
-      	  "tn": 0, 
-      	  "custom": false
-      	},
-      	"encumbrance": {
-      	  "value": 0,
-          "max": 0,
-      	  "custom": false
-      	},
-      	"health": {
-      	  "value": 0,
-      	  "max": 0,
-      	  "custom": false
-      	},
-      	"luck": {
-          "value": 5,
-          "max": 5,
-          "custom": false
-        },
-        "move": {
-          "value": 5,
-          "custom": false
-        },
-        "willpower": {
-      	  "value": 0,
-      	  "tn": 0, 
-      	  "custom": false
-      	}
+        "scores": {
+          "armor": {
+            "value": 0,
+            "properties": [],
+            "custom": false
+          },
+          "defense": {
+            "value": 0,
+            "tn": 0,
+            "custom": false
+          },
+          "encumbrance": {
+            "value": 0,
+            "max": 0,
+            "custom": false
+          },
+          "health": {
+            "value": 0,
+            "max": 0,
+            "custom": false
+          },
+          "luck": {
+            "value": 5,
+            "max": 5,
+            "custom": false
+          },
+          "move": {
+            "value": 5,
+            "custom": false
+          },
+          "willpower": {
+            "value": 0,
+            "tn": 0,
+            "custom": false
+          }
+        }
       },
       "skills": [],
       "traits": [],

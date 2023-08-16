@@ -47,16 +47,24 @@ export class SagaMachineActor extends Actor {
             await this.update({'system.scores.move.value': move});
         }
 
-        // Encumbrance
+        // Encumbrance threshold
         if (!this.system.scores.encumbrance.custom) {
             const encumbrance = this.system.stats.strength.value;
-            await this.update({'system.scores.encumbrance.value': encumbrance});
+            await this.update({'system.scores.encumbrance.max': encumbrance});
         }
+
+        // Encumbrance total
+        const encumbrance_total = this.encumbrance_total();
+        await this.update({'system.scores.encumbrance.value': encumbrance_total});
 
         // Unspent experiences
         const unspent_experiences = this.system.experiences.total - this.system.experiences.spent;
         await this.update({'system.experiences.unspent': unspent_experiences});
     }
+
+    encumbrance_total() {
+		return this.items.filter(item => item.type === 'item').reduce((total, item) => item.encumbrance() + total, 0);
+	}
 
     /**
      * Calculates the character's current Wound total from all Wound, Grave Wound and Fatigue consequences

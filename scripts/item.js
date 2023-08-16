@@ -36,6 +36,21 @@ export class SagaMachineItem extends Item {
         }
     }
 
+    encumbrance() {
+        if (!this.system.carried) return 0;
+        else if (this.system.properties.includes('Neg')) return 0;
+        else if (this.system.properties.includes('Worn') && this.system.equipped) return 0;
+        else {
+            for (const prop of this.system.properties) {
+                if (prop.startsWith('Big ')) {
+                    const [big, val] = prop.split(' ');
+                    return Number(val);
+                }
+            }
+            return 1;
+        }
+    }
+
     /**
      * Derive an attack structure from the Damage property
      */

@@ -225,10 +225,6 @@
 		</div>
 	
 		<div class="tab inventory" data-group="primary" data-tab="inventory">
-            <div class="score flex-group-center">
-                <label class="score-label">Encumbrance</label>
-                <input class="score-input" type="number" name="system.scores.encumbrance.value" value="{{ data.system.scores.encumbrance.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.encumbrance.custom }}disabled{{/unless}} />
-            </div>
             <h3>Equipment</h3>
 			<ol class="items-list">
 				<li class="item flexrow items-header">
@@ -258,6 +254,11 @@
 					</li>
 				{{/each}}
 			</ol>
+
+            <div class="score">
+                <progress name="encumbrance-bar" value="{{ data.system.scores.encumbrance.value }}" max="{{ data.system.scores.encumbrance.max }}"></progress>
+                <label class="score-secondary" name="system.scores.encumbrance.max" for="encumbrance-bar">Encumbrance {{ data.system.scores.encumbrance.value }} / {{ data.system.scores.encumbrance.max }}</label>
+            </div>
 		</div>
 
         <div class="tab advancement" data-group="primary" data-tab="advancement">
