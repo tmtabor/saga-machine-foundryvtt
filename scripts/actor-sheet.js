@@ -31,7 +31,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.weaknesses = this.items(context, 'weakness');
 		context.data.system.consequences = this.items(context, 'consequence');
 		context.data.system.equipment = this.items(context, 'item');
-		context.data.system.attacks = this.items(context, 'item', a => a.system.attack.has_attack);
+		context.data.system.attacks = this.items(context, 'item', a => a.system.attack.has_attack && a.system.equipped);
 
 		// Calculate progress bar percentages
 		context.data.system.scores.health.percent = Math.round((context.data.system.scores.health.value / context.data.system.scores.health.max) * 100)
@@ -48,6 +48,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 
 		// Item creation
 		html.find('.item-create').click(this._onItemCreate.bind(this));
+
+		// Item equipping / unequipping
+		html.find('.item-equip').click(ev => {
+			const box = $(ev.currentTarget).parents(".item");
+			const item = this.actor.items.get(box.data("id"));
+			const update = { _id: item.id, 'system.equipped': !item.system.equipped };
+			this.actor.updateEmbeddedDocuments("Item", [update] );
+		});
 
 		// Item editing
 		html.find('.item-edit').click(ev => {

@@ -27,5 +27,7 @@ Hooks.once("init", async () => {
     Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
 
     // Register handlebars helpers
-    Handlebars.registerHelper("isGM", () => game.user.isGM);
+    Handlebars.registerHelper("is_GM", () => game.user.isGM);
+    Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
+    Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armor');
 });
