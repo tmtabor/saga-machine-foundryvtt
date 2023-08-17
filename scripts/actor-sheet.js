@@ -82,10 +82,12 @@ export class SagaMachineActorSheet extends ActorSheet {
 
 		// Handle custom score toggle, decrement and increment
 		html.find('.score').on('contextmenu', event => {
+			event.preventDefault();
 			const target = $(event.target);
-			if (target.hasClass('score-input')) this._toggle_custom(target);
 			if (target.hasClass('score-secondary')) this._adjust_score(target, -1);
+			else this._toggle_custom(target);
 		}).on('click', event => {
+			event.preventDefault();
 			const target = $(event.target);
 			if (target.hasClass('score-secondary')) this._adjust_score(target, 1);
 		});
@@ -119,7 +121,10 @@ export class SagaMachineActorSheet extends ActorSheet {
 		this.actor.update(update_obj);
 	}
 
-	_toggle_custom(input) {
+	_toggle_custom(element) {
+		const input = element.hasClass('score-input') ? element : element.find('.score-input');
+		if (!input.length) return;
+
 		const score_name = input.attr('name');
 		const score = this._get_score(score_name, ['max', 'value']);
 		if (!score) return; // If the score was not found, do nothing

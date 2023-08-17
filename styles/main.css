@@ -241,6 +241,10 @@ form.saga-machine {
   height: 1.5em;
 }
 
+.saga-machine input[disabled] {
+  pointer-events: none;
+}
+
 .saga-machine progress {
   width: 100%;
 }
