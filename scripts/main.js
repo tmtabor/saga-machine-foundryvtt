@@ -2,6 +2,7 @@ import { SagaMachineActor } from "./actor.js";
 import { SagaMachineActorSheet } from "./actor-sheet.js";
 import { SagaMachineItem } from "./item.js";
 import { SagaMachineItemSheet } from "./item-sheet.js";
+import { sm_test_macro, create_hotbar_macro } from "./tests.js";
 
 // Turn on debugging
 CONFIG.debug.hooks = true;
@@ -15,7 +16,8 @@ Hooks.once("init", async () => {
     // Add classes to global game variable
     game.sagamachine = {
         SagaMachineActor,
-        SagaMachineItem
+        SagaMachineItem,
+        sm_test_macro
     };
 
     // Define custom document classes
@@ -30,4 +32,9 @@ Hooks.once("init", async () => {
     Handlebars.registerHelper("is_GM", () => game.user.isGM);
     Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
     Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armor');
+});
+
+Hooks.once("ready", async function() {
+  // Register the hotbar drop hook
+  Hooks.on("hotbarDrop", (bar, data, slot) => create_hotbar_macro(data, slot));
 });
