@@ -60,6 +60,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 			this.actor.updateEmbeddedDocuments("Item", [update] );
 		});
 
+		// Item carrying / uncarrying
+		html.find('.item-carry').click(ev => {
+			const box = $(ev.currentTarget).parents(".item");
+			const item = this.actor.items.get(box.data("id"));
+			const update = { _id: item.id, 'system.carried': !item.system.carried };
+			this.actor.updateEmbeddedDocuments("Item", [update] );
+		});
+
 		// Item editing
 		html.find('.item-edit').click(ev => {
 			const box = $(ev.currentTarget).parents(".item");
@@ -75,10 +83,12 @@ export class SagaMachineActorSheet extends ActorSheet {
 			box.slideUp(200, () => this.render(false));
 		});
 
-		// Dynamic updating of item rank
+		// Dynamic updating of item rank and quantity
 		html.find('.item-input').on("change", ev => {
 			const box = $(ev.currentTarget).parents(".item");
-			const update = { _id: box.data("id"), 'system.rank': Number(ev.currentTarget.value) };
+			const attribute = ev.currentTarget.getAttribute('name');
+			const update = { _id: box.data("id") };
+			update[attribute] = Number(ev.currentTarget.value);
 			this.actor.updateEmbeddedDocuments("Item", [update] );
 		});
 

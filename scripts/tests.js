@@ -34,8 +34,7 @@ export async function create_hotbar_macro(data, slot) {
 /**
  * Create a Macro from an Item drop. Get an existing item macro if one exists, otherwise create a new one.
  *
- * @param {string} itemName
- * @return {Promise}
+ * @param {string} dataset
  */
 export async function sm_test_macro(dataset) {
     // Get the actor if none is specified in the data

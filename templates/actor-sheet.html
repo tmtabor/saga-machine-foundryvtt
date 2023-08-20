@@ -248,6 +248,7 @@
                             {{#if (is_armor item) }}
                                 <a class="item-control item-equip {{#unless item.system.equipped }}unequipped{{/unless}}" title="Equip Item"><i class="fas fa-tshirt"></i></a>
                             {{/if}}
+                            <a class="item-control item-carry {{#unless item.system.carried }}unequipped{{/unless}}" title="Carry Item"><i class="fas fa-shopping-bag"></i></a>
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
 							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
 						</div>

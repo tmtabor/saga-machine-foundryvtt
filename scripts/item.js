@@ -44,10 +44,10 @@ export class SagaMachineItem extends Item {
             for (const prop of this.system.properties) {
                 if (prop.startsWith('Big ')) {
                     const [big, val] = prop.split(' ');
-                    return Number(val);
+                    return Number(val) * this.system.quantity;
                 }
             }
-            return 1;
+            return this.system.quantity;
         }
     }
 
