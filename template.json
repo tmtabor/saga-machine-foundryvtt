@@ -78,6 +78,10 @@
     "pc": {
       "templates": ["stats", "scores", "skills", "traits", "consequences", "equipment"],
       "ambitions": [],
+      "wealth": {
+        "lifestyle": "",
+        "money": 0
+      },
       "experiences": {
         "total": 0,
         "spent": 0,

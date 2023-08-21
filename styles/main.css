@@ -285,8 +285,7 @@ form.saga-machine {
   flex: 0;
 }
 .saga-machine .sheet-body,
-.saga-machine .sheet-body .tab,
-.saga-machine .sheet-body .tab .editor {
+.saga-machine .sheet-body .tab {
   height: 100%;
 }
 .saga-machine .tox .tox-editor-container {
@@ -437,13 +436,10 @@ form.saga-machine {
   font-size: 1.25em;
 }
 
-.saga-machine .character-notes,
-.saga-machine .gm-notes {
-  height: 250px;
-}
-
-.saga-machine .character-notes > .editor {
-  min-height: 200px;
+.saga-machine .character-notes > .editor,
+.saga-machine .gm-notes > .editor {
+  background-color: rgba(0,0,0,0.05);
+  height: 200px;
 }
 
 .saga-machine .character-notes > .editor > .tox.tox-tinymce {

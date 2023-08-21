@@ -10,7 +10,14 @@
 
         <div class="grid grid-6col item-box">
             <label class="item-label">Group</label>
-            <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.group" value="{{ data.system.group }}" />
+            <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.group" value="{{ data.system.group }}" list="item-groups" />
+            <datalist id="item-groups">
+                <option>Weapon</option>
+                <option>Armor</option>
+                <option>Consumable</option>
+                <option>Tool</option>
+                <option>Miscellaneous</option>
+            </datalist>
         </div>
 
         <div class="grid grid-6col item-box">

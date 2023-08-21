@@ -225,6 +225,25 @@
 		</div>
 	
 		<div class="tab inventory" data-group="primary" data-tab="inventory">
+            <h3>Wealth</h3>
+            <div class="grid grid-4col">
+                <label class="item-label" for="system.wealth.lifestyle">Lifestyle</label>
+                <select class="score-select" name="system.wealth.lifestyle">
+                    {{#select data.system.wealth.lifestyle}}
+                        <option value="Broke">Broke</option>
+                        <option value="Poor">Poor</option>
+                        <option value="Struggling">Struggling</option>
+                        <option value="Average">Average</option>
+                        <option value="Comfortable">Comfortable</option>
+                        <option value="Wealthy">Wealthy</option>
+                        <option value="Very Wealthy">Very Wealthy</option>
+                        <option value="Filthy Rich">Filthy Rich</option>
+                    {{/select}}
+                </select>
+                <label class="item-label" for="system.wealth.money">Money</label>
+                <input class="item-input" type="number" name="system.wealth.money" value="{{ data.system.wealth.money }}" step="1" />
+            </div>
+
             <h3>Equipment</h3>
 			<ol class="items-list">
 				<li class="item flexrow items-header">
@@ -301,16 +320,16 @@
                 </div>
             </div>
 
-            <fieldset class="character-notes">
-                <legend>Notes</legend>
+            <div class="character-notes">
+                <h3>Notes</h3>
                 {{editor data.system.notes target="system.notes" engine="prosemirror" button=true owner=owner editable=editable}}
-            </fieldset>
+            </div>
 
             {{#if (is_GM) }}
-                <fieldset class="gm-notes">
-                    <legend>GM Notes</legend>
+                <div class="gm-notes">
+                    <h3>GM Notes</h3>
                     {{editor data.system.gmnotes target="system.gmnotes" engine="prosemirror" button=true owner=owner editable=editable}}
-                </fieldset>
+                </div>
             {{/if}}
     	</div>
     </section>
