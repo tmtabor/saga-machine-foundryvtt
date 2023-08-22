@@ -17,6 +17,8 @@ export class SagaMachineActor extends Actor {
      * Calculates all derives scores for the character and updates their values
      */
     async calculate_scores() {
+        if (!this.isOwner) return; // Don't calculate scores for actors you don't own
+
         // Defense
         if (!this.system.scores.defense.custom) {
             const defense = this.median([this.system.stats.dexterity.value,

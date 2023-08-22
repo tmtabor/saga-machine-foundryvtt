@@ -476,3 +476,17 @@ form.saga-machine {
 .saga-machine .unequipped {
   color: rgba(0, 0, 0, 0.4);
 }
+
+.saga-machine header.item-top {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  grid-gap: 15px;
+}
+
+/*.saga-machine header.item-top > .profile-img {*/
+/*  width: 120px;*/
+/*}*/
+
+/*.saga-machine header.item-top > .profile-img {*/
+/*  width: 120px;*/
+/*}*/

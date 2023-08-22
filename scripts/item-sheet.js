@@ -8,8 +8,8 @@ export class SagaMachineItemSheet extends ItemSheet {
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["saga-machine", "sheet", "item"],
-            width: 520,
-            height: 280,
+            width: 600,
+            height: 300,
             // tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description"}],
             // scrollY: [".attributes"],
         });
