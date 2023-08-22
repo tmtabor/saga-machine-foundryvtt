@@ -59,9 +59,26 @@ export class SagaMachineActor extends Actor {
         const encumbrance_total = this.encumbrance_total();
         await this.update({'system.scores.encumbrance.value': encumbrance_total});
 
+        // Equipped armor
+        if (!this.system.scores.armor.custom) {
+            const armor = this.armor_value();
+            await this.update({'system.scores.armor.value': armor});
+        }
+
         // Unspent experiences
         const unspent_experiences = this.system.experiences.total - this.system.experiences.spent;
         await this.update({'system.experiences.unspent': unspent_experiences});
+    }
+
+    armor_value() {
+        const equipped_armor = this.items.filter(item => item.type === 'item' &&
+            item.system.group === 'Armor' && item.system.equipped);
+        let highest = 0;
+        for (const arm of equipped_armor) {
+            const val = arm.armor();
+            if (val > highest) highest = val;
+        }
+        return highest;
     }
 
     encumbrance_total() {

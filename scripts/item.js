@@ -36,6 +36,16 @@ export class SagaMachineItem extends Item {
         }
     }
 
+    armor() {
+        for (const prop of this.system.properties) {
+            if (prop.startsWith('Armor ')) {
+                const [arm, val] = prop.split(' ');
+                return Number(val);
+            }
+        }
+        return 0;
+    }
+
     encumbrance() {
         if (!this.system.carried) return 0;
         else if (this.system.properties.includes('Neg')) return 0;
