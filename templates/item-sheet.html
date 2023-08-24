@@ -56,13 +56,25 @@
 
     <fieldset>
         <legend>Attack</legend>
-        <div class="grid grid-6col item-box">
+        <div class="grid grid-8col item-box">
             <label class="item-label">Has Attack</label>
             <input class="toggle-check item-input" type="checkbox" name="system.attack.has_attack" {{ checked data.system.attack.has_attack }} />
             <label class="toggle-display item-label">Damage</label>
             <input class="toggle-display item-input" type="number" name="system.attack.damage" value="{{ data.system.attack.damage }}" step="1" />
             <label class="toggle-display item-label">Strength Adds</label>
             <input class="toggle-display item-input" type="checkbox" name="system.attack.damage_str" {{ checked data.system.attack.damage_str }} />
+            <label class="toggle-display item-label">Type</label>
+            <input class="toggle-display item-input" type="text" name="system.attack.damage_type" value="{{ data.system.attack.damage_type }}" list="damage-types" />
+            <datalist id="damage-types">
+                <option value="burn">Burning (burn)</option>
+                <option value="cor">Corrosive (cor)</option>
+                <option value="cut">Cutting (cut)</option>
+                <option value="fat">Fatigue (fat)</option>
+                <option value="fr">Freezing (fr)</option>
+                <option value="pi">Piercing (pi)</option>
+                <option value="sm">Smashing (sm)</option>
+                <option value="tox">Toxic (tox)</option>
+            </datalist>
 
             <label class="toggle-display item-label">Attack Stat</label>
             <select class="toggle-display grid-start-2 grid-span-2 item-input" name="system.attack.stat">

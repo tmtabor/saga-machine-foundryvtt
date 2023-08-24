@@ -74,6 +74,7 @@ export async function test_dialog(dataset) {
                     const banes = html.find('input[name=banes]').val();
                     const tn = html.find('input[name=tn]').val();
                     const damage = html.find('input[name=damage]').val();
+                    const damage_type = html.find('input[name="damage-type"]').val();
                     const stat_label = html.find('select[name=stat]').val() || html.find('select[name=score]').val();
 
                     const label = test_syntax(stat_label, html.find('select[name=skill]').val(), tn, true);
@@ -84,7 +85,7 @@ export async function test_dialog(dataset) {
                     [stat, score, skill] = apply_unskilled(stat, score, skill);
                     let total = pairs.total + stat || score + skill + modifier;
                     if (stat_label === 'defense' || stat_label === 'willpower') update_defense(actor, pairs.total);
-                    const margin = calc_margin(lookup_tn(tn), total, damage);
+                    const margin = calc_margin(lookup_tn(tn), total, damage, damage_type);
                     const pairs_message = pairs.pairs ? `<br><strong>Pair of ${pairs.pairs}'s!</strong>` : '';
                     let message = await results.toMessage({
                         speaker: ChatMessage.getSpeaker({ actor: actor }),
@@ -114,7 +115,6 @@ export async function test_dialog(dataset) {
                         </div>`;
 
                     ChatMessage.create(message);
-
                 },
                 icon: `<i class="fas fa-check"></i>`
             }
@@ -260,10 +260,11 @@ function update_defense(actor, die) {
  * @param tn
  * @param total
  * @param raw_damage
+ * @param damage_type
  * @returns {{damage: null, margin: number, critical: boolean, success: boolean, message: string}|{message: string}}
  * @private
  */
-function calc_margin(tn, total, raw_damage) {
+function calc_margin(tn, total, raw_damage, damage_type) {
     // Handle unknown TN
     if (!tn) return {
         message: ''
@@ -282,10 +283,10 @@ function calc_margin(tn, total, raw_damage) {
         damage = calc_damage(margin, raw_damage);
         success_message = 'Hit';
         failure_message = 'Miss';
-        extra_message = `Damage ${damage}`;
+        extra_message = `Damage <span class="damage">${damage}</span> <span class="damage-type">${damage_type}</span>`;
     }
 
-    const message = `<div><small>${critical ? 'Critical ' : ''}${success ? success_message : failure_message}! ${extra_message}</small></div>`;
+    const message = `<div><small>${critical ? '<span class="critical">Critical</span> ' : ''}${success ? success_message : failure_message}! ${extra_message}</small></div>`;
     return {
         success: success,
         critical: critical,
@@ -304,8 +305,9 @@ function calc_margin(tn, total, raw_damage) {
  * @private
  */
 function calc_damage(margin, damage_str) {
-	const damage = Function(`'use strict'; return (${damage_str})`)();
-	return margin + damage;
+	let damage = Function(`'use strict'; return (${damage_str})`)();
+	damage = margin + damage;
+    return damage > 0 ? damage : 0;
 }
 
 /**
@@ -326,3 +328,40 @@ function lookup_tn(raw_tn) {
 	if (!scores) return false;
 	return is_defense ? scores.defense.tn : scores.willpower.tn;
 }
+
+Hooks.on("renderChatMessage", async (app, html, msg) => {
+    const damage = html.find('.damage');
+    if (!damage.length) return;
+    const damage_type = html.find('.damage-type');
+    const critical = !!html.find('.critical').length;
+    html[0].setAttribute("draggable", true);	// Add draggable and dragstart listener
+    html[0].addEventListener("dragstart", ev => {
+        ev.currentTarget.dataset['damage'] = Number(damage.text());
+        ev.currentTarget.dataset['damageType'] = damage_type.text();
+        ev.currentTarget.dataset['critical'] = critical;
+		ev.dataTransfer.setData("text/plain", JSON.stringify(ev.currentTarget.dataset));
+    }, false);
+});
+
+Hooks.on("dropActorSheetData", (actor, sheet, data) => {
+    if (data['damage']) actor.apply_damage(data['damage'], data['damageType'], data['critical']);
+});
+
+Hooks.on("getChatLogEntryContext", (html, options) => {
+    options.push({
+        name: 'Apply Damage',
+        icon: '<i class="fas fa-user-minus"></i>',
+        condition: html => !!html.find('.damage').length,
+        callback: html => {
+            const damage = Number(html.find('.damage').text());
+            if (damage) {
+                const damage_type = html.find('.damage-type').text();
+                const critical = !!html.find('.critical').length;
+                const actor = game.user.character;
+                if (!actor) game?.canvas?.tokens?.controlled?.values()?.next()?.value?.actor;
+                if (actor) actor.apply_damage(damage, damage_type, critical);
+                else ui.notifications.warn("No valid character selected.");
+            }
+        }
+    });
+});

@@ -195,7 +195,7 @@
 
 				{{#each data.system.attacks as |attack|}}
 					<li class="item flexrow" data-id="{{ attack._id }}">
-						<h4 class="item-name rollable" data-stat="{{ attack.system.attack.stat }}" data-skill="{{ attack.system.attack.skill }}" data-tn="{{ attack.system.attack.targets }}" data-damage="{{#if attack.system.attack.damage_str}}{{ ../data.system.stats.strength.value }}+{{/if}}{{ attack.system.attack.damage }}">{{ attack.system.full_name }}</h4>
+						<h4 class="item-name rollable" data-stat="{{ attack.system.attack.stat }}" data-skill="{{ attack.system.attack.skill }}" data-tn="{{ attack.system.attack.targets }}" data-damage="{{#if attack.system.attack.damage_str}}{{ ../data.system.stats.strength.value }}+{{/if}}{{ attack.system.attack.damage }}" data-damage-type="{{ attack.system.attack.damage_type }}">{{ attack.system.full_name }}</h4>
 						<div class="item-name">{{ attack.system.properties }}</div>
 					</li>
 				{{/each}}

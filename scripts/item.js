@@ -22,7 +22,8 @@ export class SagaMachineItem extends Item {
      * Derive the full name from the base name and specialization
      */
     async full_name() {
-        const full_name = this.name + (this.system.specialized ? ` (${this.system.specialization})` : '');
+        let full_name = this.name + (this.system.specialized ? ` (${this.system.specialization})` : '');
+        if (this.type === 'trait' && this.system.ranked) full_name += ` ${this.system.rank}`;
         await this.update({'system.full_name': full_name});
     }
 

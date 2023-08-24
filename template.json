@@ -103,6 +103,7 @@
         "specialization": "",
         "specialized": false,
         "ranked": false,
+
         "rank": 0
       },
       "trait": {
@@ -154,6 +155,7 @@
         "has_attack": false,
         "damage": 0,
         "damage_str": false,
+        "damage_type": "",
         "stat": "strength",
         "skill": "Melee",
         "targets": "Defense"
