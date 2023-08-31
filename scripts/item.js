@@ -8,6 +8,9 @@ export class SagaMachineItem extends Item {
     async prepareDerivedData() {
         super.prepareDerivedData();
 
+        // Don't derive properties for items you don't own
+        if (this.actor && !this.actor.isOwner) return;
+
         // Derive the full name from the base name and specialization
         this.full_name();
 

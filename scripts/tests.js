@@ -77,20 +77,25 @@ export async function test_dialog(dataset) {
                     const damage_type = html.find('input[name="damage-type"]').val();
                     const stat_label = html.find('select[name=stat]').val() || html.find('select[name=score]').val();
 
+                    const defense_test = stat_label === 'defense' || stat_label === 'willpower';
                     const label = test_syntax(stat_label, html.find('select[name=skill]').val(), tn, true);
                     const dice = dice_roll(boons, banes);
                     let roll = await new Roll(dice, actor.system);
                     let results = await roll.evaluate();
                     let pairs = make_pairs(results, boons, banes);
                     [stat, score, skill] = apply_unskilled(stat, score, skill);
-                    let total = pairs.total + stat || score + skill + modifier;
-                    if (stat_label === 'defense' || stat_label === 'willpower') update_defense(actor, pairs.total);
+                    let total = pairs.total + (stat || score) + skill + Number(modifier);
+                    if (defense_test) update_defense(actor, pairs.total);
                     const margin = calc_margin(lookup_tn(tn), total, damage, damage_type);
                     const pairs_message = pairs.pairs ? `<br><strong>Pair of ${pairs.pairs}'s!</strong>` : '';
                     let message = await results.toMessage({
                         speaker: ChatMessage.getSpeaker({ actor: actor }),
                         flavor: label
-                    }, {create: false});
+                    }, {create: false });
+                    if (defense_test) {
+                        message.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
+                        message.whisper = game.users.filter(u => u.isGM).map(u => u.id);
+                    }
                     message.content = `
                         <div class="dice-roll">
                             <div class="dice-result">
@@ -103,7 +108,6 @@ export async function test_dialog(dataset) {
                                         <div class="dice">
                                             <header class="part-header flexrow">
                                                 <span class="part-formula">${results.formula}</span>
-            
                                                 <span class="part-total">${results.total}</span>
                                             </header>
                                             ${pairs.html}

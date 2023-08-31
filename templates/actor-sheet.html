@@ -2,7 +2,7 @@
 
     {{!-- Sheet Sidebar --}}
     <aside class="sheet-sidebar">
-        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
+        <img class="system-logo" src="systems/saga-machine/images/theme/saga-machine-logo.png" title="Saga Machine" />
         <h3>Stats</h3>
 		<div class="stats grid grid-4col">
 			<div class="stat flex-group-center">
@@ -70,7 +70,7 @@
 
             <div class="score flex-group-center">
                 <label class="score-label">Health</label>
-                <input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" data-dtype="Number" {{#unless data.system.scores.health.custom }}disabled{{/unless}} style="background: linear-gradient(to right, #ff00007a 0%, #ff00007a {{ data.system.scores.health.percent }}%, #0000000d {{ data.system.scores.health.percent }}%, #0000000d 100%);" />
+                <input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" data-dtype="Number" {{#unless data.system.scores.health.custom }}disabled{{/unless}} style="background: linear-gradient(to right, #ff00007a 0%, #ff00007a {{ data.system.scores.health.percent }}%, rgb(255 255 255 / 5%) {{ data.system.scores.health.percent }}%, rgb(255 255 255 / 5%) 100%);" />
                 <div class="score-secondary" name="system.scores.health.value">Wounds {{ data.system.scores.health.value }}</div>
             </div>
         </div>
@@ -101,6 +101,7 @@
 				{{/each}}
             </ol>
 		</div>
+        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
     </header>
         
     {{!-- Sheet Tab Navigation --}}

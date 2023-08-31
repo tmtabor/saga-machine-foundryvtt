@@ -28,6 +28,19 @@ Hooks.once("init", async () => {
     Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });
     Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
 
+    // Register system config
+    // game.settings.register('saga-machine', 'theme', {
+    //     name: 'Theme',
+    //     hint: 'The theme to use for logos and the style of the default character and item sheets',
+    //     scope: 'world',
+    //     config: true,
+    //     type: String,
+    //     default: 'default',
+    //     choices: {
+    //         "default": "Saga Machine Unified"
+    //     }
+    // });
+
     // Register handlebars helpers
     Handlebars.registerHelper("is_GM", () => game.user.isGM);
     Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
