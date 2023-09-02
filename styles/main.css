@@ -219,6 +219,11 @@
   SHEET STYLES
 */
 
+#logo {
+    content: url(../images/theme/saga-machine-logo.png);
+    width: 110px;
+}
+
 .saga-machine.actor > section.window-content {
     padding: 0;
     overflow: hidden;
@@ -327,6 +332,19 @@ img.system-logo {
 
 .saga-machine progress {
   width: 100%;
+  background-color: transparent;
+  height: 6px;
+  border: 1px solid lightgray;
+  border-radius: 3px;
+}
+
+.saga-machine progress::-webkit-progress-value {
+    background-color: rgba(17, 17, 74, 0.8);
+    border-radius: 5px;
+}
+
+.saga-machine progress::-webkit-progress-bar {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .saga-machine .item-form {
@@ -421,12 +439,29 @@ img.system-logo {
   height: calc(100% - 20px);
 }
 
-.saga-machine .tox .tox-editor-container {
-  /*background: #fff;*/
+.saga-machine .sheet-body .tab.combat,
+.saga-machine .sheet-body .tab.inventory {
+  padding-top: 10px;
 }
-.saga-machine .tox .tox-edit-area {
-  padding: 0 8px;
+
+.saga-machine.sheet .editor-content {
+    padding: 5px;
 }
+
+.saga-machine.sheet .editor-edit {
+  top: 10px;
+  right: 10px;
+}
+
+.saga-machine.sheet .prosemirror menu .pm-dropdown {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.saga-machine .prosemirror menu button:hover,
+.saga-machine .prosemirror menu button.active {
+  background: rgba(255, 255, 255, 0.4);
+}
+
 .saga-machine .items-header {
   height: 28px;
   margin: 2px 0;
@@ -452,7 +487,7 @@ img.system-logo {
 }
 .saga-machine .items-list {
   list-style: none;
-  margin: 0;
+  margin: 0 0 27px 0;
   padding: 0;
   overflow-y: auto;
   scrollbar-width: thin;
@@ -505,8 +540,9 @@ img.system-logo {
   align-items: center;
   padding: 0 2px;
   border-bottom: 1px solid #c9c7b8;
+  min-height: 27px;
 }
-.saga-machine .items-list .item:last-child {
+.saga-machine .items-list .item:last-child:not(.items-header) {
   border-bottom: none;
 }
 .saga-machine .items-list .item .item-name {
@@ -569,15 +605,18 @@ img.system-logo {
   font-size: 1.25em;
 }
 
+.saga-machine .ambitions-list {
+  margin: 0;
+}
+
 .saga-machine .character-notes > .editor,
 .saga-machine .gm-notes > .editor {
   background-color: rgba(0,0,0,0.05);
   height: 200px;
 }
 
-.saga-machine .character-notes > .editor > .tox.tox-tinymce {
-  height: 100%;
-  min-height: 200px;
+.saga-machine .character-notes {
+  margin-bottom: 15px;
 }
 
 .saga-machine .hidden {
@@ -616,10 +655,13 @@ img.system-logo {
   grid-gap: 15px;
 }
 
-/*.saga-machine header.item-top > .profile-img {*/
-/*  width: 120px;*/
-/*}*/
+.saga-machine .inventory-top {
+  height: calc(100% - 35px);
+  overflow: auto;
+}
 
-/*.saga-machine header.item-top > .profile-img {*/
-/*  width: 120px;*/
-/*}*/
+.saga-machine .score.encumbrance {
+  position: absolute;
+  bottom: 10px;
+  width: calc(100% - 20px);
+}
