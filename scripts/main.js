@@ -1,5 +1,6 @@
 import { SagaMachineActor } from "./actor.js";
 import { SagaMachineActorSheet } from "./actor-sheet.js";
+import { SMCombatTracker } from "./combat.js";
 import { SagaMachineItem } from "./item.js";
 import { SagaMachineItemSheet } from "./item-sheet.js";
 import { sm_test_macro, create_hotbar_macro } from "./tests.js";
@@ -23,6 +24,7 @@ Hooks.once("init", async () => {
     // Define custom document classes
     CONFIG.Actor.documentClass = SagaMachineActor;
     CONFIG.Item.documentClass = SagaMachineItem;
+    CONFIG.ui.combat = SMCombatTracker
 
     // Register sheet application classes
     Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });

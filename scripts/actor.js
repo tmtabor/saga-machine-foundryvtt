@@ -1,3 +1,5 @@
+import { INITIATIVE } from "./combat.js";
+
 /**
  * Extends the base Actor class to support the Saga Machine system
  *
@@ -252,5 +254,16 @@ export class SagaMachineActor extends Actor {
     median(arr) {
         const mid = Math.floor(arr.length / 2), nums = [...arr].sort((a, b) => a - b);
         return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+    }
+
+    getInitiativeRoll(formula=null) {
+        // If a formula is supplied for initiative, return a Roll using it
+        if (formula) return new Roll(formula);
+
+        // If this is an NPC, return a Roll with that turn type
+        else if (this.type === 'npc') return new Roll(INITIATIVE.NPC_TURN);
+
+        // Otherwise, evaluate fast or slow turn and return a Roll
+        else return new Roll(this.system.fast_turn ? INITIATIVE.FAST_TURN : INITIATIVE.SLOW_TURN);
     }
 }

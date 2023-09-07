@@ -187,6 +187,15 @@
 		</div>
 		
 		<div class="tab combat" data-group="primary" data-tab="combat">
+            <div class="initiative">
+                    <label class="score-label">Turn</label>
+                    <div class="toggle-switch r">
+                        <input class="toggle-check item-input" type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
+                        <div class="knobs"></div>
+                        <div class="layer"></div>
+                    </div>
+            </div>
+
             <h3>Attacks</h3>
 			<ol class="items-list">
 				<li class="item flexrow items-header">
