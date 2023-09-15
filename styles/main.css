@@ -670,6 +670,17 @@ img.system-logo {
   margin-bottom: 20px;
 }
 
+.combat-top {
+  position: relative;
+  top: 2px;
+  font-size: 1.2em;
+  margin-left: 5px;
+}
+
+.combat-top.rollable:hover {
+  color: black;
+}
+
 /* Toggle Switch */
 
 .toggle-switch .knobs,

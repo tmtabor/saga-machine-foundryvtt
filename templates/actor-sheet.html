@@ -46,12 +46,12 @@
 				<input class="score-input" type="number" name="system.scores.move.value" value="{{ data.system.scores.move.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.move.custom }}disabled{{/unless}} />
 			</div>
 			<div class="score flex-group-center">
-				<label class="score-label rollable" data-score="defense" data-whisper="true" data-consequences='{"type": "defense"}'>Def</label>
+				<label class="score-label rollable" data-score="defense">Def</label>
 				<input class="score-input" type="number" name="system.scores.defense.value" value="{{ data.system.scores.defense.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.defense.custom }}disabled{{/unless}} />
                 <div class="score-secondary" name="system.scores.defense.tn">TN {{ data.system.scores.defense.tn }}</div>
 			</div>
 			<div class="score flex-group-center">
-				<label class="score-label rollable" data-score="willpower" data-whisper="true" data-consequences='{"type": "defense"}'>Will</label>
+				<label class="score-label rollable" data-score="willpower">Will</label>
 				<input class="score-input" type="number" name="system.scores.willpower.value" value="{{ data.system.scores.willpower.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.willpower.custom }}disabled{{/unless}} />
                 <div class="score-secondary" name="system.scores.willpower.tn">TN {{ data.system.scores.willpower.tn }}</div>
 			</div>
@@ -198,6 +198,7 @@
                         <div class="knobs"></div>
                         <div class="layer"></div>
                     </div>
+                <label class="combat-top rollable" title="Defense Test" data-score="defense" data-whisper="true" data-consequences='{"type": "defense"}'><i class="fas fa-shield-alt"></i></label>
             </div>
 
             <h3>Attacks</h3>
