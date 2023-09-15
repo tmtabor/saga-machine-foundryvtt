@@ -739,7 +739,7 @@ img.system-logo {
 .toggle-switch .toggle-check:checked + .knobs:before {
   content: "Fast";
   left: 26px;
-  background-color: #dcb95f;
+  background-color: #11114a;
 }
 
 .toggle-switch .toggle-check:checked ~ .layer {
@@ -752,3 +752,39 @@ img.system-logo {
   transition: 0.3s ease all;
 }
 
+.chat-message .flavor-text > .action {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 0;
+}
+
+.chat-message .flavor-text .critical.success {
+  color: rgb(0, 128, 0);
+}
+
+.chat-message .flavor-text .success {
+  color: rgb(0, 0, 255);
+}
+
+.chat-message .flavor-text .failure {
+  color: rgb(212, 107, 0);
+}
+
+.chat-message .flavor-text .critical.failure {
+  color: rgb(255, 0, 0);
+}
+
+.chat-message .flavor-text > hr {
+  margin: 3px 0 5px 0;
+}
+
+.chat-message .tags {
+  margin-bottom: 3px;
+}
+
+.chat-message .tags > .tag {
+  border: solid 1px rgba(0, 0, 0, 0.2);
+  padding: 1px 3px 1px 3px;
+  border-radius: 3px;
+  margin-right: 5px;
+}

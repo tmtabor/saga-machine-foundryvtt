@@ -46,12 +46,12 @@
 				<input class="score-input" type="number" name="system.scores.move.value" value="{{ data.system.scores.move.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.move.custom }}disabled{{/unless}} />
 			</div>
 			<div class="score flex-group-center">
-				<label class="score-label rollable" data-score="defense">Def</label>
+				<label class="score-label rollable" data-score="defense" data-whisper="true" data-consequences='{"type": "defense"}'>Def</label>
 				<input class="score-input" type="number" name="system.scores.defense.value" value="{{ data.system.scores.defense.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.defense.custom }}disabled{{/unless}} />
                 <div class="score-secondary" name="system.scores.defense.tn">TN {{ data.system.scores.defense.tn }}</div>
 			</div>
 			<div class="score flex-group-center">
-				<label class="score-label rollable" data-score="willpower">Will</label>
+				<label class="score-label rollable" data-score="willpower" data-whisper="true" data-consequences='{"type": "defense"}'>Will</label>
 				<input class="score-input" type="number" name="system.scores.willpower.value" value="{{ data.system.scores.willpower.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.willpower.custom }}disabled{{/unless}} />
                 <div class="score-secondary" name="system.scores.willpower.tn">TN {{ data.system.scores.willpower.tn }}</div>
 			</div>
@@ -139,6 +139,10 @@
                                 </div>
                             </li>
                         {{/each}}
+
+                        <li class="item flexrow">
+                            <h4 class="item-name rollable" data-stat="strength" data-skill="Unskilled">Unskilled</h4>
+                        </li>
                     </ol>
                 </div>
 
@@ -205,7 +209,7 @@
 
 				{{#each data.system.attacks as |attack|}}
 					<li class="item flexrow" data-id="{{ attack._id }}">
-						<h4 class="item-name rollable" data-stat="{{ attack.system.attack.stat }}" data-skill="{{ attack.system.attack.skill }}" data-tn="{{ attack.system.attack.targets }}" data-damage="{{#if attack.system.attack.damage_str}}{{ ../data.system.stats.strength.value }}+{{/if}}{{ attack.system.attack.damage }}" data-damage-type="{{ attack.system.attack.damage_type }}">{{ attack.system.full_name }}</h4>
+						<h4 class="item-name rollable" data-stat="{{ attack.system.attack.stat }}" data-skill="{{ attack.system.attack.skill }}" data-tn="{{ attack.system.attack.targets }}" data-consequences='{"type": "damage", "value": "{{ attack.system.attack.total_damage }}", "damage_type": "{{ attack.system.attack.damage_type }}", "when": "success"}'>{{ attack.system.full_name }}</h4>
 						<div class="item-name">{{ attack.system.properties }}</div>
 					</li>
 				{{/each}}

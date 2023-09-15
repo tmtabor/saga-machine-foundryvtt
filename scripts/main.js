@@ -3,7 +3,7 @@ import { SagaMachineActorSheet } from "./actor-sheet.js";
 import { SMCombatTracker } from "./combat.js";
 import { SagaMachineItem } from "./item.js";
 import { SagaMachineItemSheet } from "./item-sheet.js";
-import { sm_test_macro, create_hotbar_macro } from "./tests.js";
+import { sm_test_macro } from "./tests.js";
 
 // Turn on debugging
 CONFIG.debug.hooks = true;
@@ -47,9 +47,4 @@ Hooks.once("init", async () => {
     Handlebars.registerHelper("is_GM", () => game.user.isGM);
     Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
     Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armor');
-});
-
-Hooks.once("ready", async function() {
-  // Register the hotbar drop hook
-  Hooks.on("hotbarDrop", (bar, data, slot) => create_hotbar_macro(data, slot));
 });

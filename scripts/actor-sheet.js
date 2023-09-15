@@ -35,6 +35,13 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.equipment = this.items(context, 'item');
 		context.data.system.attacks = this.items(context, 'item', a => a.system.attack.has_attack && a.system.equipped);
 
+		// Calculate totaled damage for all attacks
+		for (let weapon of context.data.system.attacks) {
+			weapon.system.attack.total_damage = weapon.system.attack.damage_str ?
+				(Number(context.data.system.stats.strength.value) + Number(weapon.system.attack.damage)) :
+				weapon.system.attack.damage;
+		}
+
 		// Calculate progress bar percentages
 		if (!context.data.system.scores.health.max) context.data.system.scores.health.percent = 0;
 		else context.data.system.scores.health.percent = Math.round((context.data.system.scores.health.value / context.data.system.scores.health.max) * 100)
@@ -121,7 +128,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 * @private
 	 */
 	_onDragStart(event) {
-		event.currentTarget.dataset['actorId'] = this.actor.id;
+		// Attach IDs to the dataset
+		this.attach_ids(event.currentTarget.dataset);
 		event.dataTransfer.setData("text/plain", JSON.stringify(event.currentTarget.dataset));
 	}
 
@@ -189,8 +197,30 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	async on_roll(event) {
 		event.preventDefault();
-		event.currentTarget.dataset['actorId'] = this.actor.id;
+
+		// Attach IDs to the dataset
+		this.attach_ids(event.currentTarget.dataset);
+
+		// Show the dialog
 		await test_dialog(event.currentTarget.dataset);
+	}
+
+	/**
+	 * Attach token, scene and/or actor IDs to the given dataset
+	 *
+	 * @param dataset
+	 */
+	attach_ids(dataset) {
+		// Attach token and scene ID, if available
+		if (this.token) {
+			dataset['tokenId'] = this.token.id;
+			dataset['sceneId'] = this.token.parent.id;
+		}
+
+		// Otherwise, attach the actor ID
+		else {
+			dataset['actorId'] = this.actor.id;
+		}
 	}
 
 	/**
