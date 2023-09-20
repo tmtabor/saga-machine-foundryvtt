@@ -1,98 +1,123 @@
 <form class="{{cssClass}}" autocomplete="off">
-    <fieldset>
-        <legend>Item Basics</legend>
-        <div class="grid grid-6col item-box">
-            <label class="item-label">Name</label>
-            <input class="grid-start-2 grid-span-3 item-input" type="text" name="name" value="{{ data.name }}" />
-            <label class="item-label">Quantity</label>
-            <input class="item-input" type="number" name="system.quantity" value="{{ data.system.quantity }}" step="1" />
+    <header class="item-top">
+        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
+
+        <div class="item-topright">
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Name</label>
+                <input class="grid-start-2 grid-span-3 item-input" type="text" name="name" value="{{ data.name }}" />
+                <label class="item-label">Quantity</label>
+                <input class="item-input" type="number" name="system.quantity" value="{{ data.system.quantity }}" step="1" />
+            </div>
+
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Group</label>
+                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.group" value="{{ data.system.group }}" list="item-groups" />
+                <datalist id="item-groups">
+                    <option>Weapon</option>
+                    <option>Armor</option>
+                    <option>Consumable</option>
+                    <option>Tool</option>
+                    <option>Miscellaneous</option>
+                </datalist>
+            </div>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="basics">Basics</a>
+        <a class="item" data-tab="attacks">Attacks</a>
+        <a class="item" data-tab="description">Description</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab basics" data-group="primary" data-tab="basics">
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Properties</label>
+                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.properties" value="{{ data.system.properties }}" />
+            </div>
+
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Carried</label>
+                <input class="item-input" type="checkbox" name="system.carried" {{ checked data.system.carried }} />
+                <label class="item-label">Equipped</label>
+                <input class="item-input" type="checkbox" name="system.equipped" {{ checked data.system.equipped }} />
+                <label class="item-label">Cost</label>
+                <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
+            </div>
+
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Specialized</label>
+                <input class="toggle-check item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
+                <label class="toggle-visible item-label">Specialization</label>
+                <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="text" name="system.specialization" value="{{ data.system.specialization }}" />
+            </div>
+
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Ranked</label>
+                <input class="toggle-check item-input" type="checkbox" name="system.ranked" {{checked data.system.ranked}} />
+                <label class="toggle-visible item-label">Rank</label>
+                <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
+            </div>
         </div>
 
-        <div class="grid grid-6col item-box">
-            <label class="item-label">Group</label>
-            <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.group" value="{{ data.system.group }}" list="item-groups" />
-            <datalist id="item-groups">
-                <option>Weapon</option>
-                <option>Armor</option>
-                <option>Consumable</option>
-                <option>Tool</option>
-                <option>Miscellaneous</option>
-            </datalist>
+        <div class="tab attacks" data-group="primary" data-tab="attacks">
+            <ol class="items-list attack-list">
+                <li class="item flexrow items-header">
+                    <div class="item-name">Stat</div>
+                    <div class="item-name">Skill</div>
+                    <div class="item-name">Targets</div>
+                    <div class="item-name">Damage</div>
+                    <div class="item-name">Type</div>
+                    <div class="item-name">Consequence</div>
+                    <div class="item-controls">
+                        <a class="item-control item-create" title="Create attack" data-type="item"><i class="fas fa-plus"></i> Add</a>
+                    </div>
+                </li>
+
+                <li class="item flexrow attack prototype">
+                    <select class="item-input item-name" name="stat">
+                        <option value="">--</option>
+                        <option value="strength">Strength</option>
+                        <option value="dexterity">Dexterity</option>
+                        <option value="speed">Speed</option>
+                        <option value="endurance">Endurance</option>
+                        <option value="intelligence">Intelligence</option>
+                        <option value="perception">Perception</option>
+                        <option value="charisma">Charisma</option>
+                        <option value="determination">Determination</option>
+                    </select>
+                    <input class="item-input item-name" type="text" name="skill" value="" />
+                    <select class="item-input item-name" name="targets">
+                        <option value="">--</option>
+                        <option value="Defense">Defense</option>
+                        <option value="Willpower">Willpower</option>
+                    </select>
+                    <input class="item-input item-name" type="text" name="damage" value="0" />
+                    <select class="item-input item-name" name="damage_type">
+                        <option value="">--</option>
+                        <option value="burn">Burning (burn)</option>
+                        <option value="cor">Corrosive (cor)</option>
+                        <option value="cut">Cutting (cut)</option>
+                        <option value="fat">Fatigue (fat)</option>
+                        <option value="fr">Freezing (fr)</option>
+                        <option value="pi">Piercing (pi)</option>
+                        <option value="sm">Smashing (sm)</option>
+                        <option value="tox">Toxic (tox)</option>
+                    </select>
+                    <input class="item-input item-name" type="text" name="consequences" value="" />
+
+                    <div class="item-controls">
+                        <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                    </div>
+                </li>
+            </ol>
         </div>
 
-        <div class="grid grid-6col item-box">
-            <label class="item-label">Properties</label>
-            <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.properties" value="{{ data.system.properties }}" />
-        </div>
-
-        <div class="grid grid-6col item-box">
-            <label class="item-label">Carried</label>
-            <input class="item-input" type="checkbox" name="system.carried" {{ checked data.system.carried }} />
-            <label class="item-label">Equipped</label>
-            <input class="item-input" type="checkbox" name="system.equipped" {{ checked data.system.equipped }} />
-            <label class="item-label">Cost</label>
-            <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
-        </div>
-
-        <div class="grid grid-6col item-box">
-            <label class="item-label">Specialized</label>
-            <input class="toggle-check item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
-            <label class="toggle-visible item-label">Specialization</label>
-            <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="text" name="system.specialization" value="{{ data.system.specialization }}" />
-        </div>
-
-        <div class="grid grid-6col item-box">
-            <label class="item-label">Ranked</label>
-            <input class="toggle-check item-input" type="checkbox" name="system.ranked" {{checked data.system.ranked}} />
-            <label class="toggle-visible item-label">Rank</label>
-            <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
-        </div>
-
-        <div class="item-box">
-            <label class="item-label">Description</label>
+        <div class="tab description" data-group="primary" data-tab="description">
             <textarea class="item-input" type="text" name="system.description">{{ data.system.description }}</textarea>
         </div>
-    </fieldset>
-
-    <fieldset>
-        <legend>Attack</legend>
-        <div class="grid grid-8col item-box">
-            <label class="item-label">Has Attack</label>
-            <input class="toggle-check item-input" type="checkbox" name="system.attack.has_attack" {{ checked data.system.attack.has_attack }} />
-            <label class="toggle-display item-label">Damage</label>
-            <input class="toggle-display item-input" type="number" name="system.attack.damage" value="{{ data.system.attack.damage }}" step="1" />
-            <label class="toggle-display item-label">Strength Adds</label>
-            <input class="toggle-display item-input" type="checkbox" name="system.attack.damage_str" {{ checked data.system.attack.damage_str }} />
-            <label class="toggle-display item-label">Type</label>
-            <select class="toggle-display item-input" name="system.attack.damage_type">
-                {{#select data.system.attack.damage_type}}
-                    <option value="burn">Burning (burn)</option>
-                    <option value="cor">Corrosive (cor)</option>
-                    <option value="cut">Cutting (cut)</option>
-                    <option value="fat">Fatigue (fat)</option>
-                    <option value="fr">Freezing (fr)</option>
-                    <option value="pi">Piercing (pi)</option>
-                    <option value="sm">Smashing (sm)</option>
-                    <option value="tox">Toxic (tox)</option>
-                {{/select}}
-            </select>
-
-            <label class="toggle-display item-label">Attack Stat</label>
-            <select class="toggle-display grid-start-2 grid-span-2 item-input" name="system.attack.stat">
-                {{#select data.system.attack.stat}}
-                    <option value="">--</option>
-                    <option value="strength">Strength</option>
-                    <option value="dexterity">Dexterity</option>
-                    <option value="speed">Speed</option>
-                    <option value="endurance">Endurance</option>
-                    <option value="intelligence">Intelligence</option>
-                    <option value="perception">Perception</option>
-                    <option value="charisma">Charisma</option>
-                    <option value="determination">Determination</option>
-                {{/select}}
-            </select>
-            <label class="toggle-display item-label">Attack Skill</label>
-            <input class="toggle-display grid-start-5 grid-span-2 item-input" type="text" name="system.attack.skill" value="{{ data.system.attack.skill }}" />
-        </div>
-    </fieldset>
+    </section>
 </form>

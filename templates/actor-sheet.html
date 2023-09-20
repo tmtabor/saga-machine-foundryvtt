@@ -204,14 +204,18 @@
             <h3>Attacks</h3>
 			<ol class="items-list">
 				<li class="item flexrow items-header">
-					<div class="item-name">Weapon</div>
+					<div class="item-name">Name</div>
+                    <div class="item-name">Test</div>
+                    <div class="item-name">Effect</div>
 					<div class="item-name">Properties</div>
 				</li>
 
 				{{#each data.system.attacks as |attack|}}
-					<li class="item flexrow" data-id="{{ attack._id }}">
-						<h4 class="item-name rollable" data-stat="{{ attack.system.attack.stat }}" data-skill="{{ attack.system.attack.skill }}" data-tn="{{ attack.system.attack.targets }}" data-consequences='{"type": "damage", "value": "{{ attack.system.attack.total_damage }}", "damage_type": "{{ attack.system.attack.damage_type }}", "when": "success"}'>{{ attack.system.full_name }}</h4>
-						<div class="item-name">{{ attack.system.properties }}</div>
+					<li class="item flexrow">
+						<h4 class="item-name rollable" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-consequences='{{ consequences_string }}'>{{ attack.full_name }}</h4>
+                        <div class="item-name">{{ attack.label }}</div>
+                        <div class="item-name">({{{ attack.effect }}})</div>
+						<div class="item-name">{{ attack.properties }}</div>
 					</li>
 				{{/each}}
 			</ol>

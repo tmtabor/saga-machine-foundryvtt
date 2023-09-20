@@ -1,4 +1,4 @@
-import { test_dialog } from "./tests.js";
+import { Attack, test_dialog } from "./tests.js";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -14,7 +14,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 			width: 850,
 			height: 650,
 			tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "basics"}],
-			scrollY: [".basics", ".skills", ".traits", ".combat", ".inventory"]
+			scrollY: [".basics", ".combat", ".inventory", ".advancement",]
 			// dragDrop: [{dragSelector: ".item-list .item", dropSelector: null}]
 		});
 	}
@@ -33,14 +33,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.weaknesses = this.items(context, 'weakness');
 		context.data.system.consequences = this.items(context, 'consequence');
 		context.data.system.equipment = this.items(context, 'item');
-		context.data.system.attacks = this.items(context, 'item', a => a.system.attack.has_attack && a.system.equipped);
-
-		// Calculate totaled damage for all attacks
-		for (let weapon of context.data.system.attacks) {
-			weapon.system.attack.total_damage = weapon.system.attack.damage_str ?
-				(Number(context.data.system.stats.strength.value) + Number(weapon.system.attack.damage)) :
-				weapon.system.attack.damage;
-		}
+		context.data.system.attacks = this._gather_attacks(context);
 
 		// Calculate progress bar percentages
 		if (!context.data.system.scores.health.max) context.data.system.scores.health.percent = 0;
@@ -119,6 +112,31 @@ export class SagaMachineActorSheet extends ActorSheet {
 			li.setAttribute("draggable", true);	// Add draggable and dragstart listener
 			li.addEventListener("dragstart", ev => this._onDragStart(ev), false);
 		});
+	}
+
+	/**
+	 * Return list of all attacks provided by all items
+	 *
+	 * @param context
+	 * @returns {*[]}
+	 * @private
+	 */
+	_gather_attacks(context) {
+		const attacks = [];
+		const attack_items = context.data.items.filter(item => item.system.attacks && item.system.attacks.length &&
+			(item.system.equipped || item.system.equipped === undefined));
+
+		for (let item of attack_items)
+			for (let attack of item.system.attacks)
+				attacks.push(new Attack({
+					actor: this.actor,
+					name: item.system.full_name,
+					type: item.type,
+					properties: item.system.properties || '',
+					...attack
+				}));
+
+		return attacks;
 	}
 
 	/**

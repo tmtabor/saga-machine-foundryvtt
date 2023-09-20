@@ -597,8 +597,13 @@ img.system-logo {
   border-right: 1px solid #c9c7b8;
   font-size: 12px;
 }
+
 .saga-machine .effects .item .effect-controls {
   border: none;
+}
+
+.saga-machine.item .attack.prototype {
+  display: none;
 }
 
 .saga-machine fieldset legend {

@@ -119,10 +119,12 @@
     "skill": {
       "templates": ["basics"],
       "default": "",
-      "ranked": true
+      "ranked": true,
+      "attacks": []
     },
     "trait": {
-      "templates": ["basics", "trait"]
+      "templates": ["basics", "trait"],
+      "attacks": []
     },
     "weakness": {
       "templates": ["basics", "trait"]
@@ -151,15 +153,7 @@
       "quantity": 1,
       "properties": [],
       "group": "",
-      "attack": {
-        "has_attack": false,
-        "damage": 0,
-        "damage_str": false,
-        "damage_type": "",
-        "stat": "strength",
-        "skill": "Melee",
-        "targets": "Defense"
-      },
+      "attacks": [],
       "carried": true,
       "equipped": false,
       "cost": 0

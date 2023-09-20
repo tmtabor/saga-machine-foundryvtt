@@ -1,4 +1,4 @@
-import {capitalize, token_actor} from "./utils.js";
+import { capitalize, token_actor } from "./utils.js";
 
 /**
  * Object representing a Saga Machine test
@@ -45,7 +45,16 @@ export class Test {
 
         // Parse the consequences, if any
         if (this.consequences) {
-            let consequence_list = JSON.parse(this.consequences);
+            // If the consequences are already parsed, return
+            if (Array.isArray(this.consequences) && this.consequences.every(c => c instanceof Consequence))
+                return;
+
+            // Otherwise, parse them if a string
+            let consequence_list = null;
+            if (typeof this.consequences === 'string') consequence_list = JSON.parse(this.consequences);
+            else consequence_list = this.consequences;
+
+            // And transform the into consequence objects
             if (!Array.isArray(consequence_list)) consequence_list = [consequence_list];
             for (let i = 0; i < consequence_list.length; i++)
                 consequence_list[i] = new Consequence(consequence_list[i], this);
@@ -379,6 +388,81 @@ export class Test {
         // Send the message to chat
         ChatMessage.create(message);
     }
+
+    static to_json(test) {
+        const json = {};
+        for (let [key, value] of Object.entries(test)) {
+            // For basic data, copy it over to the JSON
+            if (typeof value === 'string' || typeof value === 'number' ||
+                typeof value === 'boolean' || value === null)
+                json[key] = value;
+
+            // Special handling for _actor and target
+            else if (key === '_actor' || key === 'target') {
+                // If not a token actor, copy over actor ID
+                if (!value.isToken) json[key] = { actor_id: value.id };
+
+                // If a token actor, copy over token and scene IDs
+                else json[key] = { token_id: value.token.id, scene_id: value.token.parent.id };
+            }
+
+            // Special handling for consequences
+            else if (key === 'consequences') {
+                const con_json = [];
+                for (let con of test.consequences)
+                    con_json.push(Consequence.to_json(con));
+                json[key] = con_json;
+            }
+
+            // Special handling for results
+            else if (key === 'results')
+                json[key] = {
+                    _evaluated: value._evaluated,
+                    _formula: value._formula,
+                    _total: value._total,
+                    dice: value.dice.map(d => d.total)
+                };
+        }
+
+        return json;
+    }
+
+    static from_json(obj) {
+        const dataset = {};
+        for (let [key, value] of Object.entries(test)) {
+            // For basic data, copy it over to the JSON
+            if (typeof value === 'string' || typeof value === 'number' ||
+                typeof value === 'boolean' || value === null)
+                dataset[key] = obj[key]
+
+            // Special handling for _actor and target
+            else if (key === '_actor' || key === 'target') {
+                if (value instanceof game.sagamachine.SagaMachineActor) dataset[key] = value;
+                else dataset[key] = token_actor({
+                    scene_id: value.scene_id,
+                    token_id: value.tokenId,
+                    actor_id: value.actor_id
+                });
+            }
+
+            // Special handling for consequences
+            else if (key === 'consequences') dataset[key] = value;
+
+            // Special handling for results
+            else if (key === 'results') {
+                dataset[key] = new Roll(value._formula);
+                dataset[key]._evaluated = value._evaluated;
+                dataset[key]._formula = value._formula;
+                dataset[key]._total = value._total;
+                for (let i = 0; i < value.dice.length; i++)
+                    Object.defineProperty(dataset[key].dice[i], "total", {
+                        get: function () { return value.dice[i] }
+                    });
+            }
+        }
+
+        return new Test(dataset);
+    }
 }
 
 /**
@@ -410,6 +494,42 @@ export class Consequence {
         return `<div><strong>${key}:</strong> ${value}</div>`;
     }
 
+    effect() {
+        if (this.type === 'damage') return `${this.value} ${this.damage_type}`;
+        else if (this.type === 'consequence') return this.consequence_link();
+        else return 'Special';
+    }
+
+    consequence_link(name=null) {
+        // If no provided name, use the default one
+        if (!name) name = this.name;
+
+        // Get the consequence, if it exists as an item
+        let consequence = game.items.filter(item => item.type === 'consequence' && item.name === this.name);
+        if (!consequence || !consequence.length) return name;
+        return `<a class="content-link" draggable="true" data-uuid="Item.${consequence[0].id}" data-id="${consequence[0].id}" data-type="Item" data-tooltip="Item"><i class="fas fa-suitcase"></i>${name}</a>`;
+    }
+
+    base_damage() {
+        let damage = 0;
+
+        // Search damage string for each stat and apply
+        let str_dmg = String(this.value).toLowerCase();
+        if (str_dmg.includes('str')) damage += Number(this?.test?.actor?.system?.stats?.strength?.value);
+        if (str_dmg.includes('dex')) damage += Number(this?.test?.actor?.system?.stats?.dexterity?.value);
+        if (str_dmg.includes('spd')) damage += Number(this?.test?.actor?.system?.stats?.speed?.value);
+        if (str_dmg.includes('end')) damage += Number(this?.test?.actor?.system?.stats?.endurance?.value);
+        if (str_dmg.includes('int')) damage += Number(this?.test?.actor?.system?.stats?.intelligence?.value);
+        if (str_dmg.includes('per')) damage += Number(this?.test?.actor?.system?.stats?.perception?.value);
+        if (str_dmg.includes('chr')) damage += Number(this?.test?.actor?.system?.stats?.charisma?.value);
+        if (str_dmg.includes('det')) damage += Number(this?.test?.actor?.system?.stats?.determination?.value);
+
+        // Strip the damage string of any alphabetic characters, add and return
+        str_dmg = str_dmg.replace(/[^\d.-]/g, '');
+        damage += Number(str_dmg);
+        return damage;
+    }
+
     apply(when='always') {
         if (this.type === 'consequence' && this.right_time(when))    this.apply_consequence();
         if (this.type === 'damage' && this.right_time(when))         this.apply_damage();
@@ -417,17 +537,13 @@ export class Consequence {
     }
 
     apply_consequence() {
-        // Get the consequence, if it exists as an item
-        let consequence = game.items.filter(item => item.type === 'consequence' && item.name === this.name);
-
         // Attach subject to name if specified
         const clean_name = this.name ? this.name : 'Unknown';
         const full_name = this.subject ? `${clean_name} (${this.subject})` : clean_name;
 
         // Create the embedded consequence link
-        let link = null;
-        if (!consequence.length) link = full_name;
-        else link = `<a class="content-link" draggable="true" data-uuid="Item.${consequence[0].id}" data-id="${consequence[0].id}" data-type="Item" data-tooltip="Item"><i class="fas fa-suitcase"></i>${full_name}</a>`;
+        let link = this.consequence_link(full_name);
+        if (!link) link = full_name;
 
         // Set the message
         this.message = this.format_message('Consequence', link);
@@ -435,7 +551,7 @@ export class Consequence {
 
     apply_damage() {
         // Calculate the damage
-        let damage = Number(this.value);                                // Base damage
+        let damage = this.base_damage();                                // Base damage
         if (this.test && this.test.margin) damage += this.test.margin   // Add the margin
         if (damage < 0) damage = 0;                                     // Minimum 0
 
@@ -469,6 +585,53 @@ export class Consequence {
         // Set the message
         this.message = this.format_message('Defense', `TN ${defense_tn}`) +
             this.format_message('Willpower', `TN ${willpower_tn}`);
+    }
+
+    static to_json(test) {
+        const json = {};
+        for (let [key, value] of Object.entries(test)) {
+            // For basic data, copy it over to the JSON
+            if (typeof value === 'string' || typeof value === 'number' ||
+                typeof value === 'boolean' || value === null)
+                json[key] = value;
+        }
+
+        return json;
+    }
+
+    static from_json(obj) {
+        return new Consequence(obj);
+    }
+}
+
+/**
+ * Object representing an Attack test
+ */
+export class Attack extends Test {
+    _consequences_string = null;
+    _effect = null;
+
+    get full_name() {
+        return this.name || "Unnamed Attack";
+    }
+
+    get consequences_string() {
+        // Return cached version
+        if (this._consequences_string) return this._consequences_string;
+
+        // Or lazily generate the string and return
+        this._consequences_string = this.consequences ?
+            JSON.stringify(this.consequences.map(c => Consequence.to_json(c))) : "[]";
+        return this.consequences_string;
+    }
+
+    get effect() {
+        // Return cached version
+        if (this._effect) return this._effect;
+
+        // If there are no consequences specified, return empty string, otherwise, compile the list of effects
+        this._effect = this.consequences ? this.consequences.map(c => c.effect()).join(', ') : '';
+        return this._effect
     }
 }
 
