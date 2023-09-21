@@ -1,4 +1,5 @@
 import { INITIATIVE } from "./combat.js";
+import { Test } from "./tests.js";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
@@ -265,5 +266,22 @@ export class SagaMachineActor extends Actor {
 
         // Otherwise, evaluate fast or slow turn and return a Roll
         else return new Roll(this.system.fast_turn ? INITIATIVE.FAST_TURN : INITIATIVE.SLOW_TURN);
+    }
+
+    async test(dataset) {
+        // Merge the actor into the dataset
+        const spec = { actor: this, ...dataset };
+
+        // Create the test and evaluate unless evaluate=false
+        const test = new Test(spec);
+        if (dataset.evaluate !== false) await test.evaluate();
+
+        // Apply consequences, unless apply_consequences=false
+        if (dataset.apply_consequences !== false) await test.apply_consequences();
+
+        // Send to chat, if chat=true, whisper if whisper=true
+        if (dataset.chat) await test.to_chat(!!dataset.whisper);
+
+        return test;
     }
 }

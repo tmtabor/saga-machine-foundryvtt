@@ -4,6 +4,34 @@ export const INITIATIVE = {
     SLOW_TURN: "1"
 };
 
+Hooks.on("preUpdateCombat", async (combat, update_data) => {
+    if (!update_data.round && !update_data.turn) return;
+
+    const roll_defenses = async () => {
+        // New Round Card - prompt players to choose fast / slow turn
+        ChatMessage.create({content: `<strong>Round ${combat.round+1}</strong><br/>Choose a Fast or Slow turn now!`});
+
+        // Ensure that all combatants have a fast / slow turn marked in the order
+        await combat.rollAll();
+
+        // Make a defense test for everyone
+        for (let c of combat.combatants)
+            await c.actor.test({
+                stat: 'defense',
+                consequences: [{"type": "defense"}],
+                whisper: true,
+                chat: true
+            });
+    };
+
+    // Start of Combat
+    if (combat.round === 0  && combat.active) await roll_defenses();
+
+    // Start of Each New Round
+    if (combat.round !== 0 && combat.turns && combat.active && combat.current.turn > -1 &&
+        combat.current.turn === combat.turns.length - 1) await roll_defenses();
+});
+
 Hooks.on('updateActor', async (actor, update) => {
     // Update the combat initiative if the actor has changed its turn type
     const turn_changed = typeof update?.system?.fast_turn !== 'undefined' && update?.system?.fast_turn !== null;
