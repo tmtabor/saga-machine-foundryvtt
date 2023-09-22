@@ -151,6 +151,24 @@ export class Test {
         return [highest_pair, use_pair];
     }
 
+    discard_lowest(discarded_only=true) {
+        // Only need to bother with this if there are banes
+        if (this.banes <= this.boons) return;
+
+        // Find the lowest die
+        const lowest = this.results.terms[0].results.filter(d => d.discarded || !discarded_only)
+            .map(d => d.result).sort((a, b) => a - b)[0];
+
+        // Remove the lowest die
+        let discarded_yet = false;
+        this.results.terms[0].results.forEach((d, i) => {
+            if ((!discarded_only || d.discarded) && d.result === lowest && !discarded_yet) {
+                this.results.terms[0].results.splice(i, 1);
+                discarded_yet = true;
+            }
+        });
+    }
+
     add_luck_die(results) {
         const luck_die = results.terms[0].results[0];   // Get the die results
         luck_die['discarded'] = true;                   // Mark as found_selected
@@ -862,6 +880,7 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
             [test.total, test.randomizer, test.stat_value, test.skill_value] = test.calc_total();   // Calculate total
             [test.tn, test.target, test.target_score] = test.lookup_tn();                           // Determine success
             [test.success, test.critical, test.margin] = test.calc_margin();                        // Calculate margin
+            test.discard_lowest();                                                                  // Replace die
 
             // Decrement luck
             test.actor.update({'system.scores.luck.value': test.actor.system.scores.luck.value - 1});
