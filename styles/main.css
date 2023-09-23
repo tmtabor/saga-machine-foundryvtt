@@ -254,6 +254,16 @@
   text-shadow: 2px 2px black;
   letter-spacing: 0.05em;
   text-rendering: optimizeLegibility;
+  position: relative;
+}
+
+.saga-machine .sidebar-frame {
+  overflow: auto;
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 90px;
+  bottom: 40px;
 }
 
 .saga-machine .sheet-sidebar .grid {
@@ -302,7 +312,7 @@ img.system-logo {
 }
 
 .saga-machine .rollable:hover, .rollable:focus {
-    color: #eecf80;
+    color: #000000;
     text-shadow: 0 0 10px rgba(238, 207, 128, 1);
     cursor: pointer;
 }
@@ -602,6 +612,21 @@ img.system-logo {
   border: none;
 }
 
+.saga-machine .attack-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 150px;
+  gap: 0 10px;
+}
+
+.saga-machine .attack-name,
+.saga-machine .attack-effect,
+.saga-machine .attack-properties {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-left: 5px;
+}
+
 .saga-machine.item .attack.prototype {
   display: none;
 }
@@ -671,18 +696,21 @@ img.system-logo {
   width: calc(100% - 20px);
 }
 
-.initiative {
+.saga-machine .initiative {
   margin-bottom: 20px;
 }
 
-.combat-top {
+.saga-machine .combat-top {
+  margin-left: 10px;
+}
+
+.saga-machine .combat-top i {
   position: relative;
   top: 2px;
   font-size: 1.2em;
-  margin-left: 5px;
 }
 
-.combat-top.rollable:hover {
+.saga-machine .combat-top.rollable:hover {
   color: black;
 }
 
@@ -803,4 +831,10 @@ img.system-logo {
   padding: 1px 3px 1px 3px;
   border-radius: 3px;
   margin-right: 5px;
+}
+
+/* Test Dialog */
+
+.test-dialog {
+  padding-bottom: 10px;
 }

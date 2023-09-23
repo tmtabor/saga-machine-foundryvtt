@@ -548,7 +548,7 @@ export class Consequence {
 
     effect() {
         if (this.type === 'damage') return `${this.value} ${this.damage_type}`;
-        else if (this.type === 'consequence') return this.consequence_link();
+        else if (this.type === 'consequence') return this.name;
         else return 'Special';
     }
 
