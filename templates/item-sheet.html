@@ -1,6 +1,6 @@
-<form class="{{cssClass}}" autocomplete="off">
+<form class="{{cssClass}} item-sheet" autocomplete="off">
     <header class="item-top">
-        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
+        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" />
 
         <div class="item-topright">
             <div class="grid grid-6col item-box">
@@ -47,25 +47,11 @@
                 <label class="item-label">Cost</label>
                 <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
             </div>
-
-            <div class="grid grid-6col item-box">
-                <label class="item-label">Specialized</label>
-                <input class="toggle-check item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
-                <label class="toggle-visible item-label">Specialization</label>
-                <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="text" name="system.specialization" value="{{ data.system.specialization }}" />
-            </div>
-
-            <div class="grid grid-6col item-box">
-                <label class="item-label">Ranked</label>
-                <input class="toggle-check item-input" type="checkbox" name="system.ranked" {{checked data.system.ranked}} />
-                <label class="toggle-visible item-label">Rank</label>
-                <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
-            </div>
         </div>
 
         <div class="tab attacks" data-group="primary" data-tab="attacks">
             <ol class="items-list attack-list">
-                <li class="item flexrow items-header">
+                <li class="item flexrow items-header attack-row">
                     <div class="item-name">Stat</div>
                     <div class="item-name">Skill</div>
                     <div class="item-name">Targets</div>
@@ -77,7 +63,7 @@
                     </div>
                 </li>
 
-                <li class="item flexrow attack prototype">
+                <li class="item flexrow attack attack-row prototype">
                     <select class="item-input item-name" name="stat">
                         <option value="">--</option>
                         <option value="strength">Strength</option>
@@ -117,7 +103,7 @@
         </div>
 
         <div class="tab description" data-group="primary" data-tab="description">
-            <textarea class="item-input" type="text" name="system.description">{{ data.system.description }}</textarea>
+            {{editor data.system.description target="system.description" engine="prosemirror" button=true owner=owner editable=editable}}
         </div>
     </section>
 </form>

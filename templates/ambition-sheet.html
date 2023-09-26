@@ -1,22 +1,33 @@
-<form class="{{cssClass}}" autocomplete="off">
-    <div class="grid grid-4col item-box">
-        <label class="item-label">Ambition</label>
-        <input class="grid-start-2 grid-span-3 item-input" type="text" name="name" value="{{ data.name }}" />
-    </div>
-    
-	<div class="grid grid-4col item-box">
-		<label class="item-label">Type</label>
-		<select class="grid-start-2 grid-span-3 item-input" name="system.type">
-			{{#select data.system.type}}
-				<option value="Long-term">Long-term</option>
-				<option value="Short-term">Short-term</option>
-				<option value="Party">Party</option>
-			{{/select}}
-		</select>
-	</div>
+<form class="{{cssClass}} ambition-sheet" autocomplete="off">
+    <header class="item-top">
+        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" />
 
-    <div class="item-box">
-        <label class="item-label">Description</label>
-        <textarea class="item-input" type="text" name="system.description">{{ data.system.description }}</textarea>
-    </div>
+        <div class="grid grid-4col item-box">
+            <label class="item-label">Ambition</label>
+            <input class="grid-start-2 grid-span-3 item-input" type="text" name="name" value="{{ data.name }}" />
+        </div>
+
+        <div class="grid grid-4col item-box">
+            <label class="item-label">Type</label>
+            <select class="grid-start-2 grid-span-3 item-input" name="system.type">
+                {{#select data.system.type}}
+                    <option value="Long-term">Long-term</option>
+                    <option value="Short-term">Short-term</option>
+                    <option value="Party">Party</option>
+                    <option value="Quest">Quest</option>
+                {{/select}}
+            </select>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <span data-tab="basics">Description</span>
+    </nav>
+
+    <section class="sheet-body">
+        <div class="tab description" data-group="primary" data-tab="basics">
+            {{editor data.system.description target="system.description" engine="prosemirror" button=true owner=owner editable=editable}}
+        </div>
+    </section>
 </form>

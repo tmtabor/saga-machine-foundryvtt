@@ -204,7 +204,9 @@ export class Test {
 
     lookup_skill() {
         // Separate skill name from specialization
-        let [skill, specialization] = this.skill.split(' ', 2);
+        let specialization = this.skill.match(/\(([^\)]+)\)/);
+        if (specialization) specialization = specialization[specialization.length-1];
+        let skill = specialization ? this.skill.split(' ')[0] : this.skill;
 
         // If no specialization, filter skills
         let matching_skills = [];
@@ -219,7 +221,12 @@ export class Test {
                 item.system.specialization === specialization);
         }
 
-        // If there are no matching skills, return 0
+        // If there are no matching skills, try searching by full name
+        if (!matching_skills.length) {
+            matching_skills = this.actor.items.filter(item => item.type === 'skill' && item.name === this.skill);
+        }
+
+        // If there are still no matching skills, return 0
         if (!matching_skills.length) return 0;
 
         // Otherwise, look up the rank and return
@@ -426,17 +433,23 @@ export class Test {
             <input type="hidden" class="test-json" value='${test_json}' />`;
     }
 
-    async to_chat(whisper=false) {
+    async to_chat({ whisper= false, rolls= null }) {
         // Create the chat message
         const message = await this.results.toMessage({}, {create: false });
         message.flavor = this.flavor();
         message.content = this.content();
         message.speaker = ChatMessage.getSpeaker({ actor: this.actor });
 
+        // Set the roll, if a custom one was provided
+        if (rolls) {
+            if (!Array.isArray(rolls)) rolls = [rolls];                     // Ensure this is an array
+            message.rolls = rolls.map(r => JSON.stringify(r.toJSON()));     // Convert to what ChatMessage expects
+        }
+
         // Set as a whisper, if requested
         if (whisper) {
             message.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
-            message.whisper = game.users.filter(u => u.isGM).map(u => u.id);
+            message.whisper = game.users.filter(u => u.isGM || u.character?.id === this.actor?.id ).map(u => u.id);
         }
 
         // Send the message to chat
@@ -494,7 +507,7 @@ export class Test {
                 if (value instanceof game.sagamachine.SagaMachineActor) dataset[key] = value;
                 else dataset[key] = token_actor({
                     scene_id: value.scene_id,
-                    token_id: value.tokenId,
+                    token_id: value.token_id,
                     actor_id: value.actor_id
                 });
             }
@@ -739,7 +752,7 @@ export async function test_dialog(dataset) {
 
                     // Send the message to chat
                     const whisper = !!dataset['whisper'];
-                    await test.to_chat(whisper);
+                    await test.to_chat({ whisper: whisper });
 
                 },
                 icon: `<i class="fas fa-check"></i>`
@@ -889,7 +902,7 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
             await test.apply_consequences();
 
             // Display the new chat card
-            await test.to_chat(html.hasClass('whisper'));
+            await test.to_chat({ whisper: html.hasClass('whisper'), rolls: [results] });
         }
     });
 

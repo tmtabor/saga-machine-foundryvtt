@@ -433,7 +433,7 @@ img.system-logo {
   text-rendering: optimizeLegibility;
 }
 
-.saga-machine .tabs .item.active {
+.saga-machine.actor .tabs .item.active {
   text-shadow: black 2px 2px 3px;
   color: #f2d898;
 }
@@ -618,17 +618,18 @@ img.system-logo {
   gap: 0 10px;
 }
 
-.saga-machine .attack-name,
-.saga-machine .attack-effect,
-.saga-machine .attack-properties {
+.saga-machine .items-list > .attack-row > .attack-name,
+.saga-machine .items-list > .attack-row > .attack-effect,
+.saga-machine .items-list > .attack-row > .attack-properties {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   padding-left: 5px;
+  display: block;
 }
 
 .saga-machine.item .attack.prototype {
-  display: none;
+  display: none !important;
 }
 
 .saga-machine fieldset legend {
@@ -640,7 +641,8 @@ img.system-logo {
 }
 
 .saga-machine .character-notes > .editor,
-.saga-machine .gm-notes > .editor {
+.saga-machine .gm-notes > .editor,
+.saga-machine .description > .editor {
   background-color: rgba(0,0,0,0.05);
   height: 200px;
 }
@@ -677,12 +679,6 @@ img.system-logo {
 
 .saga-machine .unequipped {
   color: rgba(0, 0, 0, 0.4);
-}
-
-.saga-machine header.item-top {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  grid-gap: 15px;
 }
 
 .saga-machine .inventory-top {
@@ -837,4 +833,64 @@ img.system-logo {
 
 .test-dialog {
   padding-bottom: 10px;
+}
+
+/* Item Sheet */
+
+.saga-machine.sheet.item > .window-content {
+    padding: 0;
+    overflow: hidden;
+}
+
+.saga-machine.sheet.item header > img.profile-img {
+    height: 100px;
+    width: 100px;
+    max-height: 100px;
+    max-width: 100px;
+    margin-right: 0;
+    position: absolute;
+    left: 10px;
+    top: 34px;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.saga-machine.sheet.item header.item-top {
+  margin: 0 10px 0 120px;
+  height: 75px;
+}
+
+.saga-machine.sheet.item header.item-top label {
+  font-size: 1.1em;
+  position: relative;
+  top: 3px;
+}
+
+.saga-machine.sheet.item nav.sheet-tabs {
+  -webkit-box-flex: 0;
+  -ms-flex: 0;
+  flex: 0;
+  align-items: center;
+  height: 20px;
+  box-shadow: 0 -1px 1px rgb(0 0 0 / 25%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 0;
+  position: relative;
+  text-rendering: optimizeLegibility;
+  left: 115px;
+  width: calc(100% - 120px);
+}
+
+.saga-machine.sheet.item .attack-row {
+  display: grid;
+  grid-template-columns: 105px 90px 80px 50px 90px 1fr 50px;
+  gap: 1px;
+}
+
+.saga-machine.sheet.item .attack-row input,
+.saga-machine.sheet.item .attack-row select {
+  border-left: 1px solid #c9c7b8;
+  border-right: 1px solid #c9c7b8;
+  font-size: 0.85em;
 }

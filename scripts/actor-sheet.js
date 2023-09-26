@@ -29,8 +29,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.paths = this.items(context, 'path');
 		context.data.system.origins = this.items(context, 'origin');
 		context.data.system.skills = this.items(context, 'skill');
-		context.data.system.traits = this.items(context, 'trait');
-		context.data.system.weaknesses = this.items(context, 'weakness');
+		context.data.system.traits = this.items(context, 'trait', t => t.system.type !== 'Weakness');
+		context.data.system.weaknesses = this.items(context, 'trait', t => t.system.type === 'Weakness');
 		context.data.system.consequences = this.items(context, 'consequence');
 		context.data.system.equipment = this.items(context, 'item');
 		context.data.system.attacks = this._gather_attacks(context);
@@ -251,14 +251,16 @@ export class SagaMachineActorSheet extends ActorSheet {
 	async _onItemCreate(event) {
 		event.preventDefault();
 
-		const type = $(event.currentTarget).data("type");
+		const type = $(event.currentTarget).data("type");			// Get item type
+		const name = $(event.currentTarget).data("name");			// Get item name
+		const system = $(event.currentTarget).data("system") || {};	// Get system data
+
+		// Prepare item data
 		const header = event.currentTarget;
-		const data = duplicate(header.dataset);		// Grab any data associated with this control.
-		const name = `New ${type}`;					// Initialize a default name.
-		const itemData = {							// Prepare the item object.
-			name: name,
+		const itemData = {									// Prepare the item object
+			name: name ? name : `New ${type}`,
 			type: type,
-			system: data
+			system: system
 		};
 
 		// Finally, create the item!

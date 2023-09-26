@@ -16,6 +16,17 @@ export class SagaMachineActor extends Actor {
         await this.calculate_scores();
     }
 
+    /** @inheritdoc */
+    getRollData() {
+        const data = super.getRollData();
+
+        // Copy stats and scores to the top level
+        for (let stat of Object.keys(data.stats)) data[stat] = data.stats[stat].value;
+        for (let score of Object.keys(data.scores)) data[score] = data.scores[score].value;
+
+        return data;
+    }
+
     /**
      * Calculates all derives scores for the character and updates their values
      */
@@ -280,7 +291,7 @@ export class SagaMachineActor extends Actor {
         if (dataset.apply_consequences !== false) await test.apply_consequences();
 
         // Send to chat, if chat=true, whisper if whisper=true
-        if (dataset.chat) await test.to_chat(!!dataset.whisper);
+        if (dataset.chat) await test.to_chat({ whisper: !!dataset.whisper });
 
         return test;
     }

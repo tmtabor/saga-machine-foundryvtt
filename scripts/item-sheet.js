@@ -9,7 +9,7 @@ export class SagaMachineItemSheet extends ItemSheet {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["saga-machine", "sheet", "item"],
             width: 600,
-            height: 400,
+            height: 360,
             tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "basics"}],
             scrollY: [".basics", ".attacks", ".description"]
         });

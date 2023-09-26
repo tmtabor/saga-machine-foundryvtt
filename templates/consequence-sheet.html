@@ -1,20 +1,29 @@
-<form class="{{cssClass}}" autocomplete="off">
-    <div class="grid grid-6col item-box">
-        <label class="item-label">Name</label>
-        <input class="grid-start-2 grid-span-3 item-input" type="text" name="name" value="{{ data.name }}" />
-        <label class="item-label">Rank</label>
-        <input class="item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
-    </div>
+<form class="{{cssClass}} consequence-sheet" autocomplete="off">
+    <header class="item-top">
+        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" />
 
-    <div class="grid grid-6col item-box">
-        <label class="item-label">Has Subject</label>
-        <input class="toggle-check item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
-        <label class="toggle-visible item-label">Subject</label>
-        <input class="toggle-visible grid-start-4 grid-span-3 item-input" type="text" name="system.specialization" value="{{ data.system.specialization }}" />
-    </div>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Name</label>
+            <input class="grid-start-2 grid-span-3 item-input" type="text" name="name" value="{{ data.name }}" />
+            <label class="item-label">Rank</label>
+            <input class="item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
+        </div>
 
-    <div class="item-box">
-        <label class="item-label">Description</label>
-        <textarea class="item-input" type="text" name="system.description">{{ data.system.description }}</textarea>
-    </div>
+        <div class="grid grid-6col item-box">
+            <label class="item-label">Subject?</label>
+            <input class="toggle-check item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
+            <input class="toggle-visible grid-span-4 item-input" type="text" name="system.specialization" value="{{ data.system.specialization }}" />
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <span data-tab="basics">Description</span>
+    </nav>
+
+    <section class="sheet-body">
+        <div class="tab description" data-group="primary" data-tab="basics">
+            {{editor data.system.description target="system.description" engine="prosemirror" button=true owner=owner editable=editable}}
+        </div>
+    </section>
 </form>

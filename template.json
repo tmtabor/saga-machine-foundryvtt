@@ -96,20 +96,19 @@
     }
   },
   "Item": {
-    "types": ["skill", "trait", "weakness", "origin", "path","consequence", "item", "ambition"],
+    "types": ["weakness","skill", "trait", "origin", "path","consequence", "item", "ambition"],
     "templates": {
       "basics": {
         "full_name": "",
-        "description": "",
+        "description": ""
+      },
+      "specialized": {
         "specialization": "",
-        "specialized": false,
+        "specialized": false
+      },
+      "ranked":  {
         "ranked": false,
         "rank": 0
-      },
-      "trait": {
-        "rank": 1,
-        "requirements": [],
-        "cost": 0
       }
     },
     "ambition": {
@@ -117,20 +116,24 @@
       "description": ""
     },
     "skill": {
-      "templates": ["basics"],
+      "templates": ["basics", "specialized", "ranked"],
       "default": "",
       "ranked": true,
       "attacks": []
     },
     "trait": {
-      "templates": ["basics", "trait"],
+      "templates": ["basics", "specialized", "ranked"],
+      "type": "General",
+      "rank": 1,
+      "requirements": [],
+      "cost": 0,
       "attacks": []
     },
-    "weakness": {
-      "templates": ["basics", "trait"]
-    },
     "origin": {
-      "templates": ["basics", "trait"],
+      "templates": ["basics"],
+      "rank": 1,
+      "requirements": [],
+      "cost": 0,
       "stats": {},
       "skills": {},
       "traits": {},
@@ -145,7 +148,7 @@
       "equipment": {}
     },
     "consequence": {
-      "templates": ["basics"],
+      "templates": ["basics", "specialized", "ranked"],
       "rank": 1
     },
     "item": {
