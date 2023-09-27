@@ -495,7 +495,7 @@ img.system-logo {
   display: -ms-flexbox;
   display: flex;
 }
-.saga-machine .items-list {
+.saga-machine .sheet-body .items-list {
   list-style: none;
   margin: 0 0 27px 0;
   padding: 0;
@@ -503,12 +503,12 @@ img.system-logo {
   scrollbar-width: thin;
   color: #444;
 }
-.saga-machine .items-list .item-list {
+.saga-machine .sheet-body .items-list .item-list {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-.saga-machine .items-list .item-name {
+.saga-machine .sheet-body .items-list .item-name {
   -webkit-box-flex: 2;
   -ms-flex: 2;
   flex: 2;
@@ -523,12 +523,13 @@ img.system-logo {
   display: -ms-flexbox;
   display: flex;
 }
-.saga-machine .items-list .item-name h3, .saga-machine .items-list .item-name h4 {
+.saga-machine .sheet-body .items-list .item-name h3,
+.saga-machine .sheet-body .items-list .item-name h4 {
   margin: 0;
   white-space: nowrap;
   overflow-x: hidden;
 }
-.saga-machine .items-list .item-controls {
+.saga-machine .sheet-body .items-list .item-controls {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -539,12 +540,12 @@ img.system-logo {
   -ms-flex-pack: end;
   justify-content: flex-end;
 }
-.saga-machine .items-list .item-controls a {
+.saga-machine .sheet-body .items-list .item-controls a {
   font-size: 12px;
   text-align: center;
   margin: 0 6px;
 }
-.saga-machine .items-list .item {
+.saga-machine .sheet-body .items-list .item {
   -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
@@ -552,13 +553,13 @@ img.system-logo {
   border-bottom: 1px solid #c9c7b8;
   min-height: 27px;
 }
-.saga-machine .items-list .item:last-child:not(.items-header) {
+.saga-machine .sheet-body .items-list .item:last-child:not(.items-header) {
   border-bottom: none;
 }
-.saga-machine .items-list .item .item-name {
+.saga-machine .sheet-body .items-list .item .item-name {
   color: #191813;
 }
-.saga-machine .items-list .item .item-name .item-image {
+.saga-machine .sheet-body .items-list .item .item-name .item-image {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 30px;
   flex: 0 0 30px;
@@ -567,14 +568,14 @@ img.system-logo {
   border: none;
   margin-right: 5px;
 }
-.saga-machine .items-list .item-prop {
+.saga-machine .sheet-body .items-list .item-prop {
   text-align: center;
   border-left: 1px solid #c9c7b8;
   border-right: 1px solid #c9c7b8;
   font-size: 12px;
   max-width: 50px;
 }
-.saga-machine .items-list .items-header {
+.saga-machine .sheet-body .items-list .items-header {
   height: 28px;
   margin: 2px 0;
   padding: 0;
@@ -585,11 +586,11 @@ img.system-logo {
   border: 2px groove #eeede0;
   font-weight: bold;
 }
-.saga-machine .items-list .items-header > * {
+.saga-machine .sheet-body .items-list .items-header > * {
   font-size: 12px;
   text-align: center;
 }
-.saga-machine .items-list .items-header .item-name {
+.saga-machine .sheet-body .items-list .items-header .item-name {
   padding-left: 5px;
   text-align: left;
 }

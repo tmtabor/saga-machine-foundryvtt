@@ -14,8 +14,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 			width: 850,
 			height: 650,
 			tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "basics"}],
-			scrollY: [".basics", ".combat", ".inventory", ".advancement",]
-			// dragDrop: [{dragSelector: ".item-list .item", dropSelector: null}]
+			scrollY: [".basics", ".combat", ".inventory", ".advancement"],
+			dragDrop: [{dragSelector: ".items-list .item", dropSelector: null}]
 		});
 	}
 
@@ -123,13 +123,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	_gather_attacks(context) {
 		const attacks = [];
-		const attack_items = context.data.items.filter(item => item.system.attacks && item.system.attacks.length &&
+		const attack_items = context.actor.items.filter(item => item.system.attacks && item.system.attacks.length &&
 			(item.system.equipped || item.system.equipped === undefined));
 
 		for (let item of attack_items)
 			for (let attack of item.system.attacks)
 				attacks.push(new Attack({
 					actor: this.actor,
+					item: item,
 					name: item.system.full_name,
 					type: item.type,
 					properties: item.system.properties || '',
@@ -163,7 +164,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	items(data, type, filter, sort) {
 		if (!filter) filter = a => true;
 		if (!sort) sort = (a, b) =>  a.name > b.name ? 1 : -1;
-		return data.data.items.filter( item => item.type === type && filter(item)).sort(sort);
+		return data.actor.items.filter( item => item.type === type && filter(item)).sort(sort);
 	}
 
 	_adjust_score(target, mod) {

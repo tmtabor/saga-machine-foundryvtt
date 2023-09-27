@@ -1,38 +1,52 @@
-<form class="{{cssClass}}" autocomplete="off">
-    <div class="grid grid-6col item-box">
-        <label class="item-label">Name</label>
-        <input class="grid-start-2 grid-span-3 item-input" type="text" name="name" value="{{ data.name }}" />
-        <label class="item-label">Cost</label>
-        <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
-    </div>
-    
-    <div class="grid grid-6col item-box">
-        <label class="item-label">Requirements</label>
-        <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.requirements" value="{{ data.system.requirements }}" />
-    </div>
+<form class="{{cssClass}} origin-sheet" autocomplete="off">
+    <header class="item-top">
+        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" />
 
-    <div class="grid grid-6col item-box">
-        <label class="item-label">Stats</label>
-        <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.stats" value="{{ data.system.stats }}" />
-    </div>
+        <div class="grid grid-5col item-box">
+            <label class="item-label">Name</label>
+            <input class="grid-start-2 grid-span-2 item-input" type="text" name="name" value="{{ data.name }}" />
+            <label class="item-label">Cost</label>
+            <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
+        </div>
 
-    <div class="grid grid-6col item-box">
-        <label class="item-label">Skills</label>
-        <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.skills" value="{{ data.system.skills }}" />
-    </div>
+        <div class="grid grid-5col item-box">
+            <label class="item-label">Requirements</label>
+            <input class="grid-start-2 grid-span-4 item-input" type="text" name="system.requirements" value="{{ data.system.requirements }}" />
+        </div>
+    </header>
 
-    <div class="grid grid-6col item-box">
-        <label class="item-label">Traits</label>
-        <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.traits" value="{{ data.system.traits }}" />
-    </div>
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="basics">Basics</a>
+        <a class="item" data-tab="description">Description</a>
+    </nav>
 
-    <div class="grid grid-6col item-box">
-        <label class="item-label">Equipment</label>
-        <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.equipment" value="{{ data.system.equipment }}" />
-    </div>
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab basics" data-group="primary" data-tab="basics">
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Stats</label>
+                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.stats" value="{{ data.system.stats }}" />
+            </div>
 
-    <div class="item-box">
-        <label class="item-label">Description</label>
-        <textarea class="item-input" type="text" name="system.description">{{ data.system.description }}</textarea>
-    </div>
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Skills</label>
+                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.skills" value="{{ data.system.skills }}" />
+            </div>
+
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Traits</label>
+                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.traits" value="{{ data.system.traits }}" />
+            </div>
+
+            <div class="grid grid-6col item-box">
+                <label class="item-label">Equipment</label>
+                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.equipment" value="{{ data.system.equipment }}" />
+            </div>
+        </div>
+
+        <div class="tab description" data-group="primary" data-tab="description">
+            {{editor data.system.description target="system.description" engine="prosemirror" button=true owner=owner editable=editable}}
+        </div>
+    </section>
 </form>

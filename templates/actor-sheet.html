@@ -82,9 +82,9 @@
     <header class="sheet-header">
 		<div class="header-fields">
 			<h1 class="charname"><input name="name" type="text" value="{{ data.name }}" placeholder="Name"/></h1>
-			<ol class="origins grid grid-4col">
+			<ol class="items-list origins grid grid-4col">
 				{{#each data.system.origins as |origin|}}
-					<li class="item flexrow" data-id="{{ origin._id }}">
+					<li class="item flexrow" data-id="{{ origin._id }}" data-type="Item" data-uuid="{{ origin.uuid }}">
 						<h4 class="item-name">{{ origin.system.full_name }}</h4>
 						<div class="item-controls">
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
@@ -93,7 +93,7 @@
 					</li>
 				{{/each}}
 				{{#each data.system.paths as |path|}}
-					<li class="item flexrow" data-id="{{ path._id }}">
+					<li class="item flexrow" data-id="{{ path._id }}" data-type="Item" data-uuid="{{ path.uuid }}">
 						<h4 class="item-name">{{ path.system.full_name }}</h4>
 						<div class="item-controls">
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
@@ -130,7 +130,7 @@
                         </li>
 
                         {{#each data.system.skills as |skill|}}
-                            <li class="item flexrow" data-id="{{ skill._id }}">
+                            <li class="item flexrow" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
                                 <h4 class="item-name rollable" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
                                     {{ skill.system.full_name }}
                                 </h4>
@@ -159,7 +159,7 @@
                         </li>
 
                         {{#each data.system.traits as |trait|}}
-                            <li class="item flexrow" data-id="{{ trait._id }}">
+                            <li class="item flexrow" data-id="{{ trait._id }}" data-type="Item" data-uuid="{{ trait.uuid }}">
                                 <h4 class="item-name">{{ trait.system.full_name }}</h4>
                                 <div class="item-controls">
                                     <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
@@ -179,7 +179,7 @@
                         </li>
 
                         {{#each data.system.weaknesses as |weakness|}}
-                            <li class="item flexrow" data-id="{{ weakness._id }}">
+                            <li class="item flexrow" data-id="{{ weakness._id }}" data-type="Item" data-uuid="{{ weakness.uuid }}">
                                 <h4 class="item-name">{{ weakness.system.full_name }}</h4>
                                 <div class="item-controls">
                                     <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
@@ -212,7 +212,7 @@
 				</li>
 
 				{{#each data.system.attacks as |attack|}}
-					<li class="item attack-row">
+					<li class="item attack-row" data-type="Item" data-uuid="{{ attack.item.uuid }}">
 						<div class="item-name attack-name rollable" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-consequences='{{ consequences_string }}'>{{ attack.full_name }}</div>
                         <div class="item-name attack-effect">{{ attack.label }} {{#if attack.effect }}({{{ attack.effect }}}){{/if}}</div>
                         <div class="item-name attack-properties">{{ attack.properties }}</div>
@@ -231,7 +231,7 @@
 				</li>
 
 				{{#each data.system.consequences as |consequence|}}
-					<li class="item flexrow" data-id="{{ consequence._id }}">
+					<li class="item flexrow" data-id="{{ consequence._id }}" data-type="Item" data-uuid="{{ consequence.uuid }}">
 						<h4 class="item-name">{{ consequence.system.full_name }}</h4>
 						<input class="item-input item-prop" type="number" name="system.rank" value="{{ consequence.system.rank }}" step="1" data-dtype="Number" />
 						<div class="item-controls">
@@ -276,7 +276,7 @@
                     </li>
 
                     {{#each data.system.equipment as |item|}}
-                        <li class="item flexrow" data-id="{{ item._id }}">
+                        <li class="item flexrow" data-id="{{ item._id }}" data-type="Item" data-uuid="{{ item.uuid }}">
                             <h4 class="item-name">{{ item.system.full_name }}</h4>
                             <div class="item-name">{{item.system.properties}}</div>
                             <input class="item-input item-prop" type="number" name="system.quantity" value="{{ item.system.quantity }}" step="1" data-dtype="Number" />
@@ -316,7 +316,7 @@
                         </li>
 
                         {{#each data.system.ambitions as |ambition|}}
-                            <li class="item flexrow" data-id="{{ ambition._id }}">
+                            <li class="item flexrow" data-id="{{ ambition._id }}" data-type="Item" data-uuid="{{ ambition.uuid }}">
                                 <h4 class="item-name">{{ ambition.name }}</h4>
                                 <div class="item-properties">{{ ambition.system.type }}</div>
                                 <div class="item-controls">
