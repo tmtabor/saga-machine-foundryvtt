@@ -24,6 +24,19 @@ export class SagaMachineItemSheet extends ItemSheet {
     }
 
     /** @inheritdoc */
+	getData() {
+        const context = super.getData();
+
+        if (this.item.type === 'origin' || this.item.type === 'path') {
+            context.data.system.skills_provided = this.items_provided('skill', context.data.system.skills);
+            context.data.system.traits_provided = this.items_provided('trait', context.data.system.traits);
+            context.data.system.equipment_provided = this.items_provided('item', context.data.system.equipment);
+        }
+
+        return context;
+    }
+
+    /** @inheritdoc */
 	activateListeners(html) {
         super.activateListeners(html);
 
@@ -31,6 +44,13 @@ export class SagaMachineItemSheet extends ItemSheet {
         this.draw_attacks(html);
         html.find('.attacks .item-create').click(this.add_attack.bind(this));
         html.find('.attacks .item-delete').click(this.delete_attack.bind(this))
+
+        // Handle toggling items-provided lists
+		html.find('.items-provided').on('contextmenu', event => {
+			event.preventDefault();
+			const target = $(event.target);
+			this._toggle_items_provided(target);
+		})
     }
 
     add_attack() {
@@ -171,5 +191,50 @@ export class SagaMachineItemSheet extends ItemSheet {
         }
 
         return consequences_list;
+    }
+
+    _toggle_items_provided(element) {
+        element.parent().find('.items-provided').each((i, e) => {
+            if ($(e).is(':visible')) e.style.display = 'none';
+            else e.style.display = 'block';
+        });
+    }
+
+    matching_item(type, raw_name) {
+        // Extract rank
+        let parts = raw_name.split(' ');
+        let rank = parts[parts.length-1];
+        if (isNaN(Number(rank))) rank = '';
+
+        // Extract specialization, if any
+        let specialization = raw_name.match(/\(([^\)]+)\)/);
+        if (specialization) specialization = specialization[specialization.length-1];
+        else specialization = '';
+
+        // Extract name
+        let name = raw_name.slice(0, raw_name.length-rank.length);
+        parts = name.split('(');
+        if (parts.length > 1) name = parts[0];
+        name = name.trim()
+
+        // Query for matching items, return null if not found
+        const matches = game.items.filter(i => i.type === type && i.name === name);
+        if (matches.length) return [matches[0], name, specialization, rank]
+        else return [null, name, specialization, rank];
+    }
+
+    items_provided(type, property) {
+
+        if (!property) return '&horbar;';
+
+        const return_list = [];
+        const items_array = property.split(',').map(t => t.trim());
+        for (let raw_name of items_array) {
+            const [item, name, specialization, rank] = this.matching_item(type, raw_name)
+            if (!item) return_list.push(`<a class="content-link broken" draggable="true" data-type="${type}" data-name="${name}" data-specialization="${specialization}" data-rank="${rank}"><i class="fas fa-unlink"></i>${raw_name}</a>`);
+            else return_list.push(`<a class="content-link" draggable="true" data-uuid="${item.uuid}" data-id="${item.id}" data-type="Item" data-specialization="${specialization}" data-rank="${rank}" data-tooltip="Item"><i class="fas fa-suitcase"></i>${raw_name}</a>`);
+        }
+
+        return return_list.join(', ');
     }
 }

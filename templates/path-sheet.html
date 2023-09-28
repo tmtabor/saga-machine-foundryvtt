@@ -29,17 +29,20 @@
 
             <div class="grid grid-6col item-box">
                 <label class="item-label">Skills</label>
-                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.skills" value="{{ data.system.skills }}" />
+                <input class="grid-span-5 item-input items-provided" type="text" name="system.skills" value="{{ data.system.skills }}" />
+                <div class="grid-span-5 items-provided">{{{ data.system.skills_provided }}}</div>
             </div>
 
             <div class="grid grid-6col item-box">
                 <label class="item-label">Traits</label>
-                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.traits" value="{{ data.system.traits }}" />
+                <input class="grid-span-5 item-input items-provided" type="text" name="system.traits" value="{{ data.system.traits }}" />
+                <div class="grid-span-5 items-provided">{{{ data.system.traits_provided }}}</div>
             </div>
 
             <div class="grid grid-6col item-box">
                 <label class="item-label">Equipment</label>
-                <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.equipment" value="{{ data.system.equipment }}" />
+                <input class="grid-span-5 item-input items-provided" type="text" name="system.equipment" value="{{ data.system.equipment }}" />
+                <div class="grid-span-5 items-provided">{{{ data.system.equipment_provided }}}</div>
             </div>
         </div>
 

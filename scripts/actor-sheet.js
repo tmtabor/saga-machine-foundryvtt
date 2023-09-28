@@ -149,7 +149,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 
 			// Report the exchange to chat
 			const target_names = '<li>' + tokens.map(t => `@UUID[${t.actor.uuid}]{${t.name}}`).join('</li><li>') + '</li>';
-			ChatMessage.create({content: `<strong>${money_each}¤</strong> distributed from @UUID[${this.actor.uuid}]{${this.actor.name}} to:<ul>${target_names}</ul>`});
+			ChatMessage.create({content: `<strong>${money_each}¤</strong> each distributed from @UUID[${this.actor.uuid}]{${this.actor.name}} to:<ul style="line-height: 1.7em">${target_names}</ul>`});
 		});
 	}
 

@@ -796,3 +796,20 @@ img.system-logo {
   border-right: 1px solid #c9c7b8;
   font-size: 0.85em;
 }
+
+.saga-machine.sheet.item input.items-provided {
+  display: none;
+}
+
+.saga-machine.sheet.item div.items-provided {
+  display: block;
+  min-height: 27px;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 1px 3px 1px 3px;
+  line-height: 23px;
+  margin: 0;
+  border: 1px solid var(--color-border-light-tertiary);
+  border-radius: 3px;
+  width: calc(100% - 2px);
+  min-width: 20px;
+}
