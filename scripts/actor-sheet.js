@@ -19,6 +19,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 		});
 	}
 
+    /**
+     * Dynamically set the HTML template for the actor type
+     * @returns {string}
+     */
+    get template() {
+        return `systems/saga-machine/templates/${this.actor.type}-sheet.html`;
+    }
+
 	/** @inheritdoc */
 	getData() {
 		const context = super.getData();
@@ -33,11 +41,16 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.weaknesses = this.items(context, 'trait', t => t.system.type === 'Weakness');
 		context.data.system.consequences = this.items(context, 'consequence');
 		context.data.system.equipment = this.items(context, 'item');
-		context.data.system.attacks = this._gather_attacks(context);
 
-		// Calculate progress bar percentages
-		if (!context.data.system.scores.health.max) context.data.system.scores.health.percent = 0;
-		else context.data.system.scores.health.percent = Math.round((context.data.system.scores.health.value / context.data.system.scores.health.max) * 100)
+		if (this.actor.type === 'pc') {
+			// Gather the list of attacks
+			context.data.system.attacks = this._gather_attacks(context);
+
+			// Calculate progress bar percentages
+			if (!context.data.system.scores.health.max) context.data.system.scores.health.percent = 0;
+			else context.data.system.scores.health.percent =
+				Math.round((context.data.system.scores.health.value / context.data.system.scores.health.max) * 100);
+		}
 
 		return context;
 	}
@@ -50,7 +63,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		if ( !this.isEditable ) return;
 
 		// Item creation
-		html.find('.item-create').click(this._onItemCreate.bind(this));
+		html.find('.item-create').click(this._on_item_create.bind(this));
 
 		// Item equipping / unequipping
 		html.find('.item-equip').click(ev => {
@@ -105,12 +118,38 @@ export class SagaMachineActorSheet extends ActorSheet {
 		});
 
 		// Allow rollable labels to open roll dialog
-		html.find('.rollable').click(this.on_roll.bind(this));
+		html.find('.rollable').click(this.on_test.bind(this));
 
 		// Drag events for macros.
 		html.find('.rollable').each((i, li) => {					// Find all items on the character sheet.
 			li.setAttribute("draggable", true);	// Add draggable and dragstart listener
 			li.addEventListener("dragstart", ev => this._onDragStart(ev), false);
+		});
+
+		// Loot selected
+		html.find('.loot-selected').on("click", event=> {});
+
+		// Distribute money
+		html.find('.distribute-money').on("click", event=> {
+			const tokens = game?.canvas?.tokens?.controlled;  // Get selected tokens
+			if (!tokens.length) return ui.notifications.warn("No valid character selected.");
+
+			let money_remaining = this.actor.system.wealth.money % tokens.length;				// Remaining on sheet
+			const money_each = Math.floor(this.actor.system.wealth.money / tokens.length);	// Money for each actor
+
+			// Update selected actors
+			for (let token of tokens) {
+				if (token.actor.isOwner)
+					token.actor.update({'system.wealth.money': token.actor.system.wealth.money + money_each});
+				else money_remaining += money_each;
+			}
+
+			// Update this actor
+			this.actor.update({'system.wealth.money': money_remaining});
+
+			// Report the exchange to chat
+			const target_names = '<li>' + tokens.map(t => `@UUID[${t.actor.uuid}]{${t.name}}`).join('</li><li>') + '</li>';
+			ChatMessage.create({content: `<strong>${money_each}¤</strong> distributed from @UUID[${this.actor.uuid}]{${this.actor.name}} to:<ul>${target_names}</ul>`});
 		});
 	}
 
@@ -148,7 +187,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	_onDragStart(event) {
 		// Attach IDs to the dataset
-		this.attach_ids(event.currentTarget.dataset);
+		this._attach_ids(event.currentTarget.dataset);
 		event.dataTransfer.setData("text/plain", JSON.stringify(event.currentTarget.dataset));
 	}
 
@@ -208,20 +247,16 @@ export class SagaMachineActorSheet extends ActorSheet {
 	}
 
 	/**
-	 * When a roll label is clicked, open the roll dialog
+	 * When a roll label is clicked, open the test dialog
 	 *
 	 * @param event
 	 * @returns {Promise<void>}
 	 * @private
 	 */
-	async on_roll(event) {
+	async on_test(event) {
 		event.preventDefault();
-
-		// Attach IDs to the dataset
-		this.attach_ids(event.currentTarget.dataset);
-
-		// Show the dialog
-		await test_dialog(event.currentTarget.dataset);
+		this._attach_ids(event.currentTarget.dataset);		// Attach IDs to the dataset
+		await test_dialog(event.currentTarget.dataset);		// Show the dialog
 	}
 
 	/**
@@ -229,7 +264,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 *
 	 * @param dataset
 	 */
-	attach_ids(dataset) {
+	_attach_ids(dataset) {
 		// Attach token and scene ID, if available
 		if (this.token) {
 			dataset['tokenId'] = this.token.id;
@@ -249,7 +284,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 * @returns {Promise<*>}
 	 * @private
 	 */
-	async _onItemCreate(event) {
+	async _on_item_create(event) {
 		event.preventDefault();
 
 		const type = $(event.currentTarget).data("type");			// Get item type

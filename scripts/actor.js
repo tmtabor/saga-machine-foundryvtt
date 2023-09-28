@@ -12,8 +12,9 @@ export class SagaMachineActor extends Actor {
     async prepareDerivedData() {
         super.prepareDerivedData();
 
-        // Calculate the character's scores
-        await this.calculate_scores();
+        // Calculate the actor's scores
+        if (this.type === 'pc') await this.calculate_pc_scores();
+        if (this.type === 'stash') await this.calculate_stash_scores();
     }
 
     /** @inheritdoc */
@@ -27,10 +28,22 @@ export class SagaMachineActor extends Actor {
         return data;
     }
 
+    async calculate_stash_scores() {
+        if (!this.isOwner) return; // Don't calculate scores for actors you don't own
+
+        // Wealth total
+        const wealth_total = this.wealth_total();
+        await this.update({'system.wealth.total': wealth_total});
+
+        // Encumbrance total
+        const encumbrance_total = this.encumbrance_total();
+        await this.update({'system.encumbrance': encumbrance_total});
+    }
+
     /**
      * Calculates all derives scores for the character and updates their values
      */
-    async calculate_scores() {
+    async calculate_pc_scores() {
         if (!this.isOwner) return; // Don't calculate scores for actors you don't own
 
         // Defense
@@ -97,6 +110,11 @@ export class SagaMachineActor extends Actor {
 
     encumbrance_total() {
 		return this.items.filter(item => item.type === 'item').reduce((total, item) => item.encumbrance() + total, 0);
+	}
+
+    wealth_total() {
+		return this.items.filter(item => item.type === 'item').reduce((total, item) =>
+            item.system.cost * item.system.quantity + total, 0) + this.system.wealth.money;
 	}
 
     /**

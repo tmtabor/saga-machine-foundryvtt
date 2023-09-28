@@ -50,19 +50,23 @@ export class SagaMachineItem extends Item {
         return 0;
     }
 
-    encumbrance() {
-        if (!this.system.carried) return 0;
-        else if (this.system.properties.includes('Neg')) return 0;
+    unit_encumbrance() {
+        if (this.system.properties.includes('Neg')) return 0;
         else if (this.system.properties.includes('Worn') && this.system.equipped) return 0;
         else {
             for (const prop of this.system.properties) {
                 if (prop.startsWith('Big ')) {
                     const [big, val] = prop.split(' ');
-                    return Number(val) * this.system.quantity;
+                    return Number(val);
                 }
             }
-            return this.system.quantity;
+            return 1;
         }
+    }
+
+    encumbrance(unit=false) {
+        if (!this.system.carried) return 0;
+        return this.unit_encumbrance() * this.system.quantity;
     }
 
     /**

@@ -1,6 +1,6 @@
 {
   "Actor": {
-    "types": ["pc", "npc"],
+    "types": ["pc", "stash"],
     "templates": {
       "stats": {
         "stats": {
@@ -90,9 +90,15 @@
         "level": {}
       }
     },
-    "npc": {
-      "templates": ["stats", "scores"],
-      "bestial": false
+    "stash": {
+      "equipment": [],
+      "type": "stash",
+      "wealth": {
+        "money": 0,
+        "total": 0
+      },
+      "encumbrance": 0,
+      "description": ""
     }
   },
   "Item": {
