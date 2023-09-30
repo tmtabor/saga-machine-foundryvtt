@@ -7,35 +7,35 @@
             <h3>Stats</h3>
             <div class="stats grid grid-4col">
                 <div class="stat flex-group-center">
-                    <label class="stat-label rollable" data-stat="strength" title="Strength">Str</label>
+                    <label class="stat-label rollable" data-type="Test" data-stat="strength" title="Strength">Str</label>
                     <input class="stat-input" type="number" name="system.stats.strength.value" value="{{ data.system.stats.strength.value }}" title="Strength" step="1" data-dtype="Number" />
                 </div>
                 <div class="stat flex-group-center">
-                    <label class="stat-label rollable" data-stat="dexterity" title="Dexterity">Dex</label>
+                    <label class="stat-label rollable" data-type="Test" data-stat="dexterity" title="Dexterity">Dex</label>
                     <input class="stat-input" type="number" name="system.stats.dexterity.value" value="{{ data.system.stats.dexterity.value }}" title="Dexterity" step="1" data-dtype="Number" />
                 </div>
                 <div class="stat flex-group-center">
-                    <label class="stat-label rollable" data-stat="speed" title="Speed">Spd</label>
+                    <label class="stat-label rollable" data-type="Test" data-stat="speed" title="Speed">Spd</label>
                     <input class="stat-input" type="number" name="system.stats.speed.value" value="{{ data.system.stats.speed.value }}" title="Speed" step="1" data-dtype="Number" />
                 </div>
                 <div class="stat flex-group-center">
-                    <label class="stat-label rollable" data-stat="endurance" title="Endurance">End</label>
+                    <label class="stat-label rollable" data-type="Test" data-stat="endurance" title="Endurance">End</label>
                     <input class="stat-input" type="number" name="system.stats.endurance.value" value="{{ data.system.stats.endurance.value }}" title="Endurance" step="1" data-dtype="Number" />
                 </div>
                 <div class="stat flex-group-center">
-                    <label class="stat-label rollable" data-stat="intelligence" title="Intelligence">Int</label>
+                    <label class="stat-label rollable" data-type="Test" data-stat="intelligence" title="Intelligence">Int</label>
                     <input class="stat-input" type="number" name="system.stats.intelligence.value" value="{{ data.system.stats.intelligence.value }}" step="1" data-dtype="Number" />
                 </div>
                 <div class="stat flex-group-center">
-                    <label class="stat-label rollable" data-stat="perception" title="Perception">Per</label>
+                    <label class="stat-label rollable" data-type="Test" data-stat="perception" title="Perception">Per</label>
                     <input class="stat-input" type="number" name="system.stats.perception.value" value="{{ data.system.stats.perception.value }}" title="Perception" step="1" data-dtype="Number" />
                 </div>
                 <div class="stat flex-group-center">
-                    <label class="stat-label rollable" data-stat="charisma" title="Charisma">Chr</label>
+                    <label class="stat-label rollable" data-type="Test" data-stat="charisma" title="Charisma">Chr</label>
                     <input class="stat-input" type="number" name="system.stats.charisma.value" value="{{ data.system.stats.charisma.value }}" title="Charisma" step="1" data-dtype="Number" />
                 </div>
                 <div class="stat flex-group-center">
-                    <label class="stat-label rollable" data-stat="determination" title="Determination">Det</label>
+                    <label class="stat-label rollable" data-type="Test" data-stat="determination" title="Determination">Det</label>
                     <input class="stat-input" type="number" name="system.stats.determination.value" value="{{ data.system.stats.determination.value }}" title="Determination" step="1" data-dtype="Number" />
                 </div>
             </div>
@@ -131,7 +131,7 @@
 
                         {{#each data.system.skills as |skill|}}
                             <li class="item flexrow" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
-                                <h4 class="item-name rollable" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
+                                <h4 class="item-name rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
                                     {{ skill.system.full_name }}
                                 </h4>
                                 <input class="item-input item-prop" type="number" name="system.rank" value="{{ skill.system.rank }}" step="1" data-dtype="Number" />
@@ -196,11 +196,11 @@
             <div class="initiative">
                     <label class="score-label">Turn</label>
                     <div class="toggle-switch r">
-                        <input class="toggle-check item-input" type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
+                        <input class="toggle-check" type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
                         <div class="knobs"></div>
                         <div class="layer"></div>
                     </div>
-                <label class="score-label combat-top rollable" title="Defense Test" data-score="defense" data-whisper="true" data-consequences='{"type": "defense"}'>Defense <i class="fas fa-shield-alt"></i></label>
+                <label class="score-label combat-top rollable" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-consequences='{"type": "defense"}'>Defense <i class="fas fa-shield-alt"></i></label>
             </div>
 
             <h3>Attacks</h3>
@@ -213,7 +213,7 @@
 
 				{{#each data.system.attacks as |attack|}}
 					<li class="item attack-row" data-type="Item" data-uuid="{{ attack.item.uuid }}">
-						<div class="item-name attack-name rollable" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-consequences='{{ consequences_string }}'>{{ attack.full_name }}</div>
+						<div class="item-name attack-name rollable" data-type="Test" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-consequences='{{ consequences_string }}'>{{ attack.full_name }}</div>
                         <div class="item-name attack-effect">{{ attack.label }} {{#if attack.effect }}({{{ attack.effect }}}){{/if}}</div>
                         <div class="item-name attack-properties">{{ attack.properties }}</div>
 					</li>
@@ -261,7 +261,7 @@
                         {{/select}}
                     </select>
                     <label class="item-label" for="system.wealth.money">Money</label>
-                    <input class="item-input" type="number" name="system.wealth.money" value="{{ data.system.wealth.money }}" step="1" />
+                    <input class="money-input" type="number" name="system.wealth.money" value="{{ data.system.wealth.money }}" step="1" data-dtype="Number" />
                 </div>
 
                 <h3>Equipment</h3>

@@ -770,6 +770,9 @@ export async function test_dialog(dataset) {
  * @returns {Promise}
  */
 export async function create_hotbar_macro(data, slot) {
+    // Only create macro for tests
+    if (data.type !== 'Test') return;
+
     // Verify that the actor may be retrieved
     const actor = token_actor({
         scene_id: data['sceneId'],

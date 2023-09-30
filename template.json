@@ -102,7 +102,7 @@
     }
   },
   "Item": {
-    "types": ["weakness","skill", "trait", "origin", "path","consequence", "item", "ambition"],
+    "types": ["skill", "trait", "origin", "path","consequence", "item", "ambition"],
     "templates": {
       "basics": {
         "full_name": "",

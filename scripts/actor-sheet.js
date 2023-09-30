@@ -126,6 +126,24 @@ export class SagaMachineActorSheet extends ActorSheet {
 			li.addEventListener("dragstart", ev => this._onDragStart(ev), false);
 		});
 
+		// Disable drag events for inputs
+		html.find('.items-list .item input, .items-list .item select').on('mousedown', function(e) {
+			e.stopPropagation();
+			$(e.target).closest('.item').attr('draggable', false);
+		});
+		html.find('.items-list .item').on('mousedown', function(e) {
+			$(e.target).attr('draggable', true);
+		}).on({
+			'dragstart': function(e) {
+				e.stopPropagation();
+				let dt = e.originalEvent.dataTransfer;
+				if (dt) {
+					dt.effectAllowed = 'move';
+					dt.setData('text/html', '');
+				}
+			}
+		});
+
 		// Loot selected
 		html.find('.loot-selected').on("click", event=> {});
 
@@ -186,9 +204,13 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 * @private
 	 */
 	_onDragStart(event) {
+		if (event.currentTarget.dataset['type'] === 'Test') event.stopPropagation();
+
 		// Attach IDs to the dataset
 		this._attach_ids(event.currentTarget.dataset);
 		event.dataTransfer.setData("text/plain", JSON.stringify(event.currentTarget.dataset));
+
+		super._onDragStart(event);
 	}
 
 	/**
