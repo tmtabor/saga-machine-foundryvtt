@@ -1,5 +1,5 @@
-import { INITIATIVE } from "./combat.js";
-import { Test } from "./tests.js";
+import {INITIATIVE} from "./combat.js";
+import {Test} from "./tests.js";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
@@ -32,12 +32,10 @@ export class SagaMachineActor extends Actor {
         if (!this.isOwner) return; // Don't calculate scores for actors you don't own
 
         // Wealth total
-        const wealth_total = this.wealth_total();
-        await this.update({'system.wealth.total': wealth_total});
+        this.system.wealth.total = this.wealth_total();
 
         // Encumbrance total
-        const encumbrance_total = this.encumbrance_total();
-        await this.update({'system.encumbrance': encumbrance_total});
+        this.system.encumbrance = this.encumbrance_total();
     }
 
     /**
@@ -47,54 +45,39 @@ export class SagaMachineActor extends Actor {
         if (!this.isOwner) return; // Don't calculate scores for actors you don't own
 
         // Defense
-        if (!this.system.scores.defense.custom) {
-            const defense = this.median([this.system.stats.dexterity.value,
+        if (!this.system.scores.defense.custom)
+            this.system.scores.defense.value = this.median([this.system.stats.dexterity.value,
                 this.system.stats.speed.value, this.system.stats.perception.value]);
-            await this.update({'system.scores.defense.value': defense});
-        }
 
         // Willpower
-        if (!this.system.scores.willpower.custom) {
-            const willpower = this.median([this.system.stats.intelligence.value,
+        if (!this.system.scores.willpower.custom)
+            this.system.scores.willpower.value = this.median([this.system.stats.intelligence.value,
                 this.system.stats.charisma.value, this.system.stats.determination.value]);
-            await this.update({'system.scores.willpower.value': willpower});
-        }
 
         // Health
-        if (!this.system.scores.health.custom) {
-            const health = this.system.stats.strength.value + this.system.stats.endurance.value;
-            await this.update({'system.scores.health.max': health});
-        }
+        if (!this.system.scores.health.custom)
+            this.system.scores.health.max = this.system.stats.strength.value + this.system.stats.endurance.value;
 
         // Wound total
-        const wound_total = this.wound_total();
-        await this.update({'system.scores.health.value': wound_total});
+        this.system.scores.health.value = this.wound_total();
 
         // Move
-        if (!this.system.scores.move.custom) {
-            const move = Math.floor((this.system.stats.speed.value + this.system.stats.endurance.value) / 2);
-            await this.update({'system.scores.move.value': move});
-        }
+        if (!this.system.scores.move.custom)
+            this.system.scores.move.value = Math.floor((this.system.stats.speed.value + this.system.stats.endurance.value) / 2);
 
         // Encumbrance threshold
-        if (!this.system.scores.encumbrance.custom) {
-            const encumbrance = this.system.stats.strength.value;
-            await this.update({'system.scores.encumbrance.max': encumbrance});
-        }
+        if (!this.system.scores.encumbrance.custom)
+            this.system.scores.encumbrance.max = this.system.stats.strength.value;
 
         // Encumbrance total
-        const encumbrance_total = this.encumbrance_total();
-        await this.update({'system.scores.encumbrance.value': encumbrance_total});
+        this.system.scores.encumbrance.value = this.encumbrance_total();
 
         // Equipped armor
-        if (!this.system.scores.armor.custom) {
-            const armor = this.armor_value();
-            await this.update({'system.scores.armor.value': armor});
-        }
+        if (!this.system.scores.armor.custom)
+            this.system.scores.armor.value = this.armor_value();
 
         // Unspent experiences
-        const unspent_experiences = this.system.experiences.total - this.system.experiences.spent;
-        await this.update({'system.experiences.unspent': unspent_experiences});
+        this.system.experiences.unspent = this.system.experiences.total - this.system.experiences.spent;
     }
 
     armor_value() {
