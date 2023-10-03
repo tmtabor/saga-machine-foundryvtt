@@ -29,8 +29,6 @@ export class SagaMachineActor extends Actor {
     }
 
     async calculate_stash_scores() {
-        if (!this.isOwner) return; // Don't calculate scores for actors you don't own
-
         // Wealth total
         this.system.wealth.total = this.wealth_total();
 
@@ -42,8 +40,6 @@ export class SagaMachineActor extends Actor {
      * Calculates all derives scores for the character and updates their values
      */
     async calculate_pc_scores() {
-        if (!this.isOwner) return; // Don't calculate scores for actors you don't own
-
         // Defense
         if (!this.system.scores.defense.custom)
             this.system.scores.defense.value = this.median([this.system.stats.dexterity.value,
