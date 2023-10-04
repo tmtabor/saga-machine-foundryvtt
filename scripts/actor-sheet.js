@@ -1,5 +1,10 @@
 import { Attack, test_dialog } from "./tests.js";
 
+// Register handlebars helpers
+Handlebars.registerHelper("is_GM", () => game.user.isGM);
+Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
+Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armor');
+
 /**
  * Extend the basic ActorSheet with some very simple modifications
  * @extends {ActorSheet}

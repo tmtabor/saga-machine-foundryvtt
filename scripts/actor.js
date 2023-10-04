@@ -72,8 +72,44 @@ export class SagaMachineActor extends Actor {
         if (!this.system.scores.armor.custom)
             this.system.scores.armor.value = this.armor_value();
 
-        // Unspent experiences
+        // Experiences
+        this.system.experiences.spent = this.experiences_spent();
         this.system.experiences.unspent = this.system.experiences.total - this.system.experiences.spent;
+        this.system.experiences.level = this.power_level();
+    }
+
+    power_level() {
+        const total_spent = this.system.experiences.spent + game.settings.get('saga-machine', 'level', 120);
+
+        if (total_spent < 150)        return "Mundane";
+        else if (total_spent < 200)   return "Novice";
+        else if (total_spent < 250)   return "Exceptional";
+        else if (total_spent < 300)   return "Distinguished";
+        else if (total_spent < 350)   return "Renowned";
+        else                          return "Legendary";
+    }
+
+    stat_cost(val) {
+        return [...Array(val + 1).keys()].reduce((a, b) => a + b, 0);
+    }
+
+    experiences_spent() {
+        let total = 0;
+
+        // Add total of all stats
+        for (let stat of ['strength', 'dexterity', 'speed', 'endurance', 'intelligence', 'perception', 'charisma', 'determination'])
+            total += this.stat_cost(this.system.stats[stat].value);
+
+        // Add total of all skills and traits
+        for (let item of this.items) {
+            if (item.type === 'skill') total += this.stat_cost(item.system.rank);
+            if (item.type === 'trait') total += item.system.ranked ? item.system.cost * item.system.rank : item.system.cost;
+        }
+
+        // Subtract the cost of the character's starting stats, based on power level
+        total -= game.settings.get('saga-machine', 'level', 120);
+
+        return total;
     }
 
     armor_value() {

@@ -26,25 +26,29 @@ Hooks.once("init", async () => {
     CONFIG.Item.documentClass = SagaMachineItem;
     CONFIG.ui.combat = SMCombatTracker
 
-    // Register sheet application classes
+    // Register Saga Machine sheet classes
     Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });
     Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
 
-    // Register system config
-    // game.settings.register('saga-machine', 'theme', {
-    //     name: 'Theme',
-    //     hint: 'The theme to use for logos and the style of the default character and item sheets',
-    //     scope: 'world',
-    //     config: true,
-    //     type: String,
-    //     default: 'default',
-    //     choices: {
-    //         "default": "Saga Machine Unified"
-    //     }
-    // });
+    // Unregister the core sheets
+    Actors.unregisterSheet("core", ActorSheet);
+    Items.unregisterSheet("core", ItemSheet);
 
-    // Register handlebars helpers
-    Handlebars.registerHelper("is_GM", () => game.user.isGM);
-    Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
-    Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armor');
+    // Register system config
+    game.settings.register('saga-machine', 'level', {
+        name: 'Starting Power Level',
+        hint: 'The starting power level of all player characters.',
+        scope: 'world',
+        config: true,
+        type: Number,
+        default: 150,
+        choices: {
+            85: "Mundane",
+            120: "Novice",
+            160: "Exceptional",
+            200: "Distinguished",
+            240: "Renowned",
+            280: "Legendary"
+        }
+    });
 });

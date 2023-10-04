@@ -1,6 +1,6 @@
 {
   "Actor": {
-    "types": ["pc", "stash"],
+    "types": ["pc", "npc", "stash"],
     "templates": {
       "stats": {
         "stats": {
@@ -67,16 +67,10 @@
             "custom": false
           }
         }
-      },
-      "skills": [],
-      "traits": [],
-      "consequences": [],
-      "equipment": [],
-      "gmnotes": "",
-      "notes": ""
+      }
     },
     "pc": {
-      "templates": ["stats", "scores", "skills", "traits", "consequences", "equipment"],
+      "templates": ["stats", "scores"],
       "fast_turn": false,
       "ambitions": [],
       "wealth": {
@@ -87,8 +81,27 @@
         "total": 0,
         "spent": 0,
         "unspent": 0,
-        "level": {}
-      }
+        "level": "Novice"
+      },
+      "skills": [],
+      "traits": [],
+      "consequences": [],
+      "equipment": [],
+      "gmnotes": "",
+      "notes": ""
+    },
+    "npc": {
+      "templates": ["stats", "scores"],
+      "wealth": {
+        "lifestyle": "",
+        "money": 0
+      },
+      "skills": [],
+      "traits": [],
+      "consequences": [],
+      "equipment": [],
+      "gmnotes": "",
+      "notes": ""
     },
     "stash": {
       "equipment": [],
