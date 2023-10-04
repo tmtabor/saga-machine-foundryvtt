@@ -87,11 +87,13 @@ export class SagaMachineItemSheet extends ItemSheet {
         for (let attack of this.item.system.attacks) {
             const clone = prototype.clone();
             clone.removeClass('prototype');
+            clone.find("[name=attack_name]").val(attack.name);
             clone.find("[name=stat]").val(attack.stat);
             clone.find("[name=skill]").val(attack.skill);
             clone.find("[name=damage]").val(this.find_damage(attack));
             clone.find("[name=damage_type]").val(this.find_damage_type(attack));
             clone.find("[name=targets]").val(attack.tn);
+            clone.find("[name=properties]").val(attack.properties);
             clone.find("[name=consequences]").val(this.find_consequences(attack));
             parent.append(clone);
 
@@ -148,8 +150,10 @@ export class SagaMachineItemSheet extends ItemSheet {
         // Iterate over each node and add to the list
         const attacks = [];
         attack_nodes.each((i, node) => {
+            let name = $(node).find("[name=attack_name]").val().trim();
             let stat = $(node).find("[name=stat]").val().trim();
             let skill = $(node).find("[name=skill]").val().trim();
+            let properties = $(node).find("[name=properties]").val().trim();
             let damage = $(node).find("[name=damage]").val().trim();
             let damage_type = $(node).find("[name=damage_type]").val().trim();
             let targets = $(node).find("[name=targets]").val().trim();
@@ -157,12 +161,16 @@ export class SagaMachineItemSheet extends ItemSheet {
 
             if (!stat) return; // Don't add if no stat is specified
 
-            attacks.push({
+            // Create attack, add name and properties if set, add to list
+            const attack = {
                 stat: stat,
                 skill: skill,
                 tn: targets,
                 consequences: this.create_consequences(damage, damage_type, consequences)
-            });
+            };
+            if (name) attack['name'] = name;
+            if (properties) attack['properties'] = properties;
+            attacks.push(attack);
 
             this.item.update({'system.attacks': attacks});
         });

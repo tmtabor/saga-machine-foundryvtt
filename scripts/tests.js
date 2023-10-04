@@ -701,7 +701,7 @@ export class Attack extends Test {
 }
 
 /**
- * Show a roll dialog for the test provided in the dataset
+ * Show a test dialog for the test provided in the dataset
  *
  * @param dataset
  * @returns {Promise<void>}
@@ -714,7 +714,7 @@ export async function test_dialog(dataset) {
         actor_id: dataset.actorId
     });
 
-    const dialog_content = await renderTemplate("systems/saga-machine/templates/roll-dialog.html",
+    const dialog_content = await renderTemplate("systems/saga-machine/templates/test-dialog.html",
         {...actor.sheet.getData(), ...dataset});
 
     new Dialog({
