@@ -29,8 +29,8 @@
             <div class="grid grid-5col item-box">
                 <label class="item-label">Rank</label>
                 <input class="item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
-                <label class="grid-start-3 item-label">Default Stat</label>
-                <select class="grid-start-4 grid-span-2 item-input" name="system.default">
+                <label class="item-label">Default Stat</label>
+                <select class="grid-span-2 item-input" name="system.default">
                     {{#select data.system.default}}
                         <option value="" data-val="0">--</option>
                         <option value="strength">Strength</option>
@@ -43,6 +43,10 @@
                         <option value="determination">Determination</option>
                     {{/select}}
                 </select>
+            </div>
+            <div class="grid grid-5col item-box">
+                <label class="item-label">Free Ranks</label>
+                <input class="item-input" type="number" name="system.free_ranks" value="{{ data.system.free_ranks }}" step="1" />
             </div>
         </div>
 

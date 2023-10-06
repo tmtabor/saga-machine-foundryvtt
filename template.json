@@ -138,6 +138,7 @@
       "templates": ["basics", "specialized", "ranked"],
       "default": "",
       "ranked": true,
+      "free_ranks": 0,
       "attacks": []
     },
     "trait": {
