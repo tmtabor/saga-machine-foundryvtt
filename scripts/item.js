@@ -18,6 +18,21 @@ export class SagaMachineItem extends Item {
         this.parse_properties();
     }
 
+    /** @override */
+    async _onCreate(data, options, userId) {
+        await super._onCreate(data, options, userId);
+
+        // Set new default icons
+        if (data.img === foundry.documents.BaseItem.DEFAULT_ICON) { // If default
+            if (this.type === 'skill') this.update({'img': 'systems/saga-machine/images/defaults/skill.svg'});
+            if (this.type === 'trait') this.update({'img': 'systems/saga-machine/images/defaults/trait.svg'});
+            if (this.type === 'origin') this.update({'img': 'systems/saga-machine/images/defaults/origin.svg'});
+            if (this.type === 'path') this.update({'img': 'systems/saga-machine/images/defaults/path.svg'});
+            if (this.type === 'ambition') this.update({'img': 'systems/saga-machine/images/defaults/ambition.svg'});
+            if (this.type === 'consequence') this.update({'img': 'systems/saga-machine/images/defaults/consequence.svg'});
+        }
+    }
+
     /**
      * Derive the full name from the base name and specialization
      */

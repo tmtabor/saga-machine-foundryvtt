@@ -101,7 +101,11 @@ img.system-logo {
 }
 
 .saga-machine .rollable:hover,
-.saga-machine  .rollable:focus {
+.saga-machine .rollable:focus,
+.saga-machine .expandable:hover,
+.saga-machine .expandable:focus,
+.saga-machine .chatable:hover,
+.saga-machine .chatable:focus {
     color: #000000;
     text-shadow: 0 0 10px rgba(238, 207, 128, 1);
     cursor: pointer;
@@ -293,6 +297,12 @@ img.system-logo {
   scrollbar-width: thin;
   color: #444;
 }
+
+.saga-machine .sheet-body .skill-list li {
+  display: grid;
+  grid-template-columns: 1fr 50px 50px;
+}
+
 .saga-machine .sheet-body .items-list .item-list {
   list-style: none;
   margin: 0;
@@ -343,12 +353,16 @@ img.system-logo {
   border-bottom: 1px solid #c9c7b8;
   min-height: 27px;
 }
+
 .saga-machine .sheet-body .items-list .item:last-child:not(.items-header) {
   border-bottom: none;
 }
+
 .saga-machine .sheet-body .items-list .item .item-name {
   color: #191813;
+  min-height: 26px;
 }
+
 .saga-machine .sheet-body .items-list .item .item-name .item-image {
   -webkit-box-flex: 0;
   -ms-flex: 0 0 30px;
@@ -358,6 +372,7 @@ img.system-logo {
   border: none;
   margin-right: 5px;
 }
+
 .saga-machine .sheet-body .items-list .item-prop {
   text-align: center;
   border-left: 1px solid #c9c7b8;
@@ -405,7 +420,7 @@ img.system-logo {
 
 .saga-machine .attack-row {
   display: grid;
-  grid-template-columns: 100px 1fr 150px;
+  grid-template-columns: 130px 1fr 150px;
   gap: 0 10px;
 }
 
@@ -417,6 +432,15 @@ img.system-logo {
   text-overflow: ellipsis;
   padding-left: 5px;
   display: block;
+  line-height: 24px;
+}
+
+.saga-machine .items-list > .attack-row > .attack-name > .item-img {
+  position: absolute;
+}
+
+.saga-machine .items-list > .attack-row > .attack-name > .expandable {
+  margin-left: 30px;
 }
 
 .saga-machine.item .attack.prototype {
@@ -427,8 +451,9 @@ img.system-logo {
   font-size: 1.25em;
 }
 
-.saga-machine .ambitions-list {
+.saga-machine .sheet-body ol.ambitions-list {
   margin: 0;
+  padding: 0;
 }
 
 .saga-machine .character-notes > .editor,
@@ -438,7 +463,8 @@ img.system-logo {
   height: 200px;
 }
 
-.saga-machine .character-notes {
+.saga-machine .character-notes,
+.saga-machine .gm-notes {
   margin-bottom: 15px;
 }
 
@@ -460,6 +486,53 @@ img.system-logo {
 
 .saga-machine .toggle-display {
   display: none;
+}
+
+.saga-machine span.item-img {
+  margin-right: 5px;
+  height: 24px;
+}
+
+.saga-machine img.item-img {
+  background: rgba(0, 0, 0, 0.5);
+  height: 24px;
+  width: 24px;
+  margin: 0;
+  padding: 0;
+}
+
+.saga-machine img.item-img:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.saga-machine span.item-img > img.item-img:first-child {
+  display: inline-block;
+}
+
+.saga-machine span.item-img:hover > img.item-img:first-child {
+  display: none;
+}
+
+.saga-machine span.item-img > img.item-img:last-child {
+  display: none;
+}
+
+.saga-machine span.item-img:hover > img.item-img:last-child {
+  display: inline-block;
+}
+
+.saga-machine li.item .item-description {
+  display: none;
+  flex-basis: 100%;
+  font-size: 0.9em;
+  border-image-repeat: repeat;
+  border-image-slice: 11;
+  border-image-source: url(../images/theme/frame-elegant.svg);
+  border-image-width: 12px;
+  border-style: double;
+  padding: 5px 10px;
+  margin: 5px 0;
+  grid-column: 1/-1;
 }
 
 .saga-machine textarea.item-input {
@@ -692,6 +765,18 @@ img.system-logo {
 .toggle-switch .knobs:before,
 .toggle-switch .layer {
   transition: 0.3s ease all;
+}
+
+.chat-message .flavor-text > header.item-header {
+  margin: 10px 0 0 0;
+}
+
+.chat-message .flavor-text > header.item-header > img {
+  float: right;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.25);
+  position: relative;
+  top: -6px;
 }
 
 .chat-message .flavor-text > .action {

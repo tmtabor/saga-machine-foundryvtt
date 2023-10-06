@@ -1,0 +1,77 @@
+{{!-- Sheet Sidebar --}}
+<aside class="sheet-sidebar">
+    <img class="system-logo" src="systems/saga-machine/images/theme/saga-machine-logo.png" title="Saga Machine" />
+    <div class="sidebar-frame">
+        <h3>Stats</h3>
+        <div class="stats grid grid-4col">
+            <div class="stat flex-group-center">
+                <label class="stat-label rollable" data-type="Test" data-stat="strength" title="Strength">Str</label>
+                <input class="stat-input" type="number" name="system.stats.strength.value" value="{{ data.system.stats.strength.value }}" title="Strength" step="1" data-dtype="Number" />
+            </div>
+            <div class="stat flex-group-center">
+                <label class="stat-label rollable" data-type="Test" data-stat="dexterity" title="Dexterity">Dex</label>
+                <input class="stat-input" type="number" name="system.stats.dexterity.value" value="{{ data.system.stats.dexterity.value }}" title="Dexterity" step="1" data-dtype="Number" />
+            </div>
+            <div class="stat flex-group-center">
+                <label class="stat-label rollable" data-type="Test" data-stat="speed" title="Speed">Spd</label>
+                <input class="stat-input" type="number" name="system.stats.speed.value" value="{{ data.system.stats.speed.value }}" title="Speed" step="1" data-dtype="Number" />
+            </div>
+            <div class="stat flex-group-center">
+                <label class="stat-label rollable" data-type="Test" data-stat="endurance" title="Endurance">End</label>
+                <input class="stat-input" type="number" name="system.stats.endurance.value" value="{{ data.system.stats.endurance.value }}" title="Endurance" step="1" data-dtype="Number" />
+            </div>
+            <div class="stat flex-group-center">
+                <label class="stat-label rollable" data-type="Test" data-stat="intelligence" title="Intelligence">Int</label>
+                <input class="stat-input" type="number" name="system.stats.intelligence.value" value="{{ data.system.stats.intelligence.value }}" step="1" data-dtype="Number" />
+            </div>
+            <div class="stat flex-group-center">
+                <label class="stat-label rollable" data-type="Test" data-stat="perception" title="Perception">Per</label>
+                <input class="stat-input" type="number" name="system.stats.perception.value" value="{{ data.system.stats.perception.value }}" title="Perception" step="1" data-dtype="Number" />
+            </div>
+            <div class="stat flex-group-center">
+                <label class="stat-label rollable" data-type="Test" data-stat="charisma" title="Charisma">Chr</label>
+                <input class="stat-input" type="number" name="system.stats.charisma.value" value="{{ data.system.stats.charisma.value }}" title="Charisma" step="1" data-dtype="Number" />
+            </div>
+            <div class="stat flex-group-center">
+                <label class="stat-label rollable" data-type="Test" data-stat="determination" title="Determination">Det</label>
+                <input class="stat-input" type="number" name="system.stats.determination.value" value="{{ data.system.stats.determination.value }}" title="Determination" step="1" data-dtype="Number" />
+            </div>
+        </div>
+        <hr />
+        <h3>Scores</h3>
+        <div class="scores grid grid-4col">
+            <div class="score flex-group-center">
+                <label class="score-label">Move</label>
+                <input class="score-input" type="number" name="system.scores.move.value" value="{{ data.system.scores.move.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.move.custom }}disabled{{/unless}} />
+            </div>
+            <div class="score flex-group-center">
+                <label class="score-label rollable" data-score="defense">Def</label>
+                <input class="score-input" type="number" name="system.scores.defense.value" value="{{ data.system.scores.defense.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.defense.custom }}disabled{{/unless}} />
+                <div class="score-secondary" name="system.scores.defense.tn">TN {{ data.system.scores.defense.tn }}</div>
+            </div>
+            <div class="score flex-group-center">
+                <label class="score-label rollable" data-score="willpower">Will</label>
+                <input class="score-input" type="number" name="system.scores.willpower.value" value="{{ data.system.scores.willpower.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.willpower.custom }}disabled{{/unless}} />
+                <div class="score-secondary" name="system.scores.willpower.tn">TN {{ data.system.scores.willpower.tn }}</div>
+            </div>
+            <div class="score flex-group-center">
+                <label class="score-label">Arm</label>
+                <input class="score-input" type="number" name="system.scores.armor.value" value="{{ data.system.scores.armor.value }}" step="1" data-dtype="Number" {{#unless data.system.scores.armor.custom }}disabled{{/unless}} />
+            </div>
+        </div>
+
+        <div class="scores grid grid-2col">
+            <div class="score flex-group-center">
+                <label class="score-label">Luck</label>
+                <input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" data-dtype="Number" />
+                <div class="score-secondary" name="system.scores.luck.max">Starting {{ data.system.scores.luck.max }}</div>
+            </div>
+
+            <div class="score flex-group-center">
+                <label class="score-label">Health</label>
+                <input class="score-input" type="number" name="system.scores.health.max" value="{{ data.system.scores.health.max }}" step="1" data-dtype="Number" {{#unless data.system.scores.health.custom }}disabled{{/unless}} style="background: linear-gradient(to right, #ff00007a 0%, #ff00007a {{ data.system.scores.health.percent }}%, rgb(255 255 255 / 5%) {{ data.system.scores.health.percent }}%, rgb(255 255 255 / 5%) 100%);" />
+                <div class="score-secondary" name="system.scores.health.value">Wounds {{ data.system.scores.health.value }}</div>
+            </div>
+        </div>
+    </div>
+</aside>

@@ -1,0 +1,27 @@
+{{!-- Sheet Header --}}
+<header class="sheet-header">
+    <div class="header-fields">
+        <h1 class="charname"><input name="name" type="text" value="{{ data.name }}" placeholder="Name"/></h1>
+        <ol class="items-list origins grid grid-4col">
+            {{#each data.system.origins as |origin|}}
+                <li class="item flexrow" data-id="{{ origin._id }}" data-type="Item" data-uuid="{{ origin.uuid }}">
+                    <h4 class="item-name">{{ origin.system.full_name }}</h4>
+                    <div class="item-controls">
+                        <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                        <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                    </div>
+                </li>
+            {{/each}}
+            {{#each data.system.paths as |path|}}
+                <li class="item flexrow" data-id="{{ path._id }}" data-type="Item" data-uuid="{{ path.uuid }}">
+                    <h4 class="item-name">{{ path.system.full_name }}</h4>
+                    <div class="item-controls">
+                        <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                        <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                    </div>
+                </li>
+            {{/each}}
+        </ol>
+    </div>
+    <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
+</header>

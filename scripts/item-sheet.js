@@ -20,7 +20,7 @@ export class SagaMachineItemSheet extends ItemSheet {
      * @returns {string}
      */
     get template() {
-        return `systems/saga-machine/templates/${this.item.type}-sheet.html`;
+        return `systems/saga-machine/templates/items/${this.item.type}-sheet.html`;
     }
 
     /** @inheritdoc */

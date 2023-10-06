@@ -1,9 +1,17 @@
 import { Attack, test_dialog } from "./tests.js";
 
-// Register handlebars helpers
-Handlebars.registerHelper("is_GM", () => game.user.isGM);
-Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
-Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armor');
+Hooks.once("init", async () => {
+	// Register handlebars helpers
+	Handlebars.registerHelper("is_GM", () => game.user.isGM);
+	Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
+	Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armor');
+
+	// Register handlebars partials
+	loadTemplates([
+		'systems/saga-machine/templates/partials/character-header.html',
+		'systems/saga-machine/templates/partials/character-sidebar.html'
+	]);
+});
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -29,7 +37,8 @@ export class SagaMachineActorSheet extends ActorSheet {
      * @returns {string}
      */
     get template() {
-        return `systems/saga-machine/templates/${this.actor.type}-sheet.html`;
+		if (this.actor.system.npc) return `systems/saga-machine/templates/actors/npc-sheet.html`;
+        return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`;
     }
 
 	/** @inheritdoc */
@@ -125,6 +134,21 @@ export class SagaMachineActorSheet extends ActorSheet {
 		// Allow rollable labels to open roll dialog
 		html.find('.rollable').click(this.on_test.bind(this));
 
+		// Allow expandable elements to toggle their description
+		html.find('.expandable').click(event => {
+			const description = $(event.target).closest('.item').find('.item-description');
+			description.slideToggle(200);
+		});
+
+		// Allow chatable items to be sent to group chat
+		html.find('.chatable').click(event => {
+			const item_id = $(event.target).closest('.item').data('id');
+			if (!item_id) return;
+			const item = this.actor.items.get(item_id);
+			if (!item) return;
+			this.to_chat(item);
+		});
+
 		// Drag events for macros.
 		html.find('.rollable').each((i, li) => {					// Find all items on the character sheet.
 			li.setAttribute("draggable", true);	// Add draggable and dragstart listener
@@ -173,6 +197,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 			// Report the exchange to chat
 			const target_names = '<li>' + tokens.map(t => `@UUID[${t.actor.uuid}]{${t.name}}`).join('</li><li>') + '</li>';
 			ChatMessage.create({content: `<strong>${money_each}¤</strong> each distributed from @UUID[${this.actor.uuid}]{${this.actor.name}} to:<ul style="line-height: 1.7em">${target_names}</ul>`});
+		});
+	}
+
+	to_chat(item) {
+		ChatMessage.create({
+			flavor: `<header class="item-header"><img src="${item.img}" /><h2>${item.name}</h2></header>`,
+			content: item.system.description,
+			speaker: ChatMessage.getSpeaker({ actor: this.actor })
 		});
 	}
 
@@ -319,7 +351,6 @@ export class SagaMachineActorSheet extends ActorSheet {
 		const system = $(event.currentTarget).data("system") || {};	// Get system data
 
 		// Prepare item data
-		const header = event.currentTarget;
 		const itemData = {									// Prepare the item object
 			name: name ? name : `New ${type}`,
 			type: type,
