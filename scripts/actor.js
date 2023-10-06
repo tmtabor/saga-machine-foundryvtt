@@ -89,8 +89,9 @@ export class SagaMachineActor extends Actor {
         else                          return "Legendary";
     }
 
-    stat_cost(val) {
-        return [...Array(val + 1).keys()].reduce((a, b) => a + b, 0);
+    stat_cost(value, free) {
+        const free_total = free ? [...Array(free + 1).keys()].reduce((a, b) => a + b, 0) : 0;
+        return [...Array(value + 1).keys()].reduce((a, b) => a + b, free_total * -1);
     }
 
     experiences_spent() {
@@ -102,7 +103,7 @@ export class SagaMachineActor extends Actor {
 
         // Add total of all skills and traits
         for (let item of this.items) {
-            if (item.type === 'skill') total += this.stat_cost(item.system.rank);
+            if (item.type === 'skill') total += this.stat_cost(item.system.rank, item.system.free_ranks);
             if (item.type === 'trait') total += item.system.ranked ? item.system.cost * item.system.rank : item.system.cost;
         }
 
