@@ -42,7 +42,7 @@ Hooks.on('updateActor', async (actor, update) => {
 
 // Patch Core Functions
 Combatant.prototype.getInitiativeRoll = function (formula) {
-    // If there is no attached actor, this must be an N{C
+    // If there is no attached actor, this must be an NPC
     if (!this.actor) return new Roll(INITIATIVE.NPC_TURN);
 
     // If this is marked as an NPC, it must be an NPC

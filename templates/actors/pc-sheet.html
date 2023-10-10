@@ -19,7 +19,7 @@
 		<div class="tab basics" data-group="primary" data-tab="basics">
             <div class="grid">
                 <div class="grid-col">
-                    <h3>Skills</h3>
+                    <h3 title="{{ data.system.experiences.spent_skills }} experiences spent">Skills</h3>
                     <ol class="items-list skill-list">
                         <li class="item flexrow items-header">
                             <div class="item-name">Name</div>
@@ -62,7 +62,7 @@
                 </div>
 
                 <div class="grid-col">
-                    <h3>Traits</h3>
+                    <h3 title="{{ data.system.experiences.spent_traits }} experiences spent">Traits</h3>
                     <ol class="items-list">
                         <li class="item flexrow items-header">
                             <div class="item-name">Name</div>
@@ -121,12 +121,14 @@
 
 		<div class="tab combat" data-group="primary" data-tab="combat">
             <div class="initiative">
-                    <label class="score-label">Turn</label>
-                    <div class="toggle-switch r">
-                        <input class="toggle-check" type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
-                        <div class="knobs"></div>
-                        <div class="layer"></div>
+                <label class="score-label">Turn</label>
+                <div class="toggle-switch">
+                    <input type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
+                    <div class="slider">
+                        <span class="on">FAST&nbsp;</span>
+                        <span class="off">&nbsp;&nbsp;SLOW</span>
                     </div>
+                </div>
                 <label class="score-label combat-top rollable" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-consequences='{"type": "defense"}'>Defense <i class="fas fa-shield-alt"></i></label>
             </div>
 
@@ -286,7 +288,9 @@
                         <label>Total</label>
                         <input class="experiences-input" type="number" name="system.experiences.total" value="{{ data.system.experiences.total }}" step="1" data-dtype="Number" />
                         <label>Spent</label>
-                        <input class="experiences-input" type="number" name="system.experiences.spent" value="{{ data.system.experiences.spent }}" step="1" data-dtype="Number" disabled />
+                        <span title="Stats: {{ data.system.experiences.spent_stats }} experiences&#10;Skills: {{ data.system.experiences.spent_skills }} experiences&#10;Traits: {{ data.system.experiences.spent_traits }} experiences">
+                            <input class="experiences-input" type="number" name="system.experiences.spent" value="{{ data.system.experiences.spent }}" step="1" data-dtype="Number" disabled />
+                        </span>
                         <label>Unspent</label>
                         <input class="experiences-input" type="number" name="system.experiences.unspent" value="{{ data.system.experiences.unspent }}" step="1" data-dtype="Number" disabled />
                     </div>

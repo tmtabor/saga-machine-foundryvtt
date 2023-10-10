@@ -13,7 +13,7 @@ export class SagaMachineActor extends Actor {
         super.prepareDerivedData();
 
         // Calculate the actor's scores
-        if (this.type === 'pc') await this.calculate_pc_scores();
+        if (this.type === 'character') await this.calculate_character_scores();
         if (this.type === 'stash') await this.calculate_stash_scores();
     }
 
@@ -22,8 +22,10 @@ export class SagaMachineActor extends Actor {
         const data = super.getRollData();
 
         // Copy stats and scores to the top level
-        for (let stat of Object.keys(data.stats)) data[stat] = data.stats[stat].value;
-        for (let score of Object.keys(data.scores)) data[score] = data.scores[score].value;
+        if (data.stats) {
+            for (let stat of Object.keys(data.stats)) data[stat] = data.stats[stat].value;
+            for (let score of Object.keys(data.scores)) data[score] = data.scores[score].value;
+        }
 
         return data;
     }
@@ -39,7 +41,7 @@ export class SagaMachineActor extends Actor {
     /**
      * Calculates all derives scores for the character and updates their values
      */
-    async calculate_pc_scores() {
+    async calculate_character_scores() {
         // Defense
         if (!this.system.scores.defense.custom)
             this.system.scores.defense.value = this.median([this.system.stats.dexterity.value,
@@ -73,7 +75,8 @@ export class SagaMachineActor extends Actor {
             this.system.scores.armor.value = this.armor_value();
 
         // Experiences
-        this.system.experiences.spent = this.experiences_spent();
+        [this.system.experiences.spent, this.system.experiences.spent_stats,
+            this.system.experiences.spent_skills, this.system.experiences.spent_traits] = this.experiences_spent();
         this.system.experiences.unspent = this.system.experiences.total - this.system.experiences.spent;
         this.system.experiences.level = this.power_level();
     }
@@ -95,22 +98,26 @@ export class SagaMachineActor extends Actor {
     }
 
     experiences_spent() {
-        let total = 0;
-
         // Add total of all stats
+        let stats = 0;
         for (let stat of ['strength', 'dexterity', 'speed', 'endurance', 'intelligence', 'perception', 'charisma', 'determination'])
-            total += this.stat_cost(this.system.stats[stat].value);
-
-        // Add total of all skills and traits
-        for (let item of this.items) {
-            if (item.type === 'skill') total += this.stat_cost(item.system.rank, item.system.free_ranks);
-            if (item.type === 'trait') total += item.system.ranked ? item.system.cost * item.system.rank : item.system.cost;
-        }
+            stats += this.stat_cost(this.system.stats[stat].value);
 
         // Subtract the cost of the character's starting stats, based on power level
-        total -= game.settings.get('saga-machine', 'level', 120);
+        stats -= game.settings.get('saga-machine', 'level', 120);
 
-        return total;
+
+        // Add total of all skills and traits
+        let skills = 0;
+        let traits = 0;
+        for (let item of this.items) {
+            if (item.type === 'skill') skills += this.stat_cost(item.system.rank, item.system.free_ranks);
+            if (item.type === 'trait') traits += item.system.ranked ? item.system.cost * item.system.rank : item.system.cost;
+        }
+
+        const total = stats + skills + traits;
+
+        return [total, stats, skills, traits];
     }
 
     armor_value() {
@@ -302,12 +309,16 @@ export class SagaMachineActor extends Actor {
         return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
     }
 
+    is_pc() { return this.type === 'character' && !this.system.npc; }
+
+    is_npc() { return this.type === 'character' && this.system.npc; }
+
     getInitiativeRoll(formula=null) {
         // If a formula is supplied for initiative, return a Roll using it
         if (formula) return new Roll(formula);
 
         // If this is an NPC, return a Roll with that turn type
-        else if (this.type === 'npc') return new Roll(INITIATIVE.NPC_TURN);
+        else if (this.is_npc()) return new Roll(INITIATIVE.NPC_TURN);
 
         // Otherwise, evaluate fast or slow turn and return a Roll
         else return new Roll(this.system.fast_turn ? INITIATIVE.FAST_TURN : INITIATIVE.SLOW_TURN);

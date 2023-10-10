@@ -37,8 +37,9 @@ export class SagaMachineActorSheet extends ActorSheet {
      * @returns {string}
      */
     get template() {
-		if (this.actor.system.npc) return `systems/saga-machine/templates/actors/npc-sheet.html`;
-        return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`;
+		if (this.actor.is_pc()) 	return `systems/saga-machine/templates/actors/pc-sheet.html`;
+		if (this.actor.is_npc()) 	return `systems/saga-machine/templates/actors/npc-sheet.html`;
+									return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`;
     }
 
 	/** @inheritdoc */
@@ -56,7 +57,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.consequences = this.items(context, 'consequence');
 		context.data.system.equipment = this.items(context, 'item');
 
-		if (this.actor.type === 'pc') {
+		if (this.actor.type === 'character') {
 			// Gather the list of attacks
 			context.data.system.attacks = this._gather_attacks(context);
 
@@ -136,7 +137,11 @@ export class SagaMachineActorSheet extends ActorSheet {
 
 		// Allow expandable elements to toggle their description
 		html.find('.expandable').click(event => {
-			const description = $(event.target).closest('.item').find('.item-description');
+			let description = $(event.target).closest('.item').find('.item-description');	// PC sheets
+			if (!description.length) {														// NPC sheets
+				const id = $(event.target).closest('.item').data('id');
+				description = $(event.target).closest('.items-inline').find(`.item-description[data-id='${id}']`)
+			}
 			description.slideToggle(200);
 		});
 
@@ -173,8 +178,13 @@ export class SagaMachineActorSheet extends ActorSheet {
 			}
 		});
 
-		// Loot selected
-		html.find('.loot-selected').on("click", event=> {});
+		// Open item dialogs on NPC sheet
+		html.find('.items-inline > .item').on('contextmenu', event => {
+			event.preventDefault();
+			const box = $(event.currentTarget).closest(".item");
+			const item = this.actor.items.get(box.data("id"));
+			item.sheet.render(true);
+		})
 
 		// Distribute money
 		html.find('.distribute-money').on("click", event=> {

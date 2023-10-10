@@ -558,6 +558,12 @@ img.system-logo {
 
 .saga-machine .initiative {
   margin-bottom: 20px;
+  color: #191813;
+}
+
+.saga-machine .initiative > .toggle-switch {
+  top: 1px;
+  margin-left: 3px;
 }
 
 .saga-machine .combat-top {
@@ -572,6 +578,77 @@ img.system-logo {
 
 .saga-machine .combat-top.rollable:hover {
   color: black;
+}
+
+/*
+  NPC SHEET STYLES
+*/
+
+.saga-machine.npc-sheet .basics,
+.saga-machine.npc-sheet .advancement {
+  padding-top: 10px;
+}
+
+.saga-machine.npc-sheet .float-right {
+  float: right;
+  margin-bottom: 0;
+}
+
+.saga-machine.npc-sheet .sheet-body .float-right .item-control,
+.saga-machine.npc-sheet .sheet-body .float-right .item-control {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.saga-machine.npc-sheet .sheet-body .float-right .item-control:hover,
+.saga-machine.npc-sheet .sheet-body .float-right .item-control:active {
+  text-shadow: 0 0 10px rgb(238 207 128);
+}
+
+.saga-machine.npc-sheet .sheet-body .items-inline {
+  margin: 0 0 27px 0;
+}
+
+.saga-machine.npc-sheet .sheet-body .items-inline .item {
+  display: inline-block;
+  margin-right: 5px;
+  padding: 0;
+  min-height: auto;
+  border-bottom: none;
+}
+
+.saga-machine.npc-sheet div.items-inline .item-description {
+  display: none;
+  flex-basis: 100%;
+  font-size: 0.9em;
+  border-image-repeat: repeat;
+  border-image-slice: 11;
+  border-image-source: url(../images/theme/frame-elegant.svg);
+  border-image-width: 12px;
+  border-style: double;
+  padding: 5px 10px;
+  margin: 5px 0;
+  grid-column: 1/-1;
+}
+
+.saga-machine .toggle-switch.npc-switch {
+  position: absolute;
+  top: 2px;
+  left: 10px;
+}
+
+.saga-machine .toggle-switch.npc-switch > .slider {
+  font-weight: normal;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.saga-machine .toggle-switch.npc-switch > .slider::before {
+  background-color: #dcb95f;
+}
+
+.saga-machine .toggle-switch.npc-switch > .slider > .on,
+.saga-machine .toggle-switch.npc-switch > .slider > .off {
+  color: #dcb95f;
 }
 
 /*
@@ -685,87 +762,90 @@ img.system-logo {
   height: 100%;
 }
 
-/* Toggle Switch */
+/* Toggle Switch Styles */
 
-.toggle-switch .knobs,
-.toggle-switch .layer {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
-
-.toggle-switch {
+.saga-machine .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 17px;
-  overflow: hidden;
-  top: 4px;
+  width: 48px;
+  height: 12px;
 }
 
-.toggle-switch.r,
-.toggle-switch.r .layer {
-  border-radius: 100px;
-}
-
-.toggle-switch .toggle-check {
-  position: relative;
-  width: 100%;
-  height: 100%;
+.saga-machine .toggle-switch > input[type=checkbox] {
+  position: absolute;
+  cursor: pointer;
+  z-index: 1;
+  height: 12px;
+  width: 48px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   padding: 0;
   margin: 0;
   opacity: 0;
-  cursor: pointer;
-  z-index: 3;
 }
 
-.toggle-switch .knobs {
-  z-index: 2;
-}
-
-.toggle-switch .layer {
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.1);
-  transition: 0.3s ease all;
-  z-index: 1;
-}
-
-.toggle-switch .knobs:before {
-  content: "Slow";
+.saga-machine .toggle-switch > .slider {
   position: absolute;
-  top: 1px;
-  left: 1px;
-  width: 30px;
-  height: 13px;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-weight: bold;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 16px;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.saga-machine .toggle-switch > .slider::before {
+  position: absolute;
+  content: "";
+  height: 8px;
+  width: 8px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.saga-machine .toggle-switch > .slider > .on,
+.saga-machine .toggle-switch > .slider > .off {
   color: #FFFFFF;
-  font-size: 13px;
-  text-align: center;
-  line-height: 1;
-  padding: 1px;
-  background-color: #dcb95f;
-  border-radius: 50%;
-  transition: 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15) all;
-  text-shadow: none;
-  letter-spacing: -0.05em;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  font-size: 9px;
+  font-family: Verdana, sans-serif;
 }
 
-.toggle-switch .toggle-check:checked + .knobs:before {
-  content: "Fast";
-  left: 26px;
-  background-color: #11114a;
+.saga-machine .toggle-switch > .slider > .on {
+  display: none;
 }
 
-.toggle-switch .toggle-check:checked ~ .layer {
-  background-color: rgba(0, 0, 0, 0.1);
+.saga-machine .toggle-switch > .slider > .off {
+  display: block;
 }
 
-.toggle-switch .knobs,
-.toggle-switch .knobs:before,
-.toggle-switch .layer {
-  transition: 0.3s ease all;
+.saga-machine .toggle-switch > input:checked + .slider::before {
+  right: 2px;
+  left: unset;
 }
+
+.saga-machine .toggle-switch > input:checked + .slider .on {
+    display: block;
+}
+
+.saga-machine .toggle-switch > input:checked + .slider .off {
+    display: none;
+}
+
+/* Chat Card Styles */
 
 .chat-message .flavor-text > header.item-header {
   margin: 10px 0 0 0;

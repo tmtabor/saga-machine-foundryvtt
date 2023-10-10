@@ -16,7 +16,7 @@
     {{!-- Sheet Body --}}
     <section class="sheet-body">
 		<div class="tab basics" data-group="primary" data-tab="basics">
-            <div class="initiative">
+            <div class="initiative float-right">
                 <label class="score-label combat-top rollable" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-consequences='{"type": "defense"}'>Defense <i class="fas fa-shield-alt"></i></label>
             </div>
             <h3>Attacks</h3>
@@ -29,86 +29,71 @@
 
 				{{#each data.system.attacks as |attack|}}
 					<li class="item attack-row" data-type="Item" data-uuid="{{ attack.item.uuid }}">
-						<div class="item-name attack-name rollable" data-type="Test" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-consequences='{{ consequences_string }}'>{{ attack.full_name }}</div>
+                        <div class="item-name attack-name">
+                            <span class="item-img rollable" data-type="Test" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-consequences='{{ consequences_string }}'>
+                                <img class="item-img" src="{{ attack.item.img }}" title="Test {{ attack.full_name }}" />
+                                <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ attack.full_name }} Test" />
+                            </span>
+                            <span class="expandable">{{ attack.full_name }}</span>
+                        </div>
                         <div class="item-name attack-effect">{{ attack.label }} {{#if attack.effect }}({{{ attack.effect }}}){{/if}}</div>
                         <div class="item-name attack-properties">{{ attack.properties }}</div>
+                        <div class="item-description">{{{ attack.item.system.description }}}</div>
 					</li>
 				{{/each}}
 			</ol>
 
-            <div class="grid">
-                <div class="grid-col">
-                    <h3>Skills</h3>
-                    <ol class="items-list">
-                        <li class="item flexrow items-header">
-                            <div class="item-name">Name</div>
-                            <div class="item-prop">Rank</div>
-                            <div class="item-controls">
-                                <a class="item-control item-create" title="Create item" data-type="skill"><i class="fas fa-plus"></i> Add</a>
-                            </div>
-                        </li>
-
-                        {{#each data.system.skills as |skill|}}
-                            <li class="item flexrow" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
-                                <h4 class="item-name rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
-                                    {{ skill.system.full_name }}
-                                </h4>
-                                <input class="item-input item-prop" type="number" name="system.rank" value="{{ skill.system.rank }}" step="1" data-dtype="Number" />
-                                <div class="item-controls">
-                                    <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </li>
-                        {{/each}}
-
-                        <li class="item flexrow">
-                            <h4 class="item-name rollable" data-stat="strength" data-skill="Unskilled">Unskilled</h4>
-                        </li>
-                    </ol>
-                </div>
-
-                <div class="grid-col">
-                    <h3>Traits</h3>
-                    <ol class="items-list">
-                        <li class="item flexrow items-header">
-                            <div class="item-name">Name</div>
-                            <div class="item-controls">
-                                <a class="item-control item-create" title="Create item" data-type="trait"><i class="fas fa-plus"></i> Add</a>
-                            </div>
-                        </li>
-
-                        {{#each data.system.traits as |trait|}}
-                            <li class="item flexrow" data-id="{{ trait._id }}" data-type="Item" data-uuid="{{ trait.uuid }}">
-                                <h4 class="item-name">{{ trait.system.full_name }}</h4>
-                                <div class="item-controls">
-                                    <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </li>
-                        {{/each}}
-                    </ol>
-
-                    <h3>Weaknesses</h3>
-                    <ol class="items-list">
-                        <li class="item flexrow items-header">
-                            <div class="item-name">Name</div>
-                            <div class="item-controls">
-                                <a class="item-control item-create" title="Create item" data-type="trait" data-name="New Weakness" data-system='{"type": "Weakness"}'><i class="fas fa-plus"></i> Add</a>
-                            </div>
-                        </li>
-
-                        {{#each data.system.weaknesses as |weakness|}}
-                            <li class="item flexrow" data-id="{{ weakness._id }}" data-type="Item" data-uuid="{{ weakness.uuid }}">
-                                <h4 class="item-name">{{ weakness.system.full_name }}</h4>
-                                <div class="item-controls">
-                                    <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
-                                </div>
-                            </li>
-                        {{/each}}
-                    </ol>
-                </div>
+            <div class="item-controls float-right">
+                <a class="item-control item-create" title="Create skill" data-type="skill"><i class="fas fa-plus"></i> Add</a>
             </div>
+            <h3>Skills</h3>
+            <div class="items-inline">
+                <span class="item">
+                    <em><span class="item-name rollable" data-stat="strength">Skilled</span></em>,
+                </span>
+                <span class="item">
+                    <em><span class="item-name rollable" data-stat="strength" data-skill="Unskilled">Unskilled</span></em>
+                </span>
+                {{#if data.system.skills.length}}<span class="item">|</span>{{/if}}
+                {{#each data.system.skills as |skill|}}
+                    <span class="item" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
+                        <span class="item-name rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
+                            {{ skill.system.full_name }} {{ skill.system.rank }}
+                        </span>{{#unless @last}},{{/unless}}
+                    </span>
+                {{/each}}
+            </div>
+
+            <div class="item-controls float-right">
+                <a class="item-control item-create" title="Create trait" data-type="trait"><i class="fas fa-plus"></i> Add</a>
+            </div>
+            <h3>Traits</h3>
+            <div class="items-inline">
+                {{#unless data.system.traits.length}}<span class="item-name">None</span>{{/unless}}
+
+                {{#each data.system.traits as |trait|}}
+                    <span class="item" data-id="{{ trait._id }}" data-type="Item" data-uuid="{{ trait.uuid }}">
+                        <span class="item-name expandable">{{ trait.system.full_name }}</span>{{#unless @last}},{{/unless}}
+                    </span>
+                {{/each}}
+                {{#each data.system.traits as |trait|}}
+                    <div class="item-description" data-id="{{ trait._id }}">{{{ trait.system.description }}}</div>
+                {{/each}}
+            </div>
+
+            {{#if data.system.weaknesses.length}}
+                <h3>Weaknesses</h3>
+                <div class="items-inline">
+                    {{#each data.system.weaknesses as |weakness|}}
+                        <span class="item" data-id="{{ weakness._id }}" data-type="Item" data-uuid="{{ weakness.uuid }}">
+                            <span class="item-name expandable">{{ weakness.system.full_name }}</span>{{#unless @last}},{{/unless}}
+                        </span>
+                    {{/each}}
+                {{#each data.system.weaknesses as |weakness|}}
+                    <div class="item-description" data-id="{{ weakness._id }}">{{{ weakness.system.description }}}</div>
+                {{/each}}
+                </div>
+            {{/if}}
 
 			<h3>Consequences</h3>
 			<ol class="items-list">
@@ -122,12 +107,19 @@
 
 				{{#each data.system.consequences as |consequence|}}
 					<li class="item flexrow" data-id="{{ consequence._id }}" data-type="Item" data-uuid="{{ consequence.uuid }}">
-						<h4 class="item-name">{{ consequence.system.full_name }}</h4>
+                        <h4 class="item-name">
+                            <span class="chatable item-img">
+                                <img class="item-img" src="{{ consequence.img }}" title="Display {{ consequence.system.full_name }}" />
+                                <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ consequence.system.full_name }}" />
+                            </span>
+                            <span class="expandable">{{ consequence.system.full_name }}</span>
+                        </h4>
 						<input class="item-input item-prop" type="number" name="system.rank" value="{{ consequence.system.rank }}" step="1" data-dtype="Number" />
 						<div class="item-controls">
 							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
 							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
 						</div>
+                        <div class="item-description">{{{ consequence.system.description }}}</div>
 					</li>
 				{{/each}}
 			</ol>
@@ -167,7 +159,14 @@
 
                     {{#each data.system.equipment as |item|}}
                         <li class="item flexrow" data-id="{{ item._id }}" data-type="Item" data-uuid="{{ item.uuid }}">
-                            <h4 class="item-name">{{ item.system.full_name }}</h4>
+                            <h4 class="item-name">
+                                <span class="chatable item-img">
+                                    <img class="item-img" src="{{ item.img }}" title="Display {{ item.system.full_name }}" />
+                                    <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ item.system.full_name }}" />
+                                </span>
+                                <span class="expandable">{{ item.system.full_name }}</span>
+                            </h4>
+
                             <div class="item-name">{{item.system.properties}}</div>
                             <input class="item-input item-prop" type="number" name="system.quantity" value="{{ item.system.quantity }}" step="1" data-dtype="Number" />
                             <div class="item-controls">
@@ -181,6 +180,7 @@
                                 <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
                                 <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
                             </div>
+                            <div class="item-description">{{{ item.system.description }}}</div>
                         </li>
                     {{/each}}
                 </ol>
