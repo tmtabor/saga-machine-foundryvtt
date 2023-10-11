@@ -22,6 +22,9 @@ export class SagaMachineItem extends Item {
     async _onCreate(data, options, userId) {
         await super._onCreate(data, options, userId);
 
+        // Return if you're not the owner of this item or it hasn't been saved to the database
+        if (!this.isOwner || !this.id) return;
+
         // Set new default icons
         if (data.img === foundry.documents.BaseItem.DEFAULT_ICON) { // If default
             if (this.type === 'skill') this.update({'img': 'systems/saga-machine/images/defaults/skill.svg'});
