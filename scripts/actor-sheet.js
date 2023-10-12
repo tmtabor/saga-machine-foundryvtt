@@ -137,11 +137,16 @@ export class SagaMachineActorSheet extends ActorSheet {
 
 		// Allow expandable elements to toggle their description
 		html.find('.expandable').click(event => {
+			let all_descriptions = null;
 			let description = $(event.target).closest('.item').find('.item-description');	// PC sheets
 			if (!description.length) {														// NPC sheets
 				const id = $(event.target).closest('.item').data('id');
-				description = $(event.target).closest('.items-inline').find(`.item-description[data-id='${id}']`)
+				all_descriptions = $(event.target).closest('.items-inline').find(`.item-description`);
+				description = $(event.target).closest('.items-inline').find(`.item-description[data-id='${id}']`);
 			}
+			if (all_descriptions)
+				for (let d of all_descriptions)
+					if (d !== description[0] && $(d).is(':visible')) $(d).slideUp(200);
 			description.slideToggle(200);
 		});
 
