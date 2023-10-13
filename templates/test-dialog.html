@@ -34,7 +34,7 @@
                 {{#select skill}}
                     <option value="Unskilled" data-val="0">Unskilled</option>
                     <option value="" data-val="null">--</option>
-                    {{#each data.system.skills as |sk|}}
+                    {{#each data.system.all_skills as |sk|}}
                         <option data-id="{{ sk._id }}" value="{{ sk.system.full_name }}" data-val="{{ sk.system.rank }}">{{ sk.system.full_name }}</option>
                     {{/each}}
                 {{/select}}

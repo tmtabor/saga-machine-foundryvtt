@@ -124,6 +124,7 @@
     },
     "skill": {
       "templates": ["basics", "specialized", "ranked"],
+      "type": "General",
       "default": "",
       "ranked": true,
       "free_ranks": 0,

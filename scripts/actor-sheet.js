@@ -52,7 +52,9 @@ export class SagaMachineActorSheet extends ActorSheet {
 			(a, b) =>  a.system.type > b.system.type ? 1 : -1);
 		context.data.system.paths = this.items(context, 'path');
 		context.data.system.origins = this.items(context, 'origin');
-		context.data.system.skills = this.items(context, 'skill');
+		context.data.system.all_skills = this.items(context, 'skill');
+		context.data.system.skills = this.items(context, 'skill', s => s.system.type !== 'Restricted');
+		context.data.system.restricted_skills = this.items(context, 'skill', s => s.system.type === 'Restricted');
 		context.data.system.traits = this.items(context, 'trait', t => t.system.type !== 'Weakness');
 		context.data.system.weaknesses = this.items(context, 'trait', t => t.system.type === 'Weakness');
 		context.data.system.consequences = this.items(context, 'consequence');

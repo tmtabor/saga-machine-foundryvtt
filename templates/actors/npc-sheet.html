@@ -64,6 +64,19 @@
                 {{/each}}
             </div>
 
+            {{#if data.system.restricted_skills.length}}
+                <h3>Restricted Skills</h3>
+                <div class="items-inline">
+                    {{#each data.system.restricted_skills as |skill|}}
+                        <span class="item" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
+                            <span class="item-name rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
+                                {{ skill.system.full_name }} {{ skill.system.rank }}
+                            </span>{{#unless @last}},{{/unless}}
+                        </span>
+                    {{/each}}
+                </div>
+            {{/if}}
+
             <div class="item-controls float-right">
                 <a class="item-control item-create" title="Create trait" data-type="trait"><i class="fas fa-plus"></i> Add</a>
             </div>

@@ -9,9 +9,12 @@
             </div>
 
             <div class="grid grid-5col item-box">
-                <label class="item-label">Specialized?</label>
-                <input class="toggle-check item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
-                <input class="toggle-visible grid-start-3 grid-span-3 item-input" type="text" name="system.specialization" placeholder="Specialization" value="{{ data.system.specialization }}" />
+                <label class="item-label">Type</label>
+                <input class="item-input grid-span-4" type="text" name="system.type" value="{{ data.system.type }}" list="skill-types"/>
+                    <datalist id="skill-types">
+                        <option>General</option>
+                        <option>Restricted</option>
+                    </datalist>
             </div>
         </div>
     </header>
@@ -27,8 +30,13 @@
     <section class="sheet-body">
         <div class="tab basics" data-group="primary" data-tab="basics">
             <div class="grid grid-5col item-box">
+                <label class="item-label">Specialized?</label>
+                <input class="toggle-check item-input" type="checkbox" name="system.specialized" {{checked data.system.specialized}} />
+                <input class="toggle-visible grid-start-3 grid-span-3 item-input" type="text" name="system.specialization" placeholder="Specialization" value="{{ data.system.specialization }}" />
+
                 <label class="item-label">Rank</label>
                 <input class="item-input" type="number" name="system.rank" value="{{ data.system.rank }}" step="1" />
+
                 <label class="item-label">Default Stat</label>
                 <select class="grid-span-2 item-input" name="system.default">
                     {{#select data.system.default}}
