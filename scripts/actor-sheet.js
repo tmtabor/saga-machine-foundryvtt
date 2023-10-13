@@ -37,6 +37,7 @@ export class SagaMachineActorSheet extends ActorSheet {
      * @returns {string}
      */
     get template() {
+		if (!game.user.isGM && this.actor.limited) return "systems/saga-machine/templates/actors/limited-sheet.html";
 		if (this.actor.is_pc()) 	return `systems/saga-machine/templates/actors/pc-sheet.html`;
 		if (this.actor.is_npc()) 	return `systems/saga-machine/templates/actors/npc-sheet.html`;
 									return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`;

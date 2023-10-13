@@ -652,6 +652,44 @@ img.system-logo {
 }
 
 /*
+  LIMITED SHEET STYLES
+*/
+
+.saga-machine form.limited-sheet {
+  display: grid;
+  grid-template-rows: 90px 30px 1fr;
+  gap: 0;
+  height: 100%;
+  background: url(../images/theme/header.jpg), url(../images/theme/background.jpg);
+  background-repeat: repeat-x, no-repeat;
+  background-size: calc(100% + 50px) 100px, calc(100% + 50px);
+  background-attachment: local;
+  background-position: -50px 0;
+}
+
+.saga-machine form.limited-sheet > nav.sheet-tabs {
+  -webkit-box-flex: 0;
+  -ms-flex: 0;
+  flex: 0;
+  align-items: center;
+  height: 20px;
+  background: #11114a;
+  box-shadow: 0 -1px 1px rgb(0 0 0 / 25%);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  position: relative;
+  margin: 0;
+  padding: 0;
+  color: #dcb95f;
+  text-shadow: 2px 2px black;
+  text-rendering: optimizeLegibility;
+}
+
+.saga-machine form.limited-sheet .editor {
+  height: 100%;
+}
+
+/*
   STASH SHEET STYLES
 */
 
