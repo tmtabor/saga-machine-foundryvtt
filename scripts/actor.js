@@ -61,7 +61,8 @@ export class SagaMachineActor extends Actor {
 
         // Move
         if (!this.system.scores.move.custom)
-            this.system.scores.move.value = Math.floor((this.system.stats.speed.value + this.system.stats.endurance.value) / 2);
+            this.system.scores.move.value = this.median([this.system.stats.speed.value,
+                this.system.stats.endurance.value, this.system.stats.determination.value]);
 
         // Encumbrance threshold
         if (!this.system.scores.encumbrance.custom)
