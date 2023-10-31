@@ -151,57 +151,6 @@ export class Test {
         return [highest_pair, use_pair];
     }
 
-    discard_lowest(discarded_only=true) {
-        // Only need to bother with this if there are banes
-        if (this.banes <= this.boons) return;
-
-        // Find the lowest die
-        const lowest = this.results.terms[0].results.filter(d => d.discarded || !discarded_only)
-            .map(d => d.result).sort((a, b) => a - b)[0];
-
-        // Remove the lowest die
-        let discarded_yet = false;
-        this.results.terms[0].results.forEach((d, i) => {
-            if ((!discarded_only || d.discarded) && d.result === lowest && !discarded_yet) {
-                this.results.terms[0].results.splice(i, 1);
-                discarded_yet = true;
-            }
-        });
-    }
-
-    add_luck_die(results) {
-        const luck_die = results.terms[0].results[0];   // Get the die results
-        luck_die['discarded'] = true;                   // Mark as found_selected
-        this.results.terms[0].results.push(luck_die);   // Add to original roll
-
-        // If there are banes, discard all but the second-lowest result
-        let selected = 0;
-        if (this.banes > this.boons) {
-            // Find the second lowest result
-            selected = this.results.terms[0].results.map(d => d.result).sort((a, b) => a - b)[1];
-        }
-
-        // Otherwise, discard all but the highest result
-        else {
-            // Find the highest result
-            for (let die of this.results.terms[0].results)
-                if (die.result > selected) selected = die.result;
-        }
-
-        // Discard all others
-        let found_selected = false;
-        for (let die of this.results.terms[0].results) {
-            if (die.result === selected && !found_selected) { die.discarded = false; found_selected = true; }
-            else { die.discarded = true; }
-        }
-
-        // Set the new total
-        this.results._total = selected;
-
-        // Set the luck flag
-        this.use_luck = true;
-    }
-
     lookup_skill() {
         // Separate skill name from specialization
         let specialization = this.skill.match(/\(([^\)]+)\)/);
@@ -886,17 +835,10 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
             if (test?.actor?.system?.scores?.luck?.value <= 0)
                 return ui.notifications.warn("The character doesn't have enough Luck.");
 
-            // Roll 1d10
-            const roll = new Roll("1d10");
-            const results = await roll.evaluate();
-
-            // Replace the correct die in the original test with the new roll
-            test.add_luck_die(results);                                                             // Add the die
-            [test.pairs, test.use_pair] = test.make_pairs();                                        // Make pairs
-            [test.total, test.randomizer, test.stat_value, test.skill_value] = test.calc_total();   // Calculate total
-            [test.tn, test.target, test.target_score] = test.lookup_tn();                           // Determine success
-            [test.success, test.critical, test.margin] = test.calc_margin();                        // Calculate margin
-            test.discard_lowest();                                                                  // Replace die
+            // Add additional boon, mark luck tag and re-evaluate
+            test.boons++;
+            test.use_luck = true;
+            await test.evaluate()
 
             // Decrement luck
             test.actor.update({'system.scores.luck.value': test.actor.system.scores.luck.value - 1});
@@ -905,7 +847,7 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
             await test.apply_consequences();
 
             // Display the new chat card
-            await test.to_chat({ whisper: html.hasClass('whisper'), rolls: [results] });
+            await test.to_chat({ whisper: html.hasClass('whisper'), rolls: [test.results] });
         }
     });
 
