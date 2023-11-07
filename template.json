@@ -143,18 +143,18 @@
       "rank": 1,
       "requirements": [],
       "cost": 0,
-      "stats": {},
-      "skills": {},
-      "traits": {},
-      "equipment": {}
+      "stats": "",
+      "skills": "",
+      "traits": "",
+      "equipment": ""
     },
     "path": {
       "templates": ["basics"],
       "requirements": [],
-      "stats": {},
-      "skills": {},
-      "traits": {},
-      "equipment": {}
+      "stats": "",
+      "skills": "",
+      "traits": "",
+      "equipment": ""
     },
     "consequence": {
       "templates": ["basics", "specialized", "ranked"],
