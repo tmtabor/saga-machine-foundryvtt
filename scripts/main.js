@@ -1,6 +1,7 @@
 import { SagaMachineActor } from "./actor.js";
 import { SagaMachineActorSheet } from "./actor-sheet.js";
 import { SMCombatTracker } from "./combat.js";
+import { generate_conditions } from "./conditions.js";
 import { SagaMachineItem } from "./item.js";
 import { SagaMachineItemSheet } from "./item-sheet.js";
 import { sm_test_macro } from "./tests.js";
@@ -33,6 +34,13 @@ Hooks.once("init", async () => {
     // Unregister the core sheets
     Actors.unregisterSheet("core", ActorSheet);
     Items.unregisterSheet("core", ItemSheet);
+
+    // Register custom status effects
+    CONFIG.statusEffects = generate_conditions();
+    CONFIG.specialStatusEffects.DEFEATED = 'defeated';
+    CONFIG.specialStatusEffects.INCAPACITATED = 'unconscious';
+    CONFIG.specialStatusEffects.INVISIBLE = 'hidden'
+    game.sagamachine.standard_consequences = CONFIG.statusEffects.map(s => s.name);
 
     // Register system config
     game.settings.register('saga-machine', 'level', {
