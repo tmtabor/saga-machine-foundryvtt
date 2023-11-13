@@ -325,6 +325,29 @@ export class SagaMachineActor extends Actor {
         else return new Roll(this.system.fast_turn ? INITIATIVE.FAST_TURN : INITIATIVE.SLOW_TURN);
     }
 
+    modifiers(dataset) {
+        let mods_object = null;
+
+        // Keep track of the totals
+        let boons = 0;
+        let banes = 0;
+        let modifier = 0;
+
+        // Look up the modifiers for this test
+        if (dataset.tn === 'Defense' || dataset.tn === 'Willpower') mods_object = this.system.modifiers.other.attack;
+        else if (dataset.score === 'defense')                       mods_object = this.system.modifiers.other.defense;
+        else if (dataset.stat)                                      mods_object = this.system.modifiers.stats[dataset.stat];
+
+        // Add the modifiers
+        boons = mods_object.boons;
+        banes = mods_object.banes;
+        modifier = mods_object.modifier;
+
+        // TODO: Implement tracking modifiers as seperate entities for each consequence
+
+        return { boons: boons, banes: banes, modifier: modifier };
+    }
+
     async test(dataset) {
         // Merge the actor into the dataset
         const spec = { actor: this, ...dataset };

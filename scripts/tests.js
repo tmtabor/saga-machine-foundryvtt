@@ -664,7 +664,7 @@ export async function test_dialog(dataset) {
     });
 
     const dialog_content = await renderTemplate("systems/saga-machine/templates/test-dialog.html",
-        {...actor.sheet.getData(), ...dataset});
+        { ...actor.sheet.getData(), ...actor.modifiers(dataset), ...dataset });
 
     new Dialog({
         title: "Make Test",
