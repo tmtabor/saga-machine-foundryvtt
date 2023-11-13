@@ -11,7 +11,7 @@ export class SagaMachineItemSheet extends ItemSheet {
             width: 600,
             height: 360,
             tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "basics"}],
-            scrollY: [".basics", ".attacks", ".description"]
+            scrollY: [".basics", ".attacks", "effects", ".description"]
         });
     }
 
@@ -40,6 +40,9 @@ export class SagaMachineItemSheet extends ItemSheet {
 	activateListeners(html) {
         super.activateListeners(html);
 
+        // Everything below here is only needed if the sheet is editable
+		if ( !this.isEditable ) return;
+
         // Handle attacks
         this.draw_attacks(html);
         html.find('.attacks .item-create').click(this.add_attack.bind(this));
@@ -50,7 +53,42 @@ export class SagaMachineItemSheet extends ItemSheet {
 			event.preventDefault();
 			const target = $(event.target);
 			this._toggle_items_provided(target);
-		})
+		});
+
+        // Handle creating active effects
+        html.find('.effect-create').on('click', async event => {
+            event.preventDefault();
+
+            return await ActiveEffect.create({ name: 'New Effect' }, { parent: this.item });
+        });
+
+        // Handle editing active effects
+        html.find('.effect-edit').on('click', event => {
+            const box = $(event.target).closest('.effect');
+            const id = box.data("id");
+            const name = box.data("name");
+            const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
+            if (effect) effect.sheet.render(true);
+        });
+
+        // Handle deleting active effects
+        html.find('.effect-delete').on('click', event => {
+            const box = $(event.target).closest('.effect');
+            const id = box.data("id");
+            const name = box.data("name");
+            const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
+			effect.delete();
+			box.slideUp(200, () => this.render(false));
+        });
+
+        // Effect activate / disabled
+		html.find('.effect-toggle').click(event => {
+			const box = $(event.target).closest('.effect');
+            const id = box.data("id");
+            const name = box.data("name");
+            const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
+            effect.update({ 'disabled': !effect.disabled });
+		});
     }
 
     add_attack() {

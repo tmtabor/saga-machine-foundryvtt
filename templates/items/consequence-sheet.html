@@ -18,12 +18,39 @@
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
-        <span data-tab="basics">Description</span>
+        <a class="item" data-tab="basics">Description</a>
+        <a class="item" data-tab="effects">Effects</a>
     </nav>
 
     <section class="sheet-body">
         <div class="tab description" data-group="primary" data-tab="basics">
             {{editor data.system.description target="system.description" engine="prosemirror" button=true owner=owner editable=editable}}
+        </div>
+        <div class="tab effects" data-group="primary" data-tab="effects">
+            <ol class="items-list effects-list">
+                <li class="items-header flexrow">
+                    <h4 class="item-name effect-name flexrow">Active Effects</h4>
+                    <div class="effect-source">Duration</div>
+                    <div class="item-controls effect-controls">
+                        <a class="item-control effect-create">
+                            <i class="fas fa-plus"></i> Add
+                        </a>
+                    </div>
+                </li>
+
+            {{#each data.effects as |effect|}}
+                <li class="item effect flexrow" data-id="{{effect.id}}" data-name="{{ effect.name }}">
+                    <h4 class="item-name effect-name flexrow">{{effect.name}}</h4>
+                    <div class="effect-duration">{{effect.duration.label}}</div>
+                    <div class="item-controls effect-controls">
+                        <a class="item-control effect-toggle" title="Effect {{#if effect.disabled}}Disabled{{else}}Activated{{/if}}">
+                            <i class="fas {{#if effect.disabled}}fa-times{{else}}fa-check{{/if}}"></i>
+                        </a>
+                        <a class="item-control effect-edit" title="Edit Effect"><i class="fas fa-edit"></i></a>
+                        <a class="item-control effect-delete" title="Delete Effect"><i class="fas fa-trash"></i></a>
+                    </div>
+                </li>
+            {{/each}}
         </div>
     </section>
 </form>
