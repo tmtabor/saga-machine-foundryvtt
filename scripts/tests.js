@@ -1,3 +1,4 @@
+import "./tagify.min.js";
 import { capitalize, token_actor } from "./utils.js";
 
 /**
@@ -649,6 +650,112 @@ export class Attack extends Test {
     }
 }
 
+export class ModifierSet {
+    _name = null;
+    _description = null;
+    boons = 0;
+    banes = 0
+    modifier = 0;
+
+    constructor({name=null, description=null, boons=0, banes=0, modifier=0}) {
+        this._name = name;
+        this._description = description;
+        this.boons = parseInt(boons) || 0;
+        this.banes = parseInt(banes) || 0;
+        this.modifier = parseInt(modifier) || 0;
+    }
+
+    get name() { return this._name ? `${this._name} ${this.mod_str()}` : this.mod_str() }
+
+    get description() { return this._description || this._name }
+
+    mod_str() {
+        const boons_banes = '⊕'.repeat(this.boons) + '⊖'.repeat(this.banes);
+        const mod = this.modifier >= 0 ? `+${this.modifier}` : `${this.modifier}`;
+        if (!boons_banes) return mod;
+        else if (!this.modifier) return boons_banes;
+        else return boons_banes + mod;
+    }
+
+    tag() {
+        return { value: this.name, title: this.description, style: ModifierSet.color(this.name) }
+    }
+
+    json() {
+        return {
+            "boons": this.boons,
+            "banes": this.banes,
+            "modifier": this.modifier,
+            "name": this.name,
+            "description": this.description
+        };
+    }
+
+    static color(name) {
+        const includes_plus = name.includes('+') || name.includes('⊕');
+        const includes_minus = name.includes('-') || name.includes('⊖');
+
+        const GRAY = '--tag-bg:#a1a1a1;--tag-text-color:#2b2a2a;--tag-hover:#bababa;--tag-remove-bg:#a1a1a1;--tag-remove-btn-color:#2b2a2a';
+        const RED = '--tag-bg:#d19d9d;--tag-text-color:#530d0d;--tag-hover:#e1b4b4;--tag-remove-bg:#d19d9d;--tag-remove-btn-color:#530d0d';
+        const GREEN = '--tag-bg:#9dd1ab;--tag-text-color:#224939;--tag-hover:#b5e0c1;--tag-remove-bg:#9dd1ab;--tag-remove-btn-color:#224939';
+
+        if (includes_plus && includes_minus) return GRAY;
+        else if (includes_plus) return GREEN;
+        else if (includes_minus) return RED;
+        else return GRAY;
+    }
+
+    static total_modifiers(mods_list) {
+        let boons = 0;
+        let banes = 0;
+        let modifier = 0;
+
+        // Add up the totals
+        mods_list.forEach(m => {
+            boons += m.boons || 0;
+            banes += m.banes || 0;
+            modifier += m.modifier || 0;
+        });
+
+        return { boons: boons, banes: banes, modifier: modifier };
+    }
+
+    static list_from_string(input_str) {
+        let json_list = null;
+        try { json_list = JSON.parse(input_str); }
+        catch (e) { console.error("Error parsing list from tagify"); }
+
+        if (!Array.isArray(json_list)) { console.error(`Not list in list_from_string: ${json_list}`); return []; }
+
+        return json_list.map(t => ModifierSet.from_tag(t));
+    }
+
+    static from_tag(tag_json) {
+        // '[{"value":"Dazed ⊖","title":"Dazed","color":"red"},{"value":"Confused ⊕"},{"value":"Skilled +2"}]'
+        if (!tag_json.value) return {};
+
+        // Parse the tag name
+        const parts = tag_json.value.split(" ");
+        const all_mods = parts.pop();
+        const name = parts.join(" ");
+
+        // Count boons, banes and mod
+        let modifier = parseInt(all_mods.replace(/^\D+/, '')) || null;
+        let leading = all_mods.replace(/[0-9]/g, '');
+        if (modifier !== null && leading.at(-1) === '-') modifier *= -1; // If mod is negative, make it so
+        if (modifier !== null) leading = leading.slice(0, -1);
+        let boons = (leading.match(/[+⊕]/g) || []).length ;
+        let banes = (leading.match(/[-⊖]/g) || []).length ;
+
+        return new ModifierSet({
+            name: name,
+            boons: boons,
+            banes: banes,
+            modifier: modifier || 0
+        });
+    }
+}
+
 /**
  * Show a test dialog for the test provided in the dataset
  *
@@ -664,11 +771,26 @@ export async function test_dialog(dataset) {
     });
 
     const dialog_content = await renderTemplate("systems/saga-machine/templates/test-dialog.html",
-        { ...actor.sheet.getData(), ...actor.modifiers(dataset), ...dataset });
+        { ...actor.sheet.getData(), ...actor.total_modifiers(dataset), ...dataset });
 
     new Dialog({
         title: "Make Test",
         content: dialog_content,
+        render: html => {
+            // Initialize the modifiers (tag) widget
+            const modifiers = actor.modifiers(dataset);         // Get the list of modifiers from consequences
+            const input = html.find('input[name=modifiers]');   // Get the modifiers input DOM element
+            if (!input) return;
+            input.val(JSON.stringify(modifiers.map(m => m.tag())));
+            const tagify = new Tagify(input[0], {
+                duplicates: true,
+                transformTag: tag_data => {
+                    tag_data.style = ModifierSet.color(tag_data.value);
+                    if (isNaN(parseInt(tag_data.value.split(" ").at(-1))))
+                        tag_data.value = tag_data.value.replaceAll('+', '⊕').replaceAll('-', '⊖');
+                }
+            });
+        },
         buttons: {
             roll: {
                 label: "Make Test",
@@ -677,9 +799,9 @@ export async function test_dialog(dataset) {
                     let stat = html.find('select[name=stat] > option:selected').val();
                     let score = html.find('select[name=score] > option:selected').val();
                     let skill = html.find('select[name=skill] > option:selected').val();
-                    const modifier = html.find('input[name=modifier]').val();
-                    const boons = html.find('input[name=boons]').val();
-                    const banes = html.find('input[name=banes]').val();
+                    const { boons, banes, modifier } = ModifierSet.total_modifiers(
+                        ModifierSet.list_from_string(html.find('input[name=modifiers]').val())
+                    );
                     const tn = html.find('input[name=tn]').val();
                     const consequences = html.find('input[name=consequences]').val();
 

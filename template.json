@@ -89,68 +89,18 @@
       "equipment": [],
       "modifiers": {
         "stats": {
-          "strength": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          },
-          "dexterity": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          },
-          "speed": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          },
-          "endurance": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          },
-          "intelligence": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          },
-          "perception": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          },
-          "charisma": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          },
-          "determination": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          }
+          "strength": [],
+          "dexterity": [],
+          "speed": [],
+          "endurance": [],
+          "intelligence": [],
+          "perception": [],
+          "charisma": [],
+          "determination": []
         },
         "other": {
-          "attack": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          },
-          "defense": {
-            "boons": 0,
-            "banes": 0,
-            "modifier": 0,
-            "effects": []
-          }
+          "attack": [],
+          "defense": []
         }
       },
       "npc": false,

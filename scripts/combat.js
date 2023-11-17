@@ -21,7 +21,7 @@ Hooks.on("preUpdateCombat", async (combat, update_data) => {
                 consequences: [{"type": "defense"}],
                 whisper: true,
                 chat: true,
-                ...c.actor.modifiers({ score: 'defense' })
+                ...c.actor.total_modifiers({ score: 'defense' })
             });
     };
 

@@ -1,5 +1,5 @@
-import {INITIATIVE} from "./combat.js";
-import {Test} from "./tests.js";
+import { INITIATIVE } from "./combat.js";
+import { ModifierSet, Test } from "./tests.js";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
@@ -325,27 +325,48 @@ export class SagaMachineActor extends Actor {
         else return new Roll(this.system.fast_turn ? INITIATIVE.FAST_TURN : INITIATIVE.SLOW_TURN);
     }
 
+    total_modifiers(dataset) {
+        return ModifierSet.total_modifiers(this.modifiers(dataset));
+    }
+
     modifiers(dataset) {
         let mods_object = null;
 
-        // Keep track of the totals
-        let boons = 0;
-        let banes = 0;
-        let modifier = 0;
-
         // Look up the modifiers for this test
-        if (dataset.tn === 'Defense' || dataset.tn === 'Willpower') mods_object = this.system.modifiers.other.attack;
-        else if (dataset.score === 'defense')                       mods_object = this.system.modifiers.other.defense;
-        else if (dataset.stat)                                      mods_object = this.system.modifiers.stats[dataset.stat];
+        if (dataset.tn === 'Defense' || dataset.tn === 'Willpower') mods_object = deepClone(this.system.modifiers.other.attack);
+        if (!mods_object?.length && (dataset.score === 'defense' ||
+            dataset.score === 'willpower'))                         mods_object = deepClone(this.system.modifiers.other.defense);
+        if (!mods_object?.length && dataset.stat)                   mods_object = deepClone(this.system.modifiers.stats[dataset.stat]);
+        if (!mods_object) { console.error('No mods object found'); return []; }
 
-        // Add the modifiers
-        boons = mods_object.boons;
-        banes = mods_object.banes;
-        modifier = mods_object.modifier;
+        // Verify that the mods object is a list
+        if (!Array.isArray(mods_object)) { console.error('Mods object is not array'); return []; }
 
-        // TODO: Implement tracking modifiers as seperate entities for each consequence
+        // EACH MOD IN THE LIST SHOULD BE IN THE FORMAT
+        // name=short name&description=for tooltip&boons=0&banes=0&modifier=0
 
-        return { boons: boons, banes: banes, modifier: modifier };
+        // Add manual boons, banes or modifier passed in as part of the dataset
+        if (dataset.boons) mods_object.push(`boons=${dataset.boons}`);
+        if (dataset.banes) mods_object.push(`banes=${dataset.banes}`);
+        if (dataset.modifier) mods_object.push(`modifier=${dataset.modifier}`);
+
+        // Parse the mods object into a list of mods
+        let mods_list = [];
+        try {
+            mods_object.forEach(m => {
+                const params = new URLSearchParams(m);
+                mods_list.push(new ModifierSet({
+                    name: params.get('name'),
+                    description: params.get('description'),
+                    boons: params.get('boons'),
+                    banes: params.get('banes'),
+                    modifier: params.get('modifier')
+                }));
+            });
+        }
+        catch (e) { console.error(`Error parsing modifiers object: ${dataset.stat} ${dataset.score}`); return []; }
+
+        return mods_list;
     }
 
     async test(dataset) {

@@ -61,17 +61,10 @@
 
     <fieldset>
         <legend>Test Modifiers</legend>
-
-        <div class="grid grid-6col dialog-box">
-            <label>Boons</label>
-            <input class="grid-start-2 grid-span-2 dialog-input" type="number" name="boons" value="{{ boons }}" step="1" />
-            <label>Banes</label>
-            <input class="grid-start-5 grid-span-2 dialog-input" type="number" name="banes" value="{{ banes }}" step="1" />
-        </div>
-
-        <div class="grid grid-6col dialog-box">
-            <label>Modifier</label>
-            <input class="grid-start-2 grid-span-5 dialog-input" type="number" name="modifier" value="{{ modifier }}" step="1" />
+        <div class="dialog-box modifier-tags">
+            <input class="dialog-input modifier-tags" type="text" name="modifiers" value="{{ modifiers }}" />
+            <p class="hint">To add a boon, bane or other modifier, type <em>+</em>, <em>-</em> or the value, separated
+                by a comma. You may optionally prepend a descriptor; for example: "Aim +".</p>
         </div>
     </fieldset>
 
