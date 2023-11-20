@@ -12,7 +12,29 @@
     "author": "Thorin Tabor",
     "esmodules": ["scripts/main.js"],
     "styles": ["styles/main.css"],
-    "packs": [],
+    "packs": [
+        {
+            "name": "bestiary",
+            "label": "Bestiary",
+            "system": "saga-machine",
+            "path": "packs/bestiary",
+            "type": "Actor"
+        },
+        {
+            "name": "consequences",
+            "label": "Consequences",
+            "system": "saga-machine",
+            "path": "packs/consequences",
+            "type": "Item"
+        },
+        {
+            "name": "skills",
+            "label": "General Skills",
+            "system": "saga-machine",
+            "path": "packs/skills",
+            "type": "Item"
+        }
+    ],
     "languages": [
       {
         "lang": "en",
