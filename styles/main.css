@@ -184,6 +184,7 @@ img.system-logo {
   -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
+  width: 100%;
 }
 
 .saga-machine .sheet-header h1.charname {
@@ -203,6 +204,40 @@ img.system-logo {
   text-rendering: optimizeLegibility;
   border: none;
   background: transparent;
+}
+
+.saga-machine .sheet-header ol.origins {
+  display: block;
+  padding: 0;
+  position: relative;
+  width: calc(100% - 110px);
+  white-space: nowrap;
+  overflow-x: auto;
+  height: 25px;
+  overflow-y: hidden;
+}
+
+.saga-machine .sheet-header ol.origins > li.item {
+  display: inline-block;width: 100%;
+  min-width: 100px;
+  width: auto;
+  position: relative;
+  margin-right: 15px;
+  padding-right: 35px;
+}
+
+.saga-machine .sheet-header ol.origins > li.item > .item-name {
+  display: inline-block;
+  max-width: 150px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.saga-machine .sheet-header ol.origins > li.item > .item-controls {
+  display: inline-block;
+  position: absolute;
+  right: 5px;
 }
 
 .saga-machine .sheet-header .item-controls {
