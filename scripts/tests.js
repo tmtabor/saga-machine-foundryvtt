@@ -324,7 +324,7 @@ export class Test {
         if (!!this.stat) tags += `<span class="tag">${capitalize(this.stat)} +${this.stat_value}</span>`;
         if (!!this.skill && this.skill !== 'Unskilled') tags += `<span class="tag">${this.skill} +${this.skill_value}</span>`;
         if (this.skill && this.skill_value === 0) tags += '<span class="tag">Unskilled</span>';
-        if (!!this.modifier) tags += `<span class="tag">Modifier ${this.modifier >= 0 ? '+' : ''}${this.modifier}</span>`;
+        if (!!this.tags && this.tags.length) this.tags.forEach(t => tags += `<span class="tag">${t}</span>`);
         if (this.use_pair) tags += '<span class="tag">Pairs!</span>';
         if (this.use_luck) tags += '<span class="tag">Luck</span>';
 
@@ -709,15 +709,17 @@ export class ModifierSet {
         let boons = 0;
         let banes = 0;
         let modifier = 0;
+        let tags = [];
 
         // Add up the totals
         mods_list.forEach(m => {
             boons += m.boons || 0;
             banes += m.banes || 0;
             modifier += m.modifier || 0;
+            if (!!m.name) tags.push(m.name);
         });
 
-        return { boons: boons, banes: banes, modifier: modifier };
+        return { boons: boons, banes: banes, modifier: modifier, tags: tags };
     }
 
     static list_from_string(input_str) {
@@ -790,6 +792,9 @@ export async function test_dialog(dataset) {
                         tag_data.value = tag_data.value.replaceAll('+', '⊕').replaceAll('-', '⊖');
                 }
             });
+
+            // Redo modifiers when the stat, score or TN is changed
+            // TODO: Implement
         },
         buttons: {
             roll: {
@@ -799,7 +804,7 @@ export async function test_dialog(dataset) {
                     let stat = html.find('select[name=stat] > option:selected').val();
                     let score = html.find('select[name=score] > option:selected').val();
                     let skill = html.find('select[name=skill] > option:selected').val();
-                    const { boons, banes, modifier } = ModifierSet.total_modifiers(
+                    const { boons, banes, modifier, tags } = ModifierSet.total_modifiers(
                         ModifierSet.list_from_string(html.find('input[name=modifiers]').val())
                     );
                     const tn = html.find('input[name=tn]').val();
@@ -813,6 +818,7 @@ export async function test_dialog(dataset) {
                         boons: boons || 0,
                         banes: banes || 0,
                         modifier: modifier || 0,
+                        tags: tags,
                         tn: tn || null,
                         consequences: consequences || null
                     });
