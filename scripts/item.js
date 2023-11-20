@@ -65,7 +65,9 @@ export class SagaMachineItem extends Item {
     }
 
     unit_encumbrance() {
-        if (this.system.properties.includes('Neg')) return 0;
+        if (this.system.properties.includes('Neg') ||
+            this.system.properties.includes('Implant') ||
+            this.system.properties.includes('Software')) return 0;
         else if (this.system.properties.includes('Worn') && this.system.equipped) return 0;
         else {
             for (const prop of this.system.properties) {
