@@ -794,7 +794,18 @@ export async function test_dialog(dataset) {
             });
 
             // Redo modifiers when the stat, score or TN is changed
-            // TODO: Implement
+            const inputs = html.find('select[name=stat], select[name=score], input[name=tn]');
+            inputs.on('change', event => {
+                // Get the new test parameters
+                const modified_dataset = foundry.utils.deepClone(dataset);
+                dataset.stat = html.find('select[name=stat]').val();
+                dataset.score = html.find('select[name=score]').val();
+                dataset.tn = html.find('input[name=tn]').val();
+
+                // Get the new modifiers and set the tag widget
+                const new_modifiers = actor.modifiers(modified_dataset);
+                input.val(JSON.stringify(new_modifiers.map(m => m.tag())));
+            });
         },
         buttons: {
             roll: {
