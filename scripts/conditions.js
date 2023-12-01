@@ -23,7 +23,10 @@ export const generate_conditions = () => {
     return system_conditions;
 }
 
-Hooks.on("createItem", (item) => {
+Hooks.on("createItem", (item, options, id) => {
+    // Only run this if it is you creating the item, not for other players
+    if (game.user.id !== id) return;
+
     // If this is a standard consequence
     if (item.type === "consequence" && item.parent && game.sagamachine.standard_consequences.includes(item.name)) {
         const actor = item.parent;
@@ -44,7 +47,10 @@ Hooks.on("createItem", (item) => {
     }
 });
 
-Hooks.on("deleteItem", async (item) => {
+Hooks.on("deleteItem", async (item, options, id) => {
+    // Only run this if it is you deleting the item, not for other players
+    if (game.user.id !== id) return;
+
     // If this is a standard consequence
     if (item.type === "consequence" && item.parent && game.sagamachine.standard_consequences.includes(item.name)) {
         const actor = item.parent;
@@ -59,7 +65,10 @@ Hooks.on("deleteItem", async (item) => {
     }
 });
 
-Hooks.on("createActiveEffect", async (effect, options, userId) => {
+Hooks.on("createActiveEffect", async (effect, options, id) => {
+    // Only run this if it is you creating the active effect, not for other players
+    if (game.user.id !== id) return;
+
     // If this is a status applied directly from the UI
     if (!effect.origin && effect.statuses?.size && effect.target) {
         const actor = effect.target;
@@ -155,7 +164,10 @@ Hooks.on("createActiveEffect", async (effect, options, userId) => {
     }
 });
 
-Hooks.on("preDeleteActiveEffect", (effect, options, userId) => {
+Hooks.on("preDeleteActiveEffect", (effect, options, id) => {
+    // Only run this if it is you deleting the active effect, not for other players
+    if (game.user.id !== id) return;
+
     const actor = effect.target
 
     // If using the status UI to delete a consequence with a subject, stop and prompt
@@ -193,7 +205,10 @@ Hooks.on("preDeleteActiveEffect", (effect, options, userId) => {
     }
 });
 
-Hooks.on("deleteActiveEffect", async (effect, options, userId) => {
+Hooks.on("deleteActiveEffect", async (effect, options, id) => {
+    // Only run this if it is you deleting the active effect, not for other players
+    if (game.user.id !== id) return;
+
     // If this is a status applied directly from the UI
     if (!effect.origin && effect.statuses?.size && effect.target) {
         const actor = effect.target
