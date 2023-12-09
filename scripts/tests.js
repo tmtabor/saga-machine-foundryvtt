@@ -657,14 +657,15 @@ export class Attack extends Test {
             actor_id: dataset.actorId
         });
 
-        const strength = actor.system.stats.strength.value;                 // Get the actor's strength
-        const damage = Attack.damage(dataset);                              // Get the attack's damage
+        const strength = actor.system.stats.strength.value;                     // Get the actor's strength
+        const damage = Attack.damage(dataset);                                  // Get the attack's damage
         const properties = Attack.parse_properties(dataset.properties);
-        const light = Attack.property_value(properties, 'Light');   // Get the Light X property, if any
+        const light = Attack.property_value(properties, 'Light');       // Get the Light X property, if any
+        const hands = Attack.property_value(properties, 'Hands');  // Get the Hands X property
 
         // Check to see if the strength requirement is met
-        if (light && strength >= light) return true;
-        else return strength >= damage;
+        if (hands >= 2) return strength >= (light || (damage/2))
+        else            return strength >= (light || damage)
     }
 
     static damage(dataset) {
