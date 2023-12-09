@@ -648,6 +648,56 @@ export class Attack extends Test {
         this._effect = this.consequences ? this.consequences.map(c => c.effect()).join(', ') : '';
         return this._effect
     }
+
+    static strength_met(dataset, actor=null) {
+        // Get a reference to the actor if one has not been provided
+        if (!actor) actor = token_actor({
+            scene_id: dataset.sceneId,
+            token_id: dataset.tokenId,
+            actor_id: dataset.actorId
+        });
+
+        const strength = actor.system.stats.strength.value;                 // Get the actor's strength
+        const damage = Attack.damage(dataset);                              // Get the attack's damage
+        const properties = Attack.parse_properties(dataset.properties);
+        const light = Attack.property_value(properties, 'Light');   // Get the Light X property, if any
+
+        // Check to see if the strength requirement is met
+        if (light && strength >= light) return true;
+        else return strength >= damage;
+    }
+
+    static damage(dataset) {
+        if (!dataset.consequences) return 0;
+
+        // Parse consequences into a list
+        let consequence_list = JSON.parse(dataset.consequences);
+        if (!Array.isArray(consequence_list)) consequence_list = [consequence_list];
+
+        // Get the damage
+        for (let i = 0; i < consequence_list.length; i++) {
+            const consequence = new Consequence(consequence_list[i]);
+            if (consequence.type === 'damage') return consequence.base_damage();
+        }
+
+        return 0;
+    }
+
+    static parse_properties(properties) {
+        if (typeof properties === 'string') return properties.split(',').map(t => t.trim());
+        else if (Array.isArray(properties)) return properties;
+        else return [];
+    }
+
+    static property_value(properties, property) {
+        for (const prop of properties) {
+            if (prop.toLowerCase().startsWith(`${property.toLowerCase()} `)) {
+                const [p, val] = prop.split(' ');
+                return Number(val);
+            }
+        }
+        return 0;
+    }
 }
 
 export class ModifierSet {
@@ -773,7 +823,7 @@ export async function test_dialog(dataset) {
     });
 
     const dialog_content = await renderTemplate("systems/saga-machine/templates/test-dialog.html",
-        { ...actor.sheet.getData(), ...actor.total_modifiers(dataset), ...dataset });
+        { ...actor.sheet.getData(), ...dataset });
 
     new Dialog({
         title: "Make Test",

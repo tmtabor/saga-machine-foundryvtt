@@ -1,7 +1,8 @@
 import { INITIATIVE } from "./combat.js";
-import { ModifierSet, Test } from "./tests.js";
+import { ModifierSet, Attack, Test } from "./tests.js";
 
 /**
+ * Extends the base Actor class to support the Saga Machine system
  * Extends the base Actor class to support the Saga Machine system
  *
  * @extends {Actor}
@@ -126,14 +127,14 @@ export class SagaMachineActor extends Actor {
             item.system.group === 'Armor' && item.system.equipped);
         let highest = 0;
         for (const arm of equipped_armor) {
-            const val = arm.armor();
+            const val = arm.system.armor;
             if (val > highest) highest = val;
         }
         return highest;
     }
 
     encumbrance_total() {
-		return this.items.filter(item => item.type === 'item').reduce((total, item) => item.encumbrance() + total, 0);
+		return this.items.filter(item => item.type === 'item').reduce((total, item) => item.system.encumbrance + total, 0);
 	}
 
     wealth_total() {
@@ -337,7 +338,7 @@ export class SagaMachineActor extends Actor {
         if (!mods_object?.length && (dataset.score === 'defense' ||
             dataset.score === 'willpower'))                         mods_object = deepClone(this.system.modifiers.other.defense);
         if (!mods_object?.length && dataset.stat)                   mods_object = deepClone(this.system.modifiers.stats[dataset.stat]);
-        if (!mods_object) { console.error('No mods object found'); return []; }
+        if (!mods_object) mods_object = [];
 
         // Verify that the mods object is a list
         if (!Array.isArray(mods_object)) { console.error('Mods object is not array'); return []; }
@@ -349,6 +350,9 @@ export class SagaMachineActor extends Actor {
         if (dataset.boons) mods_object.push(`boons=${dataset.boons}`);
         if (dataset.banes) mods_object.push(`banes=${dataset.banes}`);
         if (dataset.modifier) mods_object.push(`modifier=${dataset.modifier}`);
+
+        // Add possible bane from the strength requirement
+        if (dataset.tn === 'Defense' && !Attack.strength_met(dataset, this)) mods_object.push(`name=Low Str&banes=1`);
 
         // Parse the mods object into a list of mods
         let mods_list = [];

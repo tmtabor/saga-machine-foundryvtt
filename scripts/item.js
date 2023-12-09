@@ -14,7 +14,7 @@ export class SagaMachineItem extends Item {
         // Derive the full name from the base name and specialization
         this.full_name();
 
-        // Parse the submitted property string into an array
+        // Parse the submitted property string into an array and set various derived values
         this.parse_properties();
     }
 
@@ -49,22 +49,31 @@ export class SagaMachineItem extends Item {
      * Parse the submitted property string into an array
      */
     parse_properties() {
-        if (this.type === 'item' && typeof this.system.properties === 'string') {
+        // Only do this for equipment
+        if (this.type !== 'item') return;
+
+        // Parse string into an array
+        if (typeof this.system.properties === 'string') {
             this.system.properties = this.system.properties.split(',').map(t => t.trim());
         }
+
+        this.system.armor = this.property_value('Armor');
+        this.system.hands = this.property_value('Hands') || 1;
+        this.system.unit_encumbrance = this.calc_unit_encumbrance();
+        this.system.encumbrance = this.calc_encumbrance();
     }
 
-    armor() {
+    property_value(property) {
         for (const prop of this.system.properties) {
-            if (prop.startsWith('Armor ')) {
-                const [arm, val] = prop.split(' ');
+            if (prop.toLowerCase().startsWith(`${property.toLowerCase()} `)) {
+                const [p, val] = prop.split(' ');
                 return Number(val);
             }
         }
         return 0;
     }
 
-    unit_encumbrance() {
+    calc_unit_encumbrance() {
         if (this.system.properties.includes('Neg') ||
             this.system.properties.includes('Implant') ||
             this.system.properties.includes('Software')) return 0;
@@ -80,8 +89,8 @@ export class SagaMachineItem extends Item {
         }
     }
 
-    encumbrance(unit=false) {
+    calc_encumbrance() {
         if (!this.system.carried) return 0;
-        return this.unit_encumbrance() * this.system.quantity;
+        return this.calc_unit_encumbrance() * this.system.quantity;
     }
 }

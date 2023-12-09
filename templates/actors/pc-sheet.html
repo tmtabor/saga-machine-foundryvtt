@@ -174,7 +174,7 @@
 				{{#each data.system.attacks as |attack|}}
 					<li class="item attack-row" data-type="Item" data-uuid="{{ attack.item.uuid }}">
                         <div class="item-name attack-name">
-                            <span class="item-img rollable" data-type="Test" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-consequences='{{ consequences_string }}'>
+                            <span class="item-img rollable" data-type="Test" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-properties="{{ attack.properties }}" data-consequences='{{ consequences_string }}'>
                                 <img class="item-img" src="{{ attack.item.img }}" title="Test {{ attack.full_name }}" />
                                 <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ attack.full_name }} Test" />
                             </span>
