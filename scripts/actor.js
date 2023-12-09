@@ -1,5 +1,6 @@
 import { INITIATIVE } from "./combat.js";
 import { ModifierSet, Attack, Test } from "./tests.js";
+import { standard_consequence } from "./conditions.js";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
@@ -67,7 +68,8 @@ export class SagaMachineActor extends Actor {
 
         // Encumbrance threshold
         if (!this.system.scores.encumbrance.custom)
-            this.system.scores.encumbrance.max = this.system.stats.strength.value;
+            this.system.scores.encumbrance.max = this.median([this.system.stats.strength.value,
+                this.system.stats.dexterity.value, this.system.stats.endurance.value]);
 
         // Encumbrance total
         this.system.scores.encumbrance.value = this.encumbrance_total();
@@ -81,6 +83,36 @@ export class SagaMachineActor extends Actor {
             this.system.experiences.spent_skills, this.system.experiences.spent_traits] = this.experiences_spent();
         this.system.experiences.unspent = this.system.experiences.total - this.system.experiences.spent;
         this.system.experiences.level = this.power_level();
+    }
+
+    async encumbrance_consequences() {
+        if (!this.isOwner) return;
+
+        const encumbered = this.system.scores.encumbrance.value > this.system.scores.encumbrance.max;
+        if (encumbered) {
+            // If already encumbered, skip
+            let consequences = this.items.filter(c => c.name === 'Hindered' &&
+                                                      c.system.specialization === 'Encumbered' &&
+                                                      c.type === 'consequence');
+            if (consequences.length) return;
+
+            // If not encumbered, add the consequence
+            let hindered = await standard_consequence({
+                name: 'Hindered',
+                actor: this,
+                skip_actor: true
+            });
+            [hindered] = await this.createEmbeddedDocuments('Item', [hindered]);
+            await hindered.update({ 'system.specialization': 'Encumbered', 'system.specialized': true });
+        }
+        else {
+            // Remove any encumbered consequences
+            let consequences = this.items.filter(c => c.name === 'Hindered' &&
+                                                      c.system.specialization === 'Encumbered' &&
+                                                      c.type === 'consequence');
+            if (consequences.length)
+                await this.deleteEmbeddedDocuments("Item", consequences.map(c => c.id));
+        }
     }
 
     power_level() {
@@ -390,3 +422,30 @@ export class SagaMachineActor extends Actor {
         return test;
     }
 }
+
+Hooks.on('updateActor', async (actor, change, options, id) => {
+    if (game.user.id !== id) return;                    // Only run if it is you updating the item
+
+    await actor.encumbrance_consequences();       // Add or remove Hindered consequences for encumbrance
+});
+
+Hooks.on('createItem', async (item, options, id) => {
+    if (game.user.id !== id) return;                    // Only run if it is you updating the item
+    if (item.type !== 'item' || !item.parent) return;   // Only run if you are change the inventory of an actor
+
+    await item.parent.encumbrance_consequences();       // Add or remove Hindered consequences for encumbrance
+});
+
+Hooks.on('updateItem', async (item, change, options, id) => {
+    if (game.user.id !== id) return;                    // Only run if it is you updating the item
+    if (item.type !== 'item' || !item.parent) return;   // Only run if you are change the inventory of an actor
+
+    await item.parent.encumbrance_consequences();       // Add or remove Hindered consequences for encumbrance
+});
+
+Hooks.on('deleteItem', async (item, options, id) => {
+    if (game.user.id !== id) return;                    // Only run if it is you updating the item
+    if (item.type !== 'item' || !item.parent) return;   // Only run if you are change the inventory of an actor
+
+    await item.parent.encumbrance_consequences();       // Add or remove Hindered consequences for encumbrance
+});

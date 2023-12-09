@@ -39,7 +39,7 @@ Hooks.on('updateActor', async (actor, update) => {
     if (!(turn_changed && (game.user.isGM || actor.isOwner) && game.combat)) return;
     const linked_combatants = game.combat.combatants.filter(c => c.actorId === actor.id);
     linked_combatants.forEach(c => game.combat.setInitiative(c.id, c.getInitiativeValue()));
-})
+});
 
 // Patch Core Functions
 Combatant.prototype.getInitiativeRoll = function (formula) {

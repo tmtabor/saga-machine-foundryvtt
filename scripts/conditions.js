@@ -23,6 +23,30 @@ export const generate_conditions = () => {
     return system_conditions;
 }
 
+export async function standard_consequence({name, actor, skip_actor=false, skip_global=false, skip_new=false}) {
+    let consequence = null;
+
+    // Get the existing consequence on this actor, if one exists
+    if (!skip_actor)
+        consequence = actor?.items.filter(c => c.name === name && c.type === "consequence")
+            .values().next()?.value;
+
+    // If the consequence was not found, check for a matching globally defined consequence
+    if (!skip_global && !consequence)
+        consequence = game.items.filter(c => c.name === name && c.type === "consequence")
+            .values().next()?.value;
+
+    // If the consequence was still not found, create a dummy one
+    if (!skip_new && !consequence)
+        consequence = await Item.create({
+            name: name.capitalize(),
+            type: 'consequence',
+            system: { rank: 1 }
+        });
+
+    return consequence;
+}
+
 Hooks.on("createItem", (item, options, id) => {
     // Only run this if it is you creating the item, not for other players
     if (game.user.id !== id) return;
