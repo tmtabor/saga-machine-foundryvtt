@@ -225,59 +225,63 @@ export class SagaMachineActor extends Actor {
             applied_damage = Math.floor(applied_damage / 2);
         }
 
-        if (applied_damage > 0) {
-            // Determine which consequence
-            let consequence_name = null;
-            if (type === 'fat')     consequence_name = 'Fatigue';
-            else if (critical)      consequence_name = 'Grave Wound';
-            else                    consequence_name = 'Wound';
+        // If no damage is applied, there is nothing more to do
+        if (applied_damage <= 0) return;
 
-            // Get the consequence
-            let consequence = game.items.filter(c => c.name === consequence_name && c.type === "consequence")
-                .values().next()?.value;
+        // If this reduces the character 0 or fewer HP, upgrade to a grave wound
+        if (this.system.scores.health.value + applied_damage > this.system.scores.health.max) critical = true;
 
-            // Or lazily create it, if necessary
-            if (!consequence)
-                consequence = await Item.create({
-                    name: consequence_name,
-                    type: 'consequence',
-                    system: { specialized: true, specialization: 'describe injury', rank: 1 }
-                });
+        // Determine which consequence to apply
+        let consequence_name = null;
+        if (type === 'fat')     consequence_name = 'Fatigue';
+        else if (critical)      consequence_name = 'Grave Wound';
+        else                    consequence_name = 'Wound';
 
-            // Generate a default subject based on damage type
-            let [generated_descriptor, description] = await this.generate_wound(type, critical);
+        // Get the consequence
+        let consequence = game.items.filter(c => c.name === consequence_name && c.type === "consequence")
+            .values().next()?.value;
 
-            // Prompt the user for the descriptor
-            new Dialog({
-                title: `Describe ${consequence_name}`,
-                content: `
-                    <form>
-                        <div class="form-group">
-                            <label for="descriptor">Descriptor</label>
-                            <input type="text" name="descriptor" value="${generated_descriptor}" autofocus>
-                        </div>
-                    </form>`,
-                buttons:{
-                    Confirm: {
-                        icon: "<i class='fas fa-check'></i>",
-                        label: 'OK',
-                        callback: async (html) => {
-                            const final_descriptor = html.find("[name=descriptor]").val();  // Get the user set descriptor
+        // Or lazily create it, if necessary
+        if (!consequence)
+            consequence = await Item.create({
+                name: consequence_name,
+                type: 'consequence',
+                system: { specialized: true, specialization: 'describe injury', rank: 1 }
+            });
 
-                            // Add the consequence to the actor, apply the rank and descriptor
-                            const [actor_copy] = await this.createEmbeddedDocuments('Item', [consequence]);
-                            await actor_copy.update({'system.rank': applied_damage});
-                            await actor_copy.update({'system.specialization': final_descriptor});
+        // Generate a default subject based on damage type
+        let [generated_descriptor, description] = await this.generate_wound(type, critical);
 
-                            // If there was a description generated and the user accepted the generated descriptor
-                            if (description && generated_descriptor === final_descriptor)
-                                await actor_copy.update({'system.description': description});
-                        }
+        // Prompt the user for the descriptor
+        new Dialog({
+            title: `Describe ${consequence_name}`,
+            content: `
+                <form>
+                    <div class="form-group">
+                        <label for="descriptor">Descriptor</label>
+                        <input type="text" name="descriptor" value="${generated_descriptor}" autofocus>
+                    </div>
+                </form>`,
+            buttons:{
+                Confirm: {
+                    icon: "<i class='fas fa-check'></i>",
+                    label: 'OK',
+                    callback: async (html) => {
+                        const final_descriptor = html.find("[name=descriptor]").val();  // Get the user set descriptor
+
+                        // Add the consequence to the actor, apply the rank and descriptor
+                        const [actor_copy] = await this.createEmbeddedDocuments('Item', [consequence]);
+                        await actor_copy.update({'system.rank': applied_damage});
+                        await actor_copy.update({'system.specialization': final_descriptor});
+
+                        // If there was a description generated and the user accepted the generated descriptor
+                        if (description && generated_descriptor === final_descriptor)
+                            await actor_copy.update({'system.description': description});
                     }
-                },
-                default: 'Confirm'
-            }).render(true);
-        }
+                }
+            },
+            default: 'Confirm'
+        }).render(true);
     }
 
     async generate_wound(type, critical) {
