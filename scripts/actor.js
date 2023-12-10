@@ -229,7 +229,57 @@ export class SagaMachineActor extends Actor {
         if (applied_damage <= 0) return;
 
         // If this reduces the character 0 or fewer HP, upgrade to a grave wound
-        if (this.system.scores.health.value + applied_damage > this.system.scores.health.max) critical = true;
+        if (this.system.scores.health.value + applied_damage > this.system.scores.health.max) {
+            critical = true;
+            if (type === 'fat') ChatMessage.create({ content: `Wound Total exceeds Health . ${this.name} falls unconscious for [[1d10]] hours.` });
+            else                ChatMessage.create({ content: `Wound Total exceeds Health. ${this.name} takes a Grave Wound.` });
+        }
+
+        // Determine whether and how many Dying consequences to apply
+        const current_increment = Math.floor(this.system.scores.health.value / this.system.scores.health.max);
+        const new_increment = Math.floor((this.system.scores.health.value + applied_damage) / this.system.scores.health.max);
+        const dying_to_apply = new_increment - current_increment;
+
+        // If there is a Dying to apply
+        if (dying_to_apply > 0) {
+            // Is the character already dying?
+            let already_dying = false;
+            let dying_consequnce = this?.items.filter(c => c.name === 'Dying' && c.type === "consequence")
+                .values().next()?.value;
+            if (dying_consequnce) already_dying = true;
+
+            // If not, get a copy of the consequence and apply it to the actor
+            else {
+                dying_consequnce = await standard_consequence({
+                    name: 'Dying',
+                    actor: this,
+                    skip_actor: true
+                });
+                [dying_consequnce] = await this.createEmbeddedDocuments('Item', [dying_consequnce]);
+            }
+
+            // Set the correct Dying value
+            const new_dying_value = already_dying ? dying_consequnce.system.rank + dying_to_apply : dying_to_apply;
+            await dying_consequnce.update({'system.rank': new_dying_value });
+
+            // Check to see if the character is dead
+            if (new_dying_value >= 3) {
+                // Don't do anything if already dead
+                if (!this.statuses.has('defeated')) {
+                    // Get the defeated status effect
+                    let effect = null;
+                    CONFIG.statusEffects.forEach(e => {
+                        if (e.id === 'defeated') effect = e
+                    });
+                    if (effect) {
+                        // Add the status effect
+                        const clone = foundry.utils.deepClone(effect)
+                        ActiveEffect.create(clone, {parent: this});
+                        ChatMessage.create({ content: `Dying consequences exceed 3 or more. ${this.name} is dead.` });
+                    }
+                }
+            }
+        }
 
         // Determine which consequence to apply
         let consequence_name = null;
