@@ -1,3 +1,5 @@
+import { Consequence } from "./tests.js";
+
 export const INITIATIVE = {
     FAST_TURN: "3",
     NPC_TURN: "2",
@@ -7,30 +9,87 @@ export const INITIATIVE = {
 Hooks.on("preUpdateCombat", async (combat, update_data) => {
     if (!update_data.round && !update_data.turn) return;
 
-    const roll_defenses = async () => {
-        // New Round Card - prompt players to choose fast / slow turn
-        ChatMessage.create({content: `<strong>Round ${combat.round+1}</strong><br/>Choose a Fast or Slow turn now!`});
-
+    const start_of_round = async () => {
         // Ensure that all combatants have a fast / slow turn marked in the order
         await combat.rollAll();
 
-        // Make a defense test for everyone
-        for (let c of combat.combatants)
+        // Cycle through all combatants
+        for (let c of combat.combatants) {
+
+            // Make a defense test for everyone
             await c.actor.test({
-                stat: 'defense',
-                consequences: [{"type": "defense"}],
-                whisper: true,
-                chat: true,
-                ...c.actor.total_modifiers({ score: 'defense' })
+                stat: 'defense', consequences: [{"type": "defense"}], whisper: true, chat: true,
+                ...c.actor.total_modifiers({score: 'defense'})
             });
+        }
+
+        // New Round Card - prompt players to choose fast / slow turn and display statuses
+        let content = `<h3>Round ${combat.round+1}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table>`;
+        for (let c of combat.combatants) {
+            if (c.hidden) continue; // Don't show hidden combatants
+            const statuses = Array.from(c.actor.statuses.map(s => s.split(/\s|-/).map(w => w.capitalize()).join(' '))).sort().join(', ');
+            content += `<tr><td><strong>${c.name}</strong></td><td>${statuses ? statuses : '&mdash;'}</td></tr>`;
+        }
+        content += '</table>';
+        ChatMessage.create({content: content});
+
+        // Wait for the new defenses to take effect
+        setTimeout(async () => {
+
+            // Whisper all defenses to GM
+            content = '<h4><strong>Defenses This Round</strong></h4><table>';
+            for (let c of combat.combatants)
+                content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn}</td></tr>`;
+            content += '</table>';
+            ChatMessage.create({
+                content: content,
+                type: CONST.CHAT_MESSAGE_TYPES.WHISPER,
+                whisper: game.users.filter(u => u.isGM).map(u => u.id)
+            });
+
+            // Chat messages for Bleeding and Dying consequences
+            for (let c of combat.combatants) {
+
+                // Test Endurance when dying, prompt to add or remove Dying conditions
+                if (c.actor.statuses.has('dying') && !c.actor.statuses.has('defeated')) {
+                    ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: c.actor }), content:
+                            `<p><strong>${c.name} is Dying!</strong></p><ul><li>Limited to 1 AP.</li><li>Making an Endurance test.` +
+                            `<ul><li><em>Crit Success:</em> Gain a Dying.</li><li><em>Failure:</em> Lose a Dying.</li><li><em>3 Dying:</em> ${c.name} dies.</li></ul></li></ul>` });
+                    await c.actor.test({
+                        stat: 'endurance', tn: c.actor.dying_tn(), chat: true,
+                        consequences: [{"type": "consequence", "name": "Dying", "when": "failure", "target": "self"}],
+                        ...c.actor.total_modifiers({score: 'defense'})
+                    });
+                }
+
+                // Note Bleeding and prompt for damage
+                if (c.actor.statuses.has('bleeding') && !c.actor.statuses.has('defeated')) {
+                    c.actor.items.filter(c => c.type === "consequence" && c.name === "Bleeding").forEach(b => {
+                        if (b.system.rank > 0) {
+                            const damage = new Consequence({
+                                "type": "damage",
+                                "value": b.system.rank,
+                                "damage_type": b.system.specialization,
+                                "when": "always",
+                                "target": "self" }).apply();
+                            ChatMessage.create({
+                                speaker: ChatMessage.getSpeaker({ actor: c.actor }),
+                                content: `<p><strong>${c.name} is Bleeding!</strong></p><ul><li class="ignores">Right-click and select Apply Damage.</li><li>${damage.message}</li></ul>`
+                            });
+                        }
+                    });
+                }
+            }
+
+        }, 1000);
     };
 
     // Start of Combat
-    if (combat.round === 0  && combat.active) await roll_defenses();
+    if (combat.round === 0  && combat.active) await start_of_round();
 
     // Start of Each New Round
     if (combat.round !== 0 && combat.turns && combat.active && combat.current.turn > -1 &&
-        combat.current.turn === combat.turns.length - 1) await roll_defenses();
+        combat.current.turn === combat.turns.length - 1) await start_of_round();
 });
 
 Hooks.on('updateActor', async (actor, update) => {

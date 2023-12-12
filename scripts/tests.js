@@ -549,6 +549,8 @@ export class Consequence {
         if (this.type === 'consequence' && this.right_time(when))    this.apply_consequence();
         if (this.type === 'damage' && this.right_time(when))         this.apply_damage();
         if (this.type === 'defense' && this.right_time(when))        this.apply_defense();
+
+        return this;
     }
 
     apply_consequence() {
@@ -590,8 +592,8 @@ export class Consequence {
         else if (this.target === 'target' && this.test.target)  target = this.test.target;
 
         // Calculate the TNs
-        const defense_tn = target.data.system.scores.defense.value + this.test.randomizer;
-        const willpower_tn = target.data.system.scores.willpower.value + this.test.randomizer;
+        const defense_tn = target.system.scores.defense.value + this.test.randomizer;
+        const willpower_tn = target.system.scores.willpower.value + this.test.randomizer;
 
         // Update defense and willpower
         target.update({'system.scores.defense.tn': defense_tn});
@@ -986,6 +988,7 @@ Hooks.on("renderChatMessage", async (app, html, msg) => {
     if (!damage.length) return;
     const damage_type = html.find('.damage-type');
     const critical = !!html.find('.critical').length;
+    const ignores_armor = !!html.find('.ignores').length;
 
     // Attach drag listener
     html[0].setAttribute("draggable", true);	// Add draggable and dragstart listener
@@ -993,6 +996,7 @@ Hooks.on("renderChatMessage", async (app, html, msg) => {
         ev.currentTarget.dataset['damage'] = Number(damage.text());
         ev.currentTarget.dataset['damageType'] = damage_type.text();
         ev.currentTarget.dataset['critical'] = critical;
+        ev.currentTarget.dataset['ignores'] = ignores_armor;
 		ev.dataTransfer.setData("text/plain", JSON.stringify(ev.currentTarget.dataset));
     }, false);
 });
@@ -1001,7 +1005,7 @@ Hooks.on("renderChatMessage", async (app, html, msg) => {
  * Drop Chat Card: Apply damage to target
  */
 Hooks.on("dropActorSheetData", (actor, sheet, data) => {
-    if (data['damage']) actor.apply_damage(data['damage'], data['damageType'], data['critical']);
+    if (data['damage']) actor.apply_damage(data['damage'], data['damageType'], data['critical'], data['ignores']);
 });
 
 /**
@@ -1052,11 +1056,12 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
             if (damage) {
                 const damage_type = html.find('.damage-type').text();
                 const critical = !!html.find('.critical').length;
+                const ignores_armor = !!html.find('.ignores').length;
 
                 // Get the actor controlled by a player, apply the damage and return
                 let player_actor = game.user.character;
                 if (player_actor) {
-                    player_actor.apply_damage(damage, damage_type, critical);
+                    player_actor.apply_damage(damage, damage_type, critical, ignores_armor);
                     return;
                 }
 
@@ -1069,7 +1074,7 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
                 // Apply damage to all selected token actors
                 for (let token of tokens) {
                     let actor = token?.document?.actor;
-                    if (actor) actor.apply_damage(damage, damage_type, critical);
+                    if (actor) actor.apply_damage(damage, damage_type, critical, ignores_armor);
                 }
             }
         }

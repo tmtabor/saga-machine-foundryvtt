@@ -174,6 +174,10 @@ export class SagaMachineActor extends Actor {
             item.system.cost * item.system.quantity + total, 0) + this.system.wealth.money;
 	}
 
+    dying_tn() {
+        return Math.abs(Math.min(this.system.scores.health.max - this.system.scores.health.value, 0));
+    }
+
     /**
      * Calculates the character's current Wound total from all Wound, Grave Wound and Fatigue consequences
      *
@@ -205,9 +209,9 @@ export class SagaMachineActor extends Actor {
 
     has_resistance(type) { return this.has_trait('Resistance', type); }
 
-    async apply_damage(damage, type, critical) {
+    async apply_damage(damage, type, critical, ignores) {
         // Calculate the damage to apply
-        let applied_damage = Number(damage) - this.system.scores.armor.value;
+        let applied_damage = ignores ? Number(damage) : Number(damage) - this.system.scores.armor.value;
 
         // Cast critical to boolean
         critical = (critical === 'true')

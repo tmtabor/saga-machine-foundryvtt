@@ -1,7 +1,7 @@
 export const generate_conditions = () => {
-    const system_conditions = []
+    const system_conditions = [];
     const standard_consequences = ['Bleeding', 'Bolstered', 'Dazed', 'Defeated', 'Desire', 'Disabled', 'Dying', 'Fatigue',
-      'Fear', 'Fixated', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stun', 'Wound']
+      'Fear', 'Fixated', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stun', 'Wound'];
 
     // Generate and append an object for each consequence
     standard_consequences.forEach(consequence => system_conditions.push({
