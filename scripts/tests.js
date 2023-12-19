@@ -803,7 +803,7 @@ export class ModifierSet {
         let banes = (leading.match(/[-⊖]/g) || []).length ;
 
         return new ModifierSet({
-            name: name,
+            name: name.replace(/[⊕⊖]/g, ''),
             boons: boons,
             banes: banes,
             modifier: modifier || 0
