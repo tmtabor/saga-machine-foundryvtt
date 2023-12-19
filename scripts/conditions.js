@@ -47,46 +47,55 @@ export async function standard_consequence({name, actor, skip_actor=false, skip_
     return consequence;
 }
 
-Hooks.on("createItem", (item, options, id) => {
+async function sync_status(actor) {
+    // Get the consequences and statuses
+    const consequences = new Set(actor.items.filter(item => item.type === "consequence" && item.system.rank > 0 &&
+        game.sagamachine.standard_consequences.includes(item.name)).map(c => c.name.slugify()));
+    const statuses = actor.statuses;
+
+    // Get the items that need synced
+    const add_set = consequences.difference(statuses);
+    const remove_set = statuses.difference(consequences);
+
+    // Special case for defeated and unconscious, which have no consequence
+    remove_set.delete('defeated');
+    remove_set.delete('unconscious');
+
+    // Add missing statuses
+    const status_list = [];
+    CONFIG.statusEffects.forEach(e => {
+        if (add_set.has(e.id)) status_list.push(foundry.utils.deepClone(e));
+    });
+    if (status_list.length)
+        await actor.createEmbeddedDocuments("ActiveEffect", status_list);
+
+    // Remove stale statuses
+    if (remove_set.size)
+        await actor.deleteEmbeddedDocuments("ActiveEffect", actor.effects.filter(e => remove_set.has(e.name.slugify())).map(e => e.id));
+}
+
+Hooks.on("createItem", async (item, options, id) => {
     // Only run this if it is you creating the item, not for other players
     if (game.user.id !== id) return;
 
-    // If this is a standard consequence
-    if (item.type === "consequence" && item.parent && game.sagamachine.standard_consequences.includes(item.name)) {
-        const actor = item.parent;
-
-        // Don't do anything if the actor already has the status
-        if (actor.statuses.has(item.name.slugify())) return;
-
-        // Get the active effect JSON
-        let effect = null;
-        CONFIG.statusEffects.forEach(e => {
-            if (e.name === item.name) effect = e
-        });
-        if (!effect) return;
-
-        // Clone the active effect and apply it to the actor
-        const clone = foundry.utils.deepClone(effect)
-        ActiveEffect.create(clone, { parent: actor });
-    }
+    // Sync consequences with status effects
+    if (item.type === "consequence" && item.parent) await sync_status(item.parent);
 });
 
 Hooks.on("deleteItem", async (item, options, id) => {
     // Only run this if it is you deleting the item, not for other players
     if (game.user.id !== id) return;
 
-    // If this is a standard consequence
-    if (item.type === "consequence" && item.parent && game.sagamachine.standard_consequences.includes(item.name)) {
-        const actor = item.parent;
+    // Sync consequences with status effects
+    if (item.type === "consequence" && item.parent) await sync_status(item.parent);
+});
 
-        // Get the existing active effect on this actor, if one exists
-        let effects = actor.effects.filter(e => e.name === item.name);
+Hooks.on("updateItem", async (item, change, options, id) => {
+    // Only run this if it is you updating the item, not for other players
+    if (game.user.id !== id) return;
 
-        // Remove any matching effects if this is the last consequence of this type
-        if (effects.length)
-            if (!actor.items.filter(e => e.name === item.name).length)
-                await actor.deleteEmbeddedDocuments("ActiveEffect", effects.map(e => e.id));
-    }
+    // Sync consequences with status effects
+    if (item.type === "consequence" && item.parent) await sync_status(item.parent);
 });
 
 Hooks.on("createActiveEffect", async (effect, options, id) => {
