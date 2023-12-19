@@ -31,57 +31,52 @@ Hooks.on("preUpdateCombat", async (combat, update_data) => {
             content += `<tr><td><strong>${c.name}</strong></td><td>${statuses ? statuses : '&mdash;'}</td></tr>`;
         }
         content += '</table>';
-        ChatMessage.create({content: content});
+        await ChatMessage.create({content: content});
 
-        // Wait for the new defenses to take effect
-        setTimeout(async () => {
+        // Whisper all defenses to GM
+        content = '<h4><strong>Defenses This Round</strong></h4><table>';
+        for (let c of combat.combatants)
+            content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn}</td></tr>`;
+        content += '</table>';
+        await ChatMessage.create({
+            content: content,
+            type: CONST.CHAT_MESSAGE_TYPES.WHISPER,
+            whisper: game.users.filter(u => u.isGM).map(u => u.id)
+        });
 
-            // Whisper all defenses to GM
-            content = '<h4><strong>Defenses This Round</strong></h4><table>';
-            for (let c of combat.combatants)
-                content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn}</td></tr>`;
-            content += '</table>';
-            ChatMessage.create({
-                content: content,
-                type: CONST.CHAT_MESSAGE_TYPES.WHISPER,
-                whisper: game.users.filter(u => u.isGM).map(u => u.id)
-            });
+        // Chat messages for Bleeding and Dying consequences
+        for (let c of combat.combatants) {
 
-            // Chat messages for Bleeding and Dying consequences
-            for (let c of combat.combatants) {
-
-                // Test Endurance when dying, prompt to add or remove Dying conditions
-                if (c.actor.statuses.has('dying') && !c.actor.statuses.has('defeated')) {
-                    ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: c.actor }), content:
-                            `<p><strong>${c.name} is Dying!</strong></p><ul><li>Limited to 1 AP.</li><li>Making an Endurance test.` +
-                            `<ul><li><em>Crit Success:</em> Lose a Dying.</li><li><em>Failure:</em> Gain a Dying.</li><li><em>3 Dying:</em> ${c.name} dies.</li></ul></li></ul>` });
-                    await c.actor.test({
-                        stat: 'endurance', tn: c.actor.dying_tn(), chat: true,
-                        consequences: [{"type": "consequence", "name": "Dying", "when": "failure", "target": "self"}],
-                        ...c.actor.total_modifiers({score: 'defense'})
-                    });
-                }
-
-                // Note Bleeding and prompt for damage
-                if (c.actor.statuses.has('bleeding') && !c.actor.statuses.has('defeated')) {
-                    c.actor.items.filter(c => c.type === "consequence" && c.name === "Bleeding").forEach(b => {
-                        if (b.system.rank > 0) {
-                            const damage = new Consequence({
-                                "type": "damage",
-                                "value": b.system.rank,
-                                "damage_type": b.system.specialization,
-                                "when": "always",
-                                "target": "self" }).apply();
-                            ChatMessage.create({
-                                speaker: ChatMessage.getSpeaker({ actor: c.actor }),
-                                content: `<p><strong>${c.name} is Bleeding!</strong></p><ul><li class="ignores">Right-click and select Apply Damage.</li><li>${damage.message}</li></ul>`
-                            });
-                        }
-                    });
-                }
+            // Test Endurance when dying, prompt to add or remove Dying conditions
+            if (c.actor.statuses.has('dying') && !c.actor.statuses.has('defeated')) {
+                await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: c.actor }), content:
+                        `<p><strong>${c.name} is Dying!</strong></p><ul><li>Limited to 1 AP.</li><li>Making an Endurance test.` +
+                        `<ul><li><em>Crit Success:</em> Lose a Dying.</li><li><em>Failure:</em> Gain a Dying.</li><li><em>3 Dying:</em> ${c.name} dies.</li></ul></li></ul>` });
+                await c.actor.test({
+                    stat: 'endurance', tn: c.actor.dying_tn(), chat: true,
+                    consequences: [{"type": "consequence", "name": "Dying", "when": "failure", "target": "self"}],
+                    ...c.actor.total_modifiers({score: 'defense'})
+                });
             }
 
-        }, 1000);
+            // Note Bleeding and prompt for damage
+            if (c.actor.statuses.has('bleeding') && !c.actor.statuses.has('defeated')) {
+                c.actor.items.filter(c => c.type === "consequence" && c.name === "Bleeding").forEach(b => {
+                    if (b.system.rank > 0) {
+                        const damage = new Consequence({
+                            "type": "damage",
+                            "value": b.system.rank,
+                            "damage_type": b.system.specialization,
+                            "when": "always",
+                            "target": "self" }).apply();
+                        ChatMessage.create({
+                            speaker: ChatMessage.getSpeaker({ actor: c.actor }),
+                            content: `<p><strong>${c.name} is Bleeding!</strong></p><ul><li class="ignores">Right-click and select Apply Damage.</li><li>${damage.message}</li></ul>`
+                        });
+                    }
+                });
+            }
+        }
     };
 
     // Start of Combat

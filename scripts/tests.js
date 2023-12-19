@@ -401,7 +401,7 @@ export class Test {
         }
 
         // Send the message to chat
-        ChatMessage.create(message);
+        await ChatMessage.create(message);
     }
 
     static to_json(test) {
