@@ -54,7 +54,7 @@ Hooks.on("preUpdateCombat", async (combat, update_data) => {
                 if (c.actor.statuses.has('dying') && !c.actor.statuses.has('defeated')) {
                     ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: c.actor }), content:
                             `<p><strong>${c.name} is Dying!</strong></p><ul><li>Limited to 1 AP.</li><li>Making an Endurance test.` +
-                            `<ul><li><em>Crit Success:</em> Gain a Dying.</li><li><em>Failure:</em> Lose a Dying.</li><li><em>3 Dying:</em> ${c.name} dies.</li></ul></li></ul>` });
+                            `<ul><li><em>Crit Success:</em> Lose a Dying.</li><li><em>Failure:</em> Gain a Dying.</li><li><em>3 Dying:</em> ${c.name} dies.</li></ul></li></ul>` });
                     await c.actor.test({
                         stat: 'endurance', tn: c.actor.dying_tn(), chat: true,
                         consequences: [{"type": "consequence", "name": "Dying", "when": "failure", "target": "self"}],
