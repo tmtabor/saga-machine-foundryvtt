@@ -236,13 +236,11 @@ export class Test {
      *
      * @returns {boolean}
      */
-    double_ones() {
-        let one_found = false;
-        for (let i of this.results.dice[0].results) {
-            if (i.result === 1 && !one_found) return true;
-            if (i.result === 1 && !one_found) one_found = true;
-        }
-        return false;
+     double_ones() {
+        let one_count = 0;
+        for (let i of this.results.dice[0].results)
+            if (i.result === 1) one_count++;
+        return one_count >= 2;
     }
 
     /**
