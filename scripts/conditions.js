@@ -72,6 +72,19 @@ async function sync_status(actor) {
     // Remove stale statuses
     if (remove_set.size)
         await actor.deleteEmbeddedDocuments("ActiveEffect", actor.effects.filter(e => remove_set.has(e.name.slugify())).map(e => e.id));
+
+    // Remove duplicate statuses, if necessary
+    const status_set = new Set(actor.effects.map(e => e.name));
+    if (status_set.size !== actor.effects.size) {
+        status_set.forEach(async s => {
+            if (!game.sagamachine.standard_consequences.includes(s)) return;
+            const matches = actor.effects.filter(e => e.name === s);
+            if (matches.length > 1) {
+                matches.shift();
+                await actor.deleteEmbeddedDocuments("ActiveEffect", matches.map(e => e.id));
+            }
+        });
+    }
 }
 
 Hooks.on("createItem", async (item, options, id) => {
