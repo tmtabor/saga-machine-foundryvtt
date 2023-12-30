@@ -1056,24 +1056,25 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
                 const critical = !!html.find('.critical').length;
                 const ignores_armor = !!html.find('.ignores').length;
 
-                // Get the actor controlled by a player, apply the damage and return
-                let player_actor = game.user.character;
-                if (player_actor) {
-                    player_actor.apply_damage(damage, damage_type, critical, ignores_armor);
-                    return;
-                }
-
-                // The GM won't have an actor, instead get all selected tokens
+                // Get all selected tokens
                 let tokens = game?.canvas?.tokens?.controlled;
 
-                // If there are no valid tokens, give a warning
-                if (!tokens) { ui.notifications.warn("No valid character selected."); return; }
+                // If there are no valid tokens, and you are the GM, give a warning
+                if (!tokens && game.user.isGM) { ui.notifications.warn("No valid character selected."); return; }
 
                 // Apply damage to all selected token actors
+                let applied_damage = false;
                 for (let token of tokens) {
                     let actor = token?.document?.actor;
-                    if (actor) actor.apply_damage(damage, damage_type, critical, ignores_armor);
+                    if (actor && actor.isOwner) {
+                        actor.apply_damage(damage, damage_type, critical, ignores_armor);
+                        applied_damage = true;
+                    }
                 }
+
+                // If you didn't have any owned tokens selected, fall back to applying damage to player character
+                if (!applied_damage && game.user.character)
+                    game.user.character.apply_damage(damage, damage_type, critical, ignores_armor);
             }
         }
     });
