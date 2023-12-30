@@ -210,11 +210,12 @@ export class SagaMachineActor extends Actor {
     has_resistance(type) { return this.has_trait('Resistance', type); }
 
     async apply_damage(damage, type, critical, ignores) {
+        // Cast critical and ignores to boolean
+        critical = (critical === 'true');
+        ignores = (ignores === 'true');
+
         // Calculate the damage to apply
         let applied_damage = ignores ? Number(damage) : Number(damage) - this.system.scores.armor.value;
-
-        // Cast critical to boolean
-        critical = (critical === 'true')
 
         if (this.has_immunity(type)) {      // Apply immunities
             ChatMessage.create({content: "The character has immunity. Ignoring damage.", whisper: [game.user.id]});
