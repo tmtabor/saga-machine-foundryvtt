@@ -293,12 +293,12 @@ export class Test {
         return this;
     }
 
-    async apply_consequences() {
+    async apply_consequences(dataset) {
         // If there are no consequences, do nothing
         if (!this.consequences) return;
 
         const when = this.success ? 'success' : (this.tn ? 'failure' : 'always');
-        for (let c of this.consequences) c.apply(when);
+        for (let c of this.consequences) c.apply(when, dataset);
     }
 
     flavor() {
@@ -543,10 +543,10 @@ export class Consequence {
         return damage;
     }
 
-    apply(when='always') {
-        if (this.type === 'consequence' && this.right_time(when))    this.apply_consequence();
-        if (this.type === 'damage' && this.right_time(when))         this.apply_damage();
-        if (this.type === 'defense' && this.right_time(when))        this.apply_defense();
+    apply(when='always', dataset) {
+        if (this.type === 'consequence' && this.right_time(when))    this.apply_consequence(dataset);
+        if (this.type === 'damage' && this.right_time(when))         this.apply_damage(dataset);
+        if (this.type === 'defense' && this.right_time(when))        this.apply_defense(dataset);
 
         return this;
     }
@@ -564,10 +564,21 @@ export class Consequence {
         this.message = this.format_message('Consequence', link);
     }
 
-    apply_damage() {
+    apply_damage(dataset) {
         // Calculate the damage
         let damage = this.base_damage();                                // Base damage
-        if (this.test && this.test.margin) damage += this.test.margin   // Add the margin
+        let margin = this.test && this.test.margin ?                    // Get the margin
+            this.test.margin : 0;
+
+        // Handle the Feeble property
+        const properties = Attack.parse_properties(dataset.properties);
+        if (Attack.has_property(properties, 'Feeble'))
+            margin = Math.min(damage, margin);
+
+        // Handle the Ignores property
+        const ignores = Attack.has_property(properties, 'Ignores') ? 'ignores' : '';
+
+        damage = damage + margin;                                       // Add base damage and margin
         if (damage < 0) damage = 0;                                     // Minimum 0
 
         // Get the damage type
@@ -575,7 +586,7 @@ export class Consequence {
 
         // Set the message
         this.message = this.format_message('Damage',
-            `<span class="damage">${damage}</span> <span class="damage-type">${damage_type}</span>`);
+            `<span class="damage ${ignores}">${damage}</span> <span class="damage-type">${damage_type}</span>`);
     }
 
     /**
@@ -698,6 +709,10 @@ export class Attack extends Test {
             }
         }
         return 0;
+    }
+
+    static has_property(properties, property) {
+        return properties.map(p => p.split(' ')[0]).includes(property);
     }
 }
 
@@ -887,7 +902,7 @@ export async function test_dialog(dataset) {
                     await test.evaluate();
 
                     // Apply any immediate test consequences
-                    await test.apply_consequences();
+                    await test.apply_consequences(dataset);
 
                     // Send the message to chat
                     const whisper = !!dataset['whisper'];
