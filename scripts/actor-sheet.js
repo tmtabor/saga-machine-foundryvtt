@@ -117,7 +117,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		// Dynamic updating of item rank and quantity
 		html.find('.item-input').on("change", ev => {
 			const box = $(ev.currentTarget).parents(".item");
-			const attribute = ev.currentTarget.getAttribute('name');
+			const attribute = ev.currentTarget.getAttribute('data-name');
 			const update = { _id: box.data("id") };
 			update[attribute] = Number(ev.currentTarget.value);
 			this.actor.updateEmbeddedDocuments("Item", [update] );
