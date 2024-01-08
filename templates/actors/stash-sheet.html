@@ -12,7 +12,7 @@
             </select>
             <div class="right">
                 <label class="item-label">Total Wealth: {{ data.system.wealth.total }}</label>
-                <label class="item-label">Encumbrance: {{ data.system.encumbrance }}</label>
+                <label class="item-label score score-secondary" name="system.encumbrance.max">Encumbrance: {{ data.system.encumbrance.value }} / {{#if data.system.encumbrance.max }}{{ data.system.encumbrance.max }}{{/if}}{{#unless data.system.encumbrance.max }}&infin;{{/unless}}</label>
             </div>
         </div>
     </header>
@@ -58,7 +58,7 @@
                             </h4>
                             <h4 class="item-name">{{ item.system.group }}</h4>
                             <input class="item-input item-prop" type="number" data-name="system.cost" value="{{ item.system.cost }}" step="1" data-dtype="Number" />
-                            <input class="item-input item-prop" type="number" data-name="unit_encumbrance" value="{{ item.unit_encumbrance }}" disabled data-dtype="Number" />
+                            <input class="item-input item-prop" type="number" data-name="unit_encumbrance" value="{{ item.system.unit_encumbrance }}" disabled data-dtype="Number" />
                             <input class="item-input item-prop" type="number" data-name="system.quantity" value="{{ item.system.quantity }}" step="1" data-dtype="Number" />
                             <div class="item-controls">
                                 <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>

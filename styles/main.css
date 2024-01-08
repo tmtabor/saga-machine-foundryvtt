@@ -774,6 +774,10 @@ img.system-logo {
   right: 10px;
 }
 
+.saga-machine form.stash-sheet .score-secondary {
+  font-size: 1em;
+}
+
 .saga-machine form.stash-sheet > header h1.stash-name {
   height: 50px;
   padding: 0;

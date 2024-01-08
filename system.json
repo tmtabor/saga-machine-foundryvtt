@@ -4,7 +4,7 @@
     "description": "FoundryVTT implementation of Saga Machine Unified, with partial backwards support for Age of Ambition, Shadows Over Sol, Against the Dark Yogi and Dime Adventures.",
     "version": "0.3.0",
     "compatibility": {
-        "minimum": "10",
+        "minimum": "11",
         "verified": "11",
         "maximum": "11"
     },
