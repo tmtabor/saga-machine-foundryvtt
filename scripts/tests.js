@@ -1096,4 +1096,77 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
             }
         }
     });
+
+    // Edit Damage option
+    options.push({
+        name: 'Edit Damage',
+        icon: '<i class="fa fa-edit"></i>',
+        condition: html => !!html.find('.damage').length && game.user.isGM,
+        callback: html => {
+            const id = html.data('messageId');
+            const damage = Number(html.find('.damage').text());
+            const damage_type = html.find('.damage-type').text();
+            const critical = !!html.find('.critical').length ? 'checked' : '';
+            const ignores_armor = !!html.find('.ignores').length ? 'checked' : '';
+
+            // Open edit dialog
+            new Dialog({
+                title: `Edit Damage`,
+                content: `
+                    <form>
+                        <div class="form-group">
+                            <label for="value">Value</label>
+                            <input type="number" name="value" value="${damage}" autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label for="value">Type</label>
+                            <input type="text" name="type" value="${damage_type}">
+                        </div>
+                        <div class="form-group">
+                            <label for="critical">Critical Hit</label>
+                            <input type="checkbox" name="critical" ${critical}>
+                        </div>
+                        <div class="form-group">
+                            <label for="ignore">Ignore Armor</label>
+                            <input type="checkbox" name="ignore" ${ignores_armor}>
+                        </div>
+                        <input type="hidden" name="id" value="${id}">
+                    </form>`,
+                buttons:{
+                    Edit: {
+                        icon: "<i class='fas fa-check'></i>",
+                        label: 'OK',
+                        callback: async (html) => {
+                            // Get values in the form
+                            const id = html.find("input[name=id]").val();
+                            const damage = html.find("input[name=value]").val();
+                            const damage_type = html.find("input[name=type]").val();
+                            const critical = html.find("input[name=critical]").is(':checked');
+                            const ignores_armor = html.find("input[name=ignore]").is(':checked');
+
+                            // Protect against bad ID values
+                            if (!id) { console.error("Unable to find message id to edit"); return; }
+                            const message = game.messages.get(id);
+                            if (!message) { console.error("Unable to find chat message to edit"); return; }
+
+                            // Update values in chat card
+                            const wrapper = $("<div></div>").html(message.flavor);
+                            wrapper.find('.damage').text(damage);           // Damage value
+                            wrapper.find('.damage-type').text(damage_type); // Damage type
+                            critical ?                                      // Critical
+                                wrapper.find('.success').addClass('critical').text('Critical Success!') :
+                                wrapper.find('.success').removeClass('critical').text('Success!');
+                            ignores_armor ?                                      // Ignores armor
+                                wrapper.find('.damage').addClass('ignores') :
+                                wrapper.find('.damage').removeClass('ignores');
+
+                            // Save edited card
+                            await ChatMessage.updateDocuments([{_id: id, flavor: wrapper.html()}], {});
+                        }
+                    }
+                },
+                default: 'Edit'
+            }).render(true);
+        }
+    });
 });
