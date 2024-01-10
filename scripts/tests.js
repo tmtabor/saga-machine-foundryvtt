@@ -793,7 +793,8 @@ export class ModifierSet {
         try { json_list = JSON.parse(input_str); }
         catch (e) { console.error("Error parsing list from tagify"); }
 
-        if (!Array.isArray(json_list)) { console.error(`Not list in list_from_string: ${json_list}`); return []; }
+        if (!json_list) return [];
+        if (!Array.isArray(json_list)) json_list = [json_list];
 
         return json_list.map(t => ModifierSet.from_tag(t));
     }
@@ -877,37 +878,39 @@ export async function test_dialog(dataset) {
             roll: {
                 label: "Make Test",
                 callback: async (html) => {
-                    // Gather form data
-                    let stat = html.find('select[name=stat] > option:selected').val();
-                    let score = html.find('select[name=score] > option:selected').val();
-                    let skill = html.find('select[name=skill] > option:selected').val();
-                    const { boons, banes, modifier, tags } = ModifierSet.total_modifiers(
-                        ModifierSet.list_from_string(html.find('input[name=modifiers]').val())
-                    );
-                    const tn = html.find('input[name=tn]').val();
-                    const consequences = html.find('input[name=consequences]').val();
+                    html.find('select[name=stat] > option:selected').trigger('focus');
+                    setTimeout(async () => { // Wait for unfocus event on modifier widget
+                        // Gather form data
+                        let stat = html.find('select[name=stat] > option:selected').val();
+                        let score = html.find('select[name=score] > option:selected').val();
+                        let skill = html.find('select[name=skill] > option:selected').val();
+                        const { boons, banes, modifier, tags } = ModifierSet.total_modifiers(
+                            ModifierSet.list_from_string(html.find('input[name=modifiers]').val())
+                        );
+                        const tn = html.find('input[name=tn]').val();
+                        const consequences = html.find('input[name=consequences]').val();
 
-                    // Create and evaluate the test
-                    const test = new Test({
-                        actor: actor,
-                        stat: stat || score,
-                        skill: skill || null,
-                        boons: boons || 0,
-                        banes: banes || 0,
-                        modifier: modifier || 0,
-                        tags: tags,
-                        tn: tn || null,
-                        consequences: consequences || null
-                    });
-                    await test.evaluate();
+                        // Create and evaluate the test
+                        const test = new Test({
+                            actor: actor,
+                            stat: stat || score,
+                            skill: skill || null,
+                            boons: boons || 0,
+                            banes: banes || 0,
+                            modifier: modifier || 0,
+                            tags: tags,
+                            tn: tn || null,
+                            consequences: consequences || null
+                        });
+                        await test.evaluate();
 
-                    // Apply any immediate test consequences
-                    await test.apply_consequences(dataset);
+                        // Apply any immediate test consequences
+                        await test.apply_consequences(dataset);
 
-                    // Send the message to chat
-                    const whisper = !!dataset['whisper'];
-                    await test.to_chat({ whisper: whisper });
-
+                        // Send the message to chat
+                        const whisper = !!dataset['whisper'];
+                        await test.to_chat({whisper: whisper});
+                    }, 200);
                 },
                 icon: `<i class="fas fa-check"></i>`
             }
