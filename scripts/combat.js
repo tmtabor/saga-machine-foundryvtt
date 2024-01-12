@@ -67,11 +67,12 @@ Hooks.on("preUpdateCombat", async (combat, update_data) => {
                             "type": "damage",
                             "value": b.system.rank,
                             "damage_type": b.system.specialization,
+                            "properties": "Ignores",
                             "when": "always",
                             "target": "self" }).apply();
                         ChatMessage.create({
                             speaker: ChatMessage.getSpeaker({ actor: c.actor }),
-                            content: `<p><strong>${c.name} is Bleeding!</strong></p><ul><li class="ignores">Right-click and select Apply Damage.</li><li>${damage.message}</li></ul>`
+                            content: `<p><strong>${c.name} is Bleeding!</strong></p><ul><li>Right-click and select Apply Damage.</li><li>${damage.message}</li></ul>`
                         });
                     }
                 });

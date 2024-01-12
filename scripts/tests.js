@@ -488,6 +488,8 @@ export class Consequence {
     when = 'always';    // Valid values are 'success', 'failure' and 'always'
     message = ''
 
+    static IGNORES_ALL_ARMOR = -1;
+
     constructor(dataset, test=null) {
         Object.assign(this, dataset);   // Assign properties from the dataset
         if (test) this.test = test;     // Assign the test
@@ -544,6 +546,8 @@ export class Consequence {
     }
 
     apply(when='always', dataset) {
+        if (!dataset) dataset = this;
+
         if (this.type === 'consequence' && this.right_time(when))    this.apply_consequence(dataset);
         if (this.type === 'damage' && this.right_time(when))         this.apply_damage(dataset);
         if (this.type === 'defense' && this.right_time(when))        this.apply_defense(dataset);
@@ -575,8 +579,9 @@ export class Consequence {
         if (Attack.has_property(properties, 'Feeble'))
             margin = Math.min(damage, margin);
 
-        // Handle the Ignores property
-        const ignores = Attack.has_property(properties, 'Ignores') ? 'ignores' : '';
+        // Handle the Ignores and Pierce properties
+        const ignores = Attack.has_property(properties, 'Ignores');
+        const pierce = ignores ? Consequence.IGNORES_ALL_ARMOR : Attack.property_value(properties, 'Pierce');
 
         damage = damage + margin;                                       // Add base damage and margin
         if (damage < 0) damage = 0;                                     // Minimum 0
@@ -586,7 +591,7 @@ export class Consequence {
 
         // Set the message
         this.message = this.format_message('Damage',
-            `<span class="damage ${ignores}">${damage}</span> <span class="damage-type">${damage_type}</span>`);
+            `<span class="damage" data-pierce="${pierce}">${damage}</span> <span class="damage-type">${damage_type}</span>`);
     }
 
     /**
@@ -1004,7 +1009,7 @@ Hooks.on("renderChatMessage", async (app, html, msg) => {
     if (!damage.length) return;
     const damage_type = html.find('.damage-type');
     const critical = !!html.find('.critical').length;
-    const ignores_armor = !!html.find('.ignores').length;
+    const pierce_armor = Number(damage.data('pierce')) || 0;
 
     // Attach drag listener
     html[0].setAttribute("draggable", true);	// Add draggable and dragstart listener
@@ -1012,7 +1017,7 @@ Hooks.on("renderChatMessage", async (app, html, msg) => {
         ev.currentTarget.dataset['damage'] = Number(damage.text());
         ev.currentTarget.dataset['damageType'] = damage_type.text();
         ev.currentTarget.dataset['critical'] = critical;
-        ev.currentTarget.dataset['ignores'] = ignores_armor;
+        ev.currentTarget.dataset['pierce'] = pierce_armor;
 		ev.dataTransfer.setData("text/plain", JSON.stringify(ev.currentTarget.dataset));
     }, false);
 });
@@ -1021,7 +1026,7 @@ Hooks.on("renderChatMessage", async (app, html, msg) => {
  * Drop Chat Card: Apply damage to target
  */
 Hooks.on("dropActorSheetData", (actor, sheet, data) => {
-    if (data['damage']) actor.apply_damage(data['damage'], data['damageType'], data['critical'], data['ignores']);
+    if (data['damage']) actor.apply_damage(data['damage'], data['damageType'], data['critical'], data['pierce']);
 });
 
 /**
@@ -1072,7 +1077,7 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
             if (damage) {
                 const damage_type = html.find('.damage-type').text();
                 const critical = !!html.find('.critical').length;
-                const ignores_armor = !!html.find('.ignores').length;
+                const pierce_armor = Number(html.find('.damage').data('pierce')) || 0
 
                 // Get all selected tokens
                 let tokens = game?.canvas?.tokens?.controlled;
@@ -1085,14 +1090,14 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
                 for (let token of tokens) {
                     let actor = token?.document?.actor;
                     if (actor && actor.isOwner) {
-                        actor.apply_damage(damage, damage_type, critical, ignores_armor);
+                        actor.apply_damage(damage, damage_type, critical, pierce_armor);
                         applied_damage = true;
                     }
                 }
 
                 // If you didn't have any owned tokens selected, fall back to applying damage to player character
                 if (!applied_damage && game.user.character)
-                    game.user.character.apply_damage(damage, damage_type, critical, ignores_armor);
+                    game.user.character.apply_damage(damage, damage_type, critical, pierce_armor);
             }
         }
     });

@@ -1,5 +1,5 @@
 import { INITIATIVE } from "./combat.js";
-import { ModifierSet, Attack, Test } from "./tests.js";
+import {ModifierSet, Attack, Test, Consequence} from "./tests.js";
 import { standard_consequence } from "./conditions.js";
 
 /**
@@ -209,13 +209,14 @@ export class SagaMachineActor extends Actor {
 
     has_resistance(type) { return this.has_trait('Resistance', type); }
 
-    async apply_damage(damage, type, critical, ignores) {
-        // Cast critical and ignores to boolean
-        critical = (critical === 'true');
-        ignores = (ignores === 'true');
+    async apply_damage(damage, type, critical, pierce) {
+        critical = (critical === 'true' || critical === true);   // Cast critical to boolean
+        pierce = Number(pierce);                                 // Cast pierce to number
 
         // Calculate the damage to apply
-        let applied_damage = ignores ? Number(damage) : Number(damage) - this.system.scores.armor.value;
+        let applied_damage = pierce === Consequence.IGNORES_ALL_ARMOR ?
+            Number(damage) :
+            Number(damage) - Math.max(this.system.scores.armor.value - Math.max(pierce, 0), 0);
 
         if (this.has_immunity(type)) {      // Apply immunities
             ChatMessage.create({content: "The character has immunity. Ignoring damage.", whisper: [game.user.id]});
@@ -473,7 +474,7 @@ export class SagaMachineActor extends Actor {
         if (dataset.evaluate !== false) await test.evaluate();
 
         // Apply consequences, unless apply_consequences=false
-        if (dataset.apply_consequences !== false) await test.apply_consequences();
+        if (dataset.apply_consequences !== false) await test.apply_consequences(dataset);
 
         // Send to chat, if chat=true, whisper if whisper=true
         if (dataset.chat) await test.to_chat({ whisper: !!dataset.whisper });
