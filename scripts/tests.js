@@ -520,7 +520,7 @@ export class Consequence {
         if (!name) name = this.name;
 
         // Get the consequence, if it exists as an item
-        let consequence = game.items.filter(item => item.type === 'consequence' && item.name === this.name);
+        let consequence = game.items.filter(item => item.type === 'consequence' && item.name === name);
         if (!consequence || !consequence.length) return name;
         return `<a class="content-link" draggable="true" data-uuid="Item.${consequence[0].id}" data-id="${consequence[0].id}" data-type="Item" data-tooltip="Item"><i class="fas fa-suitcase"></i>${name}</a>`;
     }
@@ -592,6 +592,10 @@ export class Consequence {
         // Set the message
         this.message = this.format_message('Damage',
             `<span class="damage" data-pierce="${pierce}">${damage}</span> <span class="damage-type">${damage_type}</span>`);
+
+        // Handle the Stun property
+        if (Attack.has_property(properties, 'Stun'))
+            this.message += this.format_message('Consequence', this.consequence_link('Stun'));
     }
 
     /**
