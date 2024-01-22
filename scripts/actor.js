@@ -446,6 +446,9 @@ export class SagaMachineActor extends Actor {
         // Add possible bane from the strength requirement
         if (dataset.tn === 'Defense' && !Attack.strength_met(dataset, this)) mods_object.push(`name=Low Str&banes=1`);
 
+        // Add possible bane from Bulky
+        if (dataset.stat === 'Speed' || dataset.skill === 'Athletics') mods_object.push(`name=Bulky&banes=1`);
+
         // Parse the mods object into a list of mods
         let mods_list = [];
         try {
