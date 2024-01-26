@@ -46,43 +46,50 @@ export class SagaMachineActor extends Actor {
     async calculate_character_scores() {
         // Defense
         if (!this.system.scores.defense.custom)
-            this.system.scores.defense.value = this.median([this.system.stats.dexterity.value,
-                this.system.stats.speed.value, this.system.stats.perception.value]);
+            this.system.scores.defense.value = this.calculate_score('defense',
+                [this.system.stats.dexterity.value, this.system.stats.speed.value, this.system.stats.perception.value]);
 
         // Willpower
         if (!this.system.scores.willpower.custom)
-            this.system.scores.willpower.value = this.median([this.system.stats.intelligence.value,
-                this.system.stats.charisma.value, this.system.stats.determination.value]);
+            this.system.scores.willpower.value = this.calculate_score('willpower',
+                [this.system.stats.intelligence.value, this.system.stats.charisma.value, this.system.stats.determination.value]);
 
         // Health
         if (!this.system.scores.health.custom)
-            this.system.scores.health.max = this.system.stats.strength.value + this.system.stats.endurance.value;
+            this.system.scores.health.max = this.calculate_score('health',
+                this.system.stats.strength.value + this.system.stats.endurance.value);
 
         // Wound total
         this.system.scores.health.value = this.wound_total();
 
         // Move
         if (!this.system.scores.move.custom)
-            this.system.scores.move.value = this.median([this.system.stats.speed.value,
-                this.system.stats.endurance.value, this.system.stats.determination.value]);
+            this.system.scores.move.value = this.calculate_score('move',
+                [this.system.stats.speed.value, this.system.stats.endurance.value, this.system.stats.determination.value]);
 
         // Encumbrance threshold
         if (!this.system.scores.encumbrance.custom)
-            this.system.scores.encumbrance.max = this.median([this.system.stats.strength.value,
-                this.system.stats.dexterity.value, this.system.stats.endurance.value]);
+            this.system.scores.encumbrance.max = this.calculate_score('encumbrance',
+                [this.system.stats.strength.value, this.system.stats.dexterity.value, this.system.stats.endurance.value]);
 
         // Encumbrance total
         this.system.scores.encumbrance.value = this.encumbrance_total();
 
         // Equipped armor
         if (!this.system.scores.armor.custom)
-            this.system.scores.armor.value = this.armor_value();
+            this.system.scores.armor.value = this.calculate_score('armor', this.armor_value());
 
         // Experiences
         [this.system.experiences.spent, this.system.experiences.spent_stats,
             this.system.experiences.spent_skills, this.system.experiences.spent_traits] = this.experiences_spent();
         this.system.experiences.unspent = this.system.experiences.total - this.system.experiences.spent;
         this.system.experiences.level = this.power_level();
+    }
+
+    calculate_score(name, stats) {
+        const base = Array.isArray(stats) ? this.median(stats) : stats;
+        const mods = this.total_modifiers({base_score: name});
+        return Math.floor((base + mods.modifier) / (mods.divide || 1));
     }
 
     async encumbrance_consequences() {
@@ -426,6 +433,7 @@ export class SagaMachineActor extends Actor {
         let mods_object = null;
 
         // Look up the modifiers for this test
+        if (dataset.base_score)                                     mods_object = deepClone(this.system.modifiers.scores[dataset.base_score]);
         if (dataset.tn === 'Defense' || dataset.tn === 'Willpower') mods_object = deepClone(this.system.modifiers.other.attack);
         if (!mods_object?.length && (dataset.score === 'defense' ||
             dataset.score === 'willpower'))                         mods_object = deepClone(this.system.modifiers.other.defense);
@@ -450,22 +458,7 @@ export class SagaMachineActor extends Actor {
         if (dataset.stat === 'Speed' || dataset.skill === 'Athletics') mods_object.push(`name=Bulky&banes=1`);
 
         // Parse the mods object into a list of mods
-        let mods_list = [];
-        try {
-            mods_object.forEach(m => {
-                const params = new URLSearchParams(m);
-                mods_list.push(new ModifierSet({
-                    name: params.get('name'),
-                    description: params.get('description'),
-                    boons: params.get('boons'),
-                    banes: params.get('banes'),
-                    modifier: params.get('modifier')
-                }));
-            });
-        }
-        catch (e) { console.error(`Error parsing modifiers object: ${dataset.stat} ${dataset.score}`); return []; }
-
-        return mods_list;
+        return ModifierSet.parse(mods_object);
     }
 
     async test(dataset) {
