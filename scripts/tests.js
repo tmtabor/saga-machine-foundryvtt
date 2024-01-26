@@ -731,13 +731,15 @@ export class ModifierSet {
     boons = 0;
     banes = 0
     modifier = 0;
+    divide = 0;
 
-    constructor({name=null, description=null, boons=0, banes=0, modifier=0}) {
+    constructor({name=null, description=null, boons=0, banes=0, modifier=0, divide=0}) {
         this._name = name;
         this._description = description;
         this.boons = parseInt(boons) || 0;
         this.banes = parseInt(banes) || 0;
         this.modifier = parseInt(modifier) || 0;
+        this.divide = parseInt(divide) || 0;
     }
 
     get name() { return this._name ? `${this._name} ${this.mod_str()}` : this.mod_str() }
@@ -761,9 +763,38 @@ export class ModifierSet {
             "boons": this.boons,
             "banes": this.banes,
             "modifier": this.modifier,
+            "divide": this.divide,
             "name": this.name,
             "description": this.description
         };
+    }
+
+    /**
+     * Accepts list of raw key/value strings and returns a list of ModifierSet objects
+     *
+     * Ex: name=short_name&description=for_tooltip&boons=0&banes=0&modifier=0&divide=0
+     *
+     * @param raw_mods_list
+     * @returns {*[]}
+     */
+    static parse(raw_mods_list) {
+        let mods_list = [];
+        try {
+            raw_mods_list.forEach(m => {
+                const params = new URLSearchParams(m);
+                mods_list.push(new ModifierSet({
+                    name: params.get('name'),
+                    description: params.get('description'),
+                    boons: params.get('boons'),
+                    banes: params.get('banes'),
+                    modifier: params.get('modifier'),
+                    divide: params.get('divide')
+                }));
+            });
+
+            return mods_list;
+        }
+        catch (e) { console.error(`Error parsing modifiers object: ${raw_mods_list}`); return []; }
     }
 
     static color(name) {
@@ -784,6 +815,7 @@ export class ModifierSet {
         let boons = 0;
         let banes = 0;
         let modifier = 0;
+        let divide = 0;
         let tags = [];
 
         // Add up the totals
@@ -791,10 +823,11 @@ export class ModifierSet {
             boons += m.boons || 0;
             banes += m.banes || 0;
             modifier += m.modifier || 0;
+            divide += m.divide || 0;
             if (!!m.name) tags.push(m.name);
         });
 
-        return { boons: boons, banes: banes, modifier: modifier, tags: tags };
+        return { boons: boons, banes: banes, modifier: modifier, divide: divide, tags: tags };
     }
 
     static list_from_string(input_str) {

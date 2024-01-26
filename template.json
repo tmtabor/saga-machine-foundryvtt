@@ -98,6 +98,15 @@
           "charisma": [],
           "determination": []
         },
+        "scores": {
+          "move": [],
+          "defense": [],
+          "willpower": [],
+          "health": [],
+          "armor": [],
+          "luck": [],
+          "encumbrance": []
+        },
         "other": {
           "attack": [],
           "defense": []
