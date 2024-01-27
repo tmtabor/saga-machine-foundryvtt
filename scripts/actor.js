@@ -44,6 +44,13 @@ export class SagaMachineActor extends Actor {
      * Calculates all derives scores for the character and updates their values
      */
     async calculate_character_scores() {
+        // Armor properties
+        this.system.scores.armor.properties = this.armor_properties();
+
+        // Equipped armor
+        if (!this.system.scores.armor.custom)
+            this.system.scores.armor.value = this.calculate_score('armor', this.armor_value());
+
         // Defense
         if (!this.system.scores.defense.custom)
             this.system.scores.defense.value = this.calculate_score('defense',
@@ -65,19 +72,17 @@ export class SagaMachineActor extends Actor {
         // Move
         if (!this.system.scores.move.custom)
             this.system.scores.move.value = this.calculate_score('move',
-                [this.system.stats.speed.value, this.system.stats.endurance.value, this.system.stats.determination.value]);
+                [this.system.stats.speed.value, this.system.stats.endurance.value, this.system.stats.determination.value],
+                {modifier: this.system.scores.armor.properties['Bulky'] * -1 || 0});
 
         // Encumbrance threshold
         if (!this.system.scores.encumbrance.custom)
             this.system.scores.encumbrance.max = this.calculate_score('encumbrance',
-                [this.system.stats.strength.value, this.system.stats.dexterity.value, this.system.stats.endurance.value]);
+                [this.system.stats.strength.value, this.system.stats.dexterity.value, this.system.stats.endurance.value],
+                {modifier: this.system.scores.armor.properties['Powered'] || 0});
 
         // Encumbrance total
         this.system.scores.encumbrance.value = this.encumbrance_total();
-
-        // Equipped armor
-        if (!this.system.scores.armor.custom)
-            this.system.scores.armor.value = this.calculate_score('armor', this.armor_value());
 
         // Experiences
         [this.system.experiences.spent, this.system.experiences.spent_stats,
@@ -86,9 +91,9 @@ export class SagaMachineActor extends Actor {
         this.system.experiences.level = this.power_level();
     }
 
-    calculate_score(name, stats) {
+    calculate_score(name, stats, other_modifiers={}) {
         const base = Array.isArray(stats) ? this.median(stats) : stats;
-        const mods = this.total_modifiers({base_score: name});
+        const mods = this.total_modifiers({base_score: name, ...other_modifiers});
         return Math.floor((base + mods.modifier) / (mods.divide || 1));
     }
 
@@ -161,7 +166,27 @@ export class SagaMachineActor extends Actor {
         return [total, stats, skills, traits];
     }
 
+    armor_properties() {
+        const equipped_armor = this.items.filter(item => item.type === 'item' &&
+            item.system.group === 'Armor' && item.system.equipped);
+        let highest = {
+            'Armor': 0,
+            'Bulky': 0,
+            'Powered': 0
+        };
+        for (const arm of equipped_armor) {
+            if (arm.system.armor > highest.Armor) highest.Armor = arm.system.armor;
+            if (arm.system.bulky > highest.Bulky) highest.Bulky = arm.system.bulky;
+            if (arm.system.powered > highest.Powered) highest.Powered = arm.system.powered;
+            if (arm.system.properties.includes('Sealed')) highest.Sealed = true;
+        }
+        return highest;
+    }
+
     armor_value() {
+        if (this.system.scores.armor.properties['Armor'])
+            return this.system.scores.armor.properties['Armor'];
+
         const equipped_armor = this.items.filter(item => item.type === 'item' &&
             item.system.group === 'Armor' && item.system.equipped);
         let highest = 0;
@@ -455,7 +480,12 @@ export class SagaMachineActor extends Actor {
         if (dataset.tn === 'Defense' && !Attack.strength_met(dataset, this)) mods_object.push(`name=Low Str&banes=1`);
 
         // Add possible bane from Bulky
-        if (dataset.stat === 'Speed' || dataset.skill === 'Athletics') mods_object.push(`name=Bulky&banes=1`);
+        if ((dataset.stat === 'speed' || dataset.skill === 'Athletics') && this.system.scores.armor.properties['Bulky'])
+            mods_object.push(`name=Bulky&banes=1`);
+
+        // Add boons from Powered property
+        if (dataset.stat === 'strength' && this.system.scores.armor.properties['Powered'])
+            mods_object.push(`name=Powered&boons=2`);
 
         // Parse the mods object into a list of mods
         return ModifierSet.parse(mods_object);
