@@ -87,6 +87,18 @@ async function sync_status(actor) {
     }
 }
 
+async function sync_effects(item, delete_only=false) {
+    // Find item effects, delete those effects, return if delete_only
+    const matches = item.parent.effects.filter(e => e.origin === item.uuid);
+    for (let e of matches) e.delete();
+    if (delete_only) return;
+
+    // Copy all item effects to actor
+    const copies = [];
+    for (let e of item.effects) copies.push(e.clone({ parent: item.parent, origin: item.uuid }));
+    item.parent.createEmbeddedDocuments('ActiveEffect', copies);
+}
+
 Hooks.on("createItem", async (item, options, id) => {
     // Only run this if it is you creating the item, not for other players
     if (game.user.id !== id) return;
@@ -116,14 +128,9 @@ Hooks.on("updateActiveEffect", async (effect, change, options, id) => {
     if (game.user.id !== id) return;
 
     // Updating an effect on an item which belongs to an actor
-    if (!effect.modifiesActor && effect.transfer && effect.parent && effect.parent.parent && effect.parent.parent.type === 'character') {
-        // Find copy
-        const matches = effect.parent.parent.effects.filter(e => e.origin === effect.parent.uuid && e.name === effect.name);
-        if (!matches || !matches.length) return;
-
-        // Update copy
-        matches[0].update(change);
-    }
+    if (!effect.modifiesActor && effect.transfer && effect.parent &&
+        effect.parent.parent && effect.parent.parent.type === 'character')
+        await sync_effects(effect.parent);
 });
 
 Hooks.on("createActiveEffect", async (effect, options, id) => {
@@ -223,6 +230,11 @@ Hooks.on("createActiveEffect", async (effect, options, id) => {
         // Add a copy to the actor
         [consequence] = await actor.createEmbeddedDocuments('Item', [consequence]);
     }
+
+    // Updating an effect on an item which belongs to an actor
+    if (!effect.modifiesActor && effect.transfer && effect.parent &&
+        effect.parent.parent && effect.parent.parent.type === 'character')
+        await sync_effects(effect.parent);
 });
 
 Hooks.on("preDeleteActiveEffect", (effect, options, id) => {
@@ -281,4 +293,9 @@ Hooks.on("deleteActiveEffect", async (effect, options, id) => {
         if (consequences.length)
             await actor.deleteEmbeddedDocuments("Item", consequences.map(c => c.id));
     }
+
+    // Updating an effect on an item which belongs to an actor
+    if (!effect.modifiesActor && effect.transfer && effect.parent &&
+        effect.parent.parent && effect.parent.parent.type === 'character')
+        await sync_effects(effect.parent, true);
 });
