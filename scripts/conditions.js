@@ -111,6 +111,21 @@ Hooks.on("updateItem", async (item, change, options, id) => {
     if (item.type === "consequence" && item.parent) await sync_status(item.parent);
 });
 
+Hooks.on("updateActiveEffect", async (effect, change, options, id) => {
+    // Only run this if it is you updating the effect, not for other players
+    if (game.user.id !== id) return;
+
+    // Updating an effect on an item which belongs to an actor
+    if (!effect.modifiesActor && effect.transfer && effect.parent && effect.parent.parent && effect.parent.parent.type === 'character') {
+        // Find copy
+        const matches = effect.parent.parent.effects.filter(e => e.origin === effect.parent.uuid && e.name === effect.name);
+        if (!matches || !matches.length) return;
+
+        // Update copy
+        matches[0].update(change);
+    }
+});
+
 Hooks.on("createActiveEffect", async (effect, options, id) => {
     // Only run this if it is you creating the active effect, not for other players
     if (game.user.id !== id) return;

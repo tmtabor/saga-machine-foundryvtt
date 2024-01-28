@@ -34,7 +34,7 @@
         "scores": {
           "armor": {
             "value": 0,
-            "properties": [],
+            "properties": {},
             "custom": false
           },
           "defense": {
