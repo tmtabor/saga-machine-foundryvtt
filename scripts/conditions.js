@@ -133,6 +133,20 @@ Hooks.on("updateActiveEffect", async (effect, change, options, id) => {
         await sync_effects(effect.parent);
 });
 
+Hooks.on("preCreateActiveEffect", async (effect, data, options, id) => {
+    // Only run this if it is you creating the active effect, not for other players
+    if (game.user.id !== id) return;
+
+    // If creating an effect on an actor which came from an item, replace @rank with correct value
+    if (effect.modifiesActor && effect.parent && effect.parent.type === 'character' && effect.origin) {
+        const item = await fromUuid(effect.origin);                             // Get the item
+        if (!item) return true;                                                 // If not valid item, do nothing
+        for (let change of effect.changes)                                      // For each change in the Active Effect
+            change.value = change.value.replaceAll('@rank', item.system.rank);  // Replace @rank with the item's rank
+        effect.updateSource({'changes': effect.changes});                       // Update the effect being added
+    }
+});
+
 Hooks.on("createActiveEffect", async (effect, options, id) => {
     // Only run this if it is you creating the active effect, not for other players
     if (game.user.id !== id) return;
