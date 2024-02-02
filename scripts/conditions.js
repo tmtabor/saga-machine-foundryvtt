@@ -99,6 +99,30 @@ async function sync_effects(item, delete_only=false) {
     item.parent.createEmbeddedDocuments('ActiveEffect', copies);
 }
 
+function evaluate_formula(value, item) {
+    function substitute_variables(raw, item) {
+        raw = raw.replaceAll('@rank', item.system.rank);
+        if (item.parent)
+            raw = raw.replaceAll('@strength', item.parent.system.stats.strength.value)
+                         .replaceAll('@dexterity', item.parent.system.stats.dexterity.value)
+                         .replaceAll('@speed', item.parent.system.stats.speed.value)
+                         .replaceAll('@endurance', item.parent.system.stats.endurance.value)
+                         .replaceAll('@intelligence', item.parent.system.stats.intelligence.value)
+                         .replaceAll('@perception', item.parent.system.stats.perception.value)
+                         .replaceAll('@charisma', item.parent.system.stats.charisma.value)
+                         .replaceAll('@determination', item.parent.system.stats.determination.value);
+        return raw;
+    }
+
+    const do_math = raw => Function(`'use strict'; return (${raw})`)();
+    const to_evaluate = ['boons', 'banes', 'modifier', 'divide', 'percent'];
+    const params = new URLSearchParams(value.replaceAll('+', '%2b'));
+    for (const p of to_evaluate)
+        if (params.has(p)) params.set(p, do_math(substitute_variables(params.get(p), item)));
+
+    return params.toString();
+}
+
 Hooks.on("createItem", async (item, options, id) => {
     // Only run this if it is you creating the item, not for other players
     if (game.user.id !== id) return;
@@ -142,7 +166,7 @@ Hooks.on("preCreateActiveEffect", async (effect, data, options, id) => {
         const item = await fromUuid(effect.origin);                             // Get the item
         if (!item) return true;                                                 // If not valid item, do nothing
         for (let change of effect.changes)                                      // For each change in the Active Effect
-            change.value = change.value.replaceAll('@rank', item.system.rank);  // Replace @rank with the item's rank
+            change.value = evaluate_formula(change.value, item);                // Replace variables, do math
         effect.updateSource({'changes': effect.changes});                       // Update the effect being added
     }
 });

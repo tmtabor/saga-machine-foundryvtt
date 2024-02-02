@@ -732,14 +732,16 @@ export class ModifierSet {
     banes = 0
     modifier = 0;
     divide = 0;
+    percent = 0;
 
-    constructor({name=null, description=null, boons=0, banes=0, modifier=0, divide=0}) {
+    constructor({name=null, description=null, boons=0, banes=0, modifier=0, divide=0, percent=0}) {
         this._name = name;
         this._description = description;
         this.boons = parseInt(boons) || 0;
         this.banes = parseInt(banes) || 0;
         this.modifier = parseInt(modifier) || 0;
         this.divide = parseInt(divide) || 0;
+        this.percent = parseInt(percent) || 0;
     }
 
     get name() { return this._name ? `${this._name} ${this.mod_str()}` : this.mod_str() }
@@ -764,6 +766,7 @@ export class ModifierSet {
             "banes": this.banes,
             "modifier": this.modifier,
             "divide": this.divide,
+            "percent": this.percent,
             "name": this.name,
             "description": this.description
         };
@@ -772,7 +775,7 @@ export class ModifierSet {
     /**
      * Accepts list of raw key/value strings and returns a list of ModifierSet objects
      *
-     * Ex: name=short_name&description=for_tooltip&boons=0&banes=0&modifier=0&divide=0
+     * Ex: name=short_name&description=for_tooltip&boons=0&banes=0&modifier=0&divide=0&percent=0
      *
      * @param raw_mods_list
      * @returns {*[]}
@@ -788,7 +791,8 @@ export class ModifierSet {
                     boons: params.get('boons'),
                     banes: params.get('banes'),
                     modifier: params.get('modifier'),
-                    divide: params.get('divide')
+                    divide: params.get('divide'),
+                    percent: params.get('percent')
                 }));
             });
 
@@ -816,6 +820,7 @@ export class ModifierSet {
         let banes = 0;
         let modifier = 0;
         let divide = 0;
+        let percent = 0;
         let tags = [];
 
         // Add up the totals
@@ -824,10 +829,11 @@ export class ModifierSet {
             banes += m.banes || 0;
             modifier += m.modifier || 0;
             divide += m.divide || 0;
+            percent += m.percent || 0;
             if (!!m.name) tags.push(m.name);
         });
 
-        return { boons: boons, banes: banes, modifier: modifier, divide: divide, tags: tags };
+        return { boons: boons, banes: banes, modifier: modifier, divide: divide, percent: percent, tags: tags };
     }
 
     static list_from_string(input_str) {

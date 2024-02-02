@@ -94,7 +94,8 @@ export class SagaMachineActor extends Actor {
     calculate_score(name, stats, other_modifiers={}) {
         const base = Array.isArray(stats) ? this.median(stats) : stats;
         const mods = this.total_modifiers({base_score: name, ...other_modifiers});
-        return Math.floor((base + mods.modifier) / (mods.divide || 1));
+        const percent = 1 + (mods.percent / 100);
+        return Math.floor(((base + mods.modifier) * percent) / (mods.divide || 1));
     }
 
     async encumbrance_consequences() {
