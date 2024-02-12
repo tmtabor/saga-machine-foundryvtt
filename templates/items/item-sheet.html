@@ -35,17 +35,25 @@
     <section class="sheet-body">
         <div class="tab basics" data-group="primary" data-tab="basics">
             <div class="grid grid-6col item-box">
+                <label class="item-label">TL</label>
+                <input class="item-input" type="number" name="system.tl" value="{{ data.system.tl }}" step="1" />
+                <label class="item-label">Availability</label>
+                <select class="item-input" data-name="system.availability">
+                    {{#select data.system.availability}}
+                        <option value="common">Common</option>
+                        <option value="uncommon">Uncommon</option>
+                        <option value="rare">Rare</option>
+                        <option value="exotic">Exotic</option>
+                    {{/select}}
+                </select>
+                <label class="item-label">Cost</label>
+                <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
                 <label class="item-label">Properties</label>
                 <input class="grid-start-2 grid-span-5 item-input" type="text" name="system.properties" value="{{ data.system.properties }}" />
-            </div>
-
-            <div class="grid grid-6col item-box">
                 <label class="item-label">Carried</label>
                 <input class="item-input" type="checkbox" name="system.carried" {{ checked data.system.carried }} />
                 <label class="item-label">Equipped</label>
                 <input class="item-input" type="checkbox" name="system.equipped" {{ checked data.system.equipped }} />
-                <label class="item-label">Cost</label>
-                <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
             </div>
         </div>
 

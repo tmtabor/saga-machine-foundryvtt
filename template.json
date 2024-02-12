@@ -196,6 +196,8 @@
       "attacks": [],
       "carried": true,
       "equipped": false,
+      "tl": 0,
+      "availability": "common",
       "cost": 0
     }
   }
