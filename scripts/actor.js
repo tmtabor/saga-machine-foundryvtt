@@ -339,6 +339,10 @@ export class SagaMachineActor extends Actor {
                 system: { specialized: true, specialization: 'describe injury', rank: 1 }
             });
 
+        // Apply the wound to the actor
+        const [actor_copy] = await this.createEmbeddedDocuments('Item', [consequence]);
+        await actor_copy.update({'system.rank': applied_damage});
+
         // Generate a default subject based on damage type
         let [generated_descriptor, description] = await this.generate_wound(type, critical);
 
@@ -358,15 +362,10 @@ export class SagaMachineActor extends Actor {
                     label: 'OK',
                     callback: async (html) => {
                         const final_descriptor = html.find("[name=descriptor]").val();  // Get the user set descriptor
+                        if (generated_descriptor !== final_descriptor) description = '';
 
-                        // Add the consequence to the actor, apply the rank and descriptor
-                        const [actor_copy] = await this.createEmbeddedDocuments('Item', [consequence]);
-                        await actor_copy.update({'system.rank': applied_damage});
-                        await actor_copy.update({'system.specialization': final_descriptor});
-
-                        // If there was a description generated and the user accepted the generated descriptor
-                        if (description && generated_descriptor === final_descriptor)
-                            await actor_copy.update({'system.description': description});
+                        // Add the descriptor to the wound
+                        await actor_copy.update({'system.specialization': final_descriptor, 'system.description': description});
                     }
                 }
             },
@@ -376,7 +375,7 @@ export class SagaMachineActor extends Actor {
 
     async generate_wound(type, critical) {
         let descriptor = '';
-        let description = null;
+        let description = '';
 
         // Handle grave wounds
         if (critical) {
@@ -479,7 +478,7 @@ export class SagaMachineActor extends Actor {
         if (dataset.modifier) mods_object.push(`modifier=${dataset.modifier}`);
 
         // Add possible bane from the strength requirement
-        if (dataset.tn === 'Defense' && !Attack.strength_met(dataset, this)) mods_object.push(`name=Low Str&banes=1`);
+        if (Attack.is_attack(dataset) && !Attack.strength_met(dataset, this)) mods_object.push(`name=Low Str&banes=1`);
 
         // Add possible bane from Bulky
         if ((dataset.stat === 'speed' || dataset.skill === 'Athletics') && this.system.scores.armor.properties['Bulky'])
@@ -488,6 +487,9 @@ export class SagaMachineActor extends Actor {
         // Add boons from Powered property
         if (dataset.stat === 'strength' && this.system.scores.armor.properties['Powered'])
             mods_object.push(`name=Powered&boons=2`);
+
+        // Add boon from the Auto property
+        if (Attack.is_attack(dataset) && Attack.has_property(dataset.properties, 'Auto')) mods_object.push(`name=Auto&boons=1`);
 
         // Parse the mods object into a list of mods
         return ModifierSet.parse(mods_object);

@@ -479,7 +479,7 @@ img.system-logo {
   margin-left: 30px;
 }
 
-.saga-machine.item .attack.prototype {
+.saga-machine .attack.prototype, .consequence.prototype {
   display: none !important;
 }
 

@@ -294,11 +294,50 @@ export class Test {
     }
 
     async apply_consequences(dataset) {
-        // If there are no consequences, do nothing
-        if (!this.consequences) return;
+        const properties = dataset?.properties || this.properties || [];
+        if (!this.consequences_evaluated) {
+            // Handle extra hits and shots from the Auto property
+            if (Attack.has_property(properties, 'Auto')) {
+                const base_attack = this.basic_attack_damage() || {value: 0, damage_type: 'sm'};
+                for (let m_count = this.margin - 5; m_count > 0; m_count -= 5)
+                    this.consequences.push(new Consequence({
+                        type: 'damage',
+                        value: base_attack.value,
+                        damage_type: base_attack.damage_type,
+                        margin: m_count,
+                        when: 'success',
+                        target: 'target',
+                        properties: properties
+                    }, this));
+                this.consequences.push(new Consequence({
+                    type: 'message',
+                    key: 'Ammo',
+                    value: `Automatic fire consumes ${Attack.property_value(properties, 'Auto')} shots.`
+                }, this));
+            }
 
+            // Handle the Stun property
+            if (Attack.has_property(properties, 'Stun'))
+                this.consequences.push(new Consequence({ type: 'consequence', name: 'Stun', when: 'success', target: 'target' }, this));
+
+            const ordering = ['defense', 'damage', 'consequence', 'message']
+            this.consequences.sort((a, b) => {
+                if (ordering.indexOf(a.type) > ordering.indexOf(b.type)) return 1;
+                if (ordering.indexOf(a.type) < ordering.indexOf(b.type)) return -1;
+                if (ordering.indexOf(a.type) === ordering.indexOf(b.type)) return 0;
+            });
+            this.consequences_evaluated = true;
+        }
+
+        // Apply consequences
         const when = this.success ? 'success' : (this.tn ? 'failure' : 'always');
         for (let c of this.consequences) c.apply(when, dataset);
+    }
+
+    basic_attack_damage() {
+        const damage_consequences = this.consequences.filter(c => c.type === 'damage');
+        if (damage_consequences.length) return damage_consequences[0];
+        else return null;
     }
 
     flavor() {
@@ -325,6 +364,7 @@ export class Test {
         if (!!this.tags && this.tags.length) this.tags.forEach(t => tags += `<span class="tag">${t}</span>`);
         if (this.use_pair) tags += '<span class="tag">Pairs!</span>';
         if (this.use_luck) tags += '<span class="tag">Luck</span>';
+        if (this.edited) tags += '<span class="tag">Edited</span>';
 
         // Return the result
         return `<h4 class="action">${this.label}</h4>
@@ -497,7 +537,7 @@ export class Consequence {
     }
 
     validate() {
-        if (!['consequence', 'damage', 'defense', 'willpower'].includes(this.type))
+        if (!['consequence', 'damage', 'defense', 'message'].includes(this.type))
             throw `Unknown type ${this.type}`;
     }
 
@@ -548,11 +588,16 @@ export class Consequence {
     apply(when='always', dataset) {
         if (!dataset) dataset = this;
 
-        if (this.type === 'consequence' && this.right_time(when))    this.apply_consequence(dataset);
+        if (this.type === 'consequence' && this.right_time(when))    this.apply_consequence();
         if (this.type === 'damage' && this.right_time(when))         this.apply_damage(dataset);
-        if (this.type === 'defense' && this.right_time(when))        this.apply_defense(dataset);
+        if (this.type === 'defense' && this.right_time(when))        this.apply_defense();
+        if (this.type === 'message' && this.right_time(when))        this.apply_message();
 
         return this;
+    }
+
+    apply_message() {
+        this.message = this.format_message(this.key ? this.key : 'Message', this.value);
     }
 
     apply_consequence() {
@@ -570,20 +615,20 @@ export class Consequence {
 
     apply_damage(dataset) {
         // Calculate the damage
-        let damage = this.base_damage();                                // Base damage
-        let margin = this.test && this.test.margin ?                    // Get the margin
-            this.test.margin : 0;
+        let base_damage = this.base_damage();                         // Base damage
+        let margin = this.margin ? Number(this.margin) :              // Get the margin
+            (this.test && this.test.margin ? Number(this.test.margin) : 0);
 
         // Handle the Feeble property
-        const properties = Attack.parse_properties(dataset.properties);
-        if (Attack.has_property(properties, 'Feeble'))
-            margin = Math.min(damage, margin);
+        this.properties = Attack.parse_properties(dataset.properties);
+        if (Attack.has_property(this.properties, 'Feeble'))
+            margin = Math.min(base_damage, margin);
 
         // Handle the Ignores and Pierce properties
-        const ignores = Attack.has_property(properties, 'Ignores');
-        const pierce = ignores ? Consequence.IGNORES_ALL_ARMOR : Attack.property_value(properties, 'Pierce');
+        const ignores = Attack.has_property(this.properties, 'Ignores');
+        const pierce = ignores ? Consequence.IGNORES_ALL_ARMOR : Attack.property_value(this.properties, 'Pierce');
 
-        damage = damage + margin;                                       // Add base damage and margin
+        let damage = base_damage + margin;                              // Add base damage and margin
         if (damage < 0) damage = 0;                                     // Minimum 0
 
         // Get the damage type
@@ -592,10 +637,6 @@ export class Consequence {
         // Set the message
         this.message = this.format_message('Damage',
             `<span class="damage" data-pierce="${pierce}">${damage}</span> <span class="damage-type">${damage_type}</span>`);
-
-        // Handle the Stun property
-        if (Attack.has_property(properties, 'Stun'))
-            this.message += this.format_message('Consequence', this.consequence_link('Stun'));
     }
 
     /**
@@ -627,7 +668,7 @@ export class Consequence {
         for (let [key, value] of Object.entries(test)) {
             // For basic data, copy it over to the JSON
             if (typeof value === 'string' || typeof value === 'number' ||
-                typeof value === 'boolean' || value === null)
+                typeof value === 'boolean' || value === null || key === 'properties')
                 json[key] = value;
         }
 
@@ -667,6 +708,10 @@ export class Attack extends Test {
         // If there are no consequences specified, return empty string, otherwise, compile the list of effects
         this._effect = this.consequences ? this.consequences.map(c => c.effect()).join(', ') : '';
         return this._effect
+    }
+
+    static is_attack(dataset) {
+        return dataset.tn === 'Defense' || dataset.tn === 'Willpower';
     }
 
     static strength_met(dataset, actor=null) {
@@ -711,7 +756,7 @@ export class Attack extends Test {
     }
 
     static property_value(properties, property) {
-        for (const prop of properties) {
+        for (const prop of Attack.parse_properties(properties)) {
             if (prop.toLowerCase().startsWith(`${property.toLowerCase()} `)) {
                 const [p, val] = prop.split(' ');
                 return Number(val);
@@ -721,7 +766,7 @@ export class Attack extends Test {
     }
 
     static has_property(properties, property) {
-        return properties.map(p => p.split(' ')[0]).includes(property);
+        return Attack.parse_properties(properties).map(p => p.split(' ')[0]).includes(property);
     }
 }
 
@@ -1047,29 +1092,36 @@ Hooks.once("ready", async function() {
  * Drag Chat Card: Attach test data to chat card
  */
 Hooks.on("renderChatMessage", async (app, html, msg) => {
-    // Get test data
-    const damage = html.find('.damage');
-    if (!damage.length) return;
-    const damage_type = html.find('.damage-type');
-    const critical = !!html.find('.critical').length;
-    const pierce_armor = Number(damage.data('pierce')) || 0;
+    if (!html.find('.damage').length) return;  // Do nothing if no damage to attach
+
+    // Is the first hit a critical hit?
+    let critical = !!html.find('.critical').length;
+
+    // Gather data for all hits
+    const hits = [];
+    html.find('.damage').each((i, e) => {
+        const damage = Number($(e).text());
+        const damage_type = $(e).parent().find('.damage-type').text();
+        const pierce_armor = Number($(e).data('pierce')) || 0;
+        hits.push({ damage: damage, damageType: damage_type, critical: critical, pierce: pierce_armor });
+        critical = false; // Subsequent hits aren't critical
+    });
 
     // Attach drag listener
     html[0].setAttribute("draggable", true);	// Add draggable and dragstart listener
     html[0].addEventListener("dragstart", ev => {
-        ev.currentTarget.dataset['damage'] = Number(damage.text());
-        ev.currentTarget.dataset['damageType'] = damage_type.text();
-        ev.currentTarget.dataset['critical'] = critical;
-        ev.currentTarget.dataset['pierce'] = pierce_armor;
-		ev.dataTransfer.setData("text/plain", JSON.stringify(ev.currentTarget.dataset));
+        ev.currentTarget.dataset['hits'] = JSON.stringify(hits);
+		ev.dataTransfer.setData("text/plain", JSON.stringify({ hits: hits }));
     }, false);
 });
 
 /**
  * Drop Chat Card: Apply damage to target
  */
-Hooks.on("dropActorSheetData", (actor, sheet, data) => {
-    if (data['damage']) actor.apply_damage(data['damage'], data['damageType'], data['critical'], data['pierce']);
+Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
+    if (data['hits'])
+        for (let hit of data['hits'])
+            await actor.apply_damage(hit['damage'], hit['damageType'], hit['critical'], hit['pierce']);
 });
 
 /**
@@ -1116,104 +1168,167 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
         icon: '<i class="fas fa-user-minus"></i>',
         condition: html => !!html.find('.damage').length,
         callback: html => {
-            const damage = Number(html.find('.damage').text());
-            if (damage) {
-                const damage_type = html.find('.damage-type').text();
-                const critical = !!html.find('.critical').length;
-                const pierce_armor = Number(html.find('.damage').data('pierce')) || 0
+            // Get all selected tokens
+            let tokens = game?.canvas?.tokens?.controlled;
 
-                // Get all selected tokens
-                let tokens = game?.canvas?.tokens?.controlled;
+            // If there are no valid tokens, and you are the GM, give a warning
+            if (!tokens.length && game.user.isGM) { ui.notifications.warn("No valid character selected."); return; }
 
-                // If there are no valid tokens, and you are the GM, give a warning
-                if (!tokens && game.user.isGM) { ui.notifications.warn("No valid character selected."); return; }
+            // Filter for owned token actors, falling back to player character is none are selected
+            let valid_tokens = tokens.filter(t => t?.document?.actor?.isOwner)
+            if (!valid_tokens.length && game.user.character) valid_tokens = [game.user.character];
 
-                // Apply damage to all selected token actors
-                let applied_damage = false;
-                for (let token of tokens) {
-                    let actor = token?.document?.actor;
-                    if (actor && actor.isOwner) {
+            // For all valid actors
+            for (let token of valid_tokens) {
+                let actor = token?.document?.actor;
+                if (actor && actor.isOwner) {
+                    // Is the first hit a critical hit?
+                    let critical = !!html.find('.critical').length;
+
+                    // Apply each damage
+                    html.find('.damage').each((i, e) => {
+                        const damage = Number($(e).text());
+                        const damage_type = $(e).parent().find('.damage-type').text();
+                        const pierce_armor = Number($(e).data('pierce')) || 0;
+
                         actor.apply_damage(damage, damage_type, critical, pierce_armor);
-                        applied_damage = true;
-                    }
+                        critical = false; // Subsequent hits aren't critical
+                    });
                 }
-
-                // If you didn't have any owned tokens selected, fall back to applying damage to player character
-                if (!applied_damage && game.user.character)
-                    game.user.character.apply_damage(damage, damage_type, critical, pierce_armor);
             }
         }
     });
 
-    // Edit Damage option
+    // Edit Test option
     options.push({
-        name: 'Edit Damage',
+        name: 'Edit Results',
         icon: '<i class="fa fa-edit"></i>',
-        condition: html => !!html.find('.damage').length && game.user.isGM,
+        condition: html => game.user.isGM,
         callback: html => {
-            const id = html.data('messageId');
-            const damage = Number(html.find('.damage').text());
-            const damage_type = html.find('.damage-type').text();
-            const critical = !!html.find('.critical').length ? 'checked' : '';
-            const ignores_armor = !!html.find('.ignores').length ? 'checked' : '';
+            const message_id = html.data('messageId');
+            const test = Test.from_json(JSON.parse(html.find('.test-json').val()));
 
             // Open edit dialog
             new Dialog({
-                title: `Edit Damage`,
+                title: `Edit Results`,
                 content: `
-                    <form>
+                    <form class="saga-machine">
                         <div class="form-group">
-                            <label for="value">Value</label>
-                            <input type="number" name="value" value="${damage}" autofocus>
+                            <label for="critical">Success</label>
+                            <input type="checkbox" name="success" ${test.success ? 'checked' : ''}>
                         </div>
                         <div class="form-group">
-                            <label for="value">Type</label>
-                            <input type="text" name="type" value="${damage_type}">
+                            <label for="critical">Critical</label>
+                            <input type="checkbox" name="critical" ${test.critical ? 'checked' : ''}>
                         </div>
                         <div class="form-group">
-                            <label for="critical">Critical Hit</label>
-                            <input type="checkbox" name="critical" ${critical}>
+                            <label for="value">Margin</label>
+                            <input type="number" name="margin" value="${test.margin}" autofocus>
                         </div>
-                        <div class="form-group">
-                            <label for="ignore">Ignore Armor</label>
-                            <input type="checkbox" name="ignore" ${ignores_armor}>
+                        <div class="sheet-body">
+                            <ol class="items-list consequence-list">
+                                <li class="item flexrow items-header consequence-row">
+                                    <div class="item-name">Type</div>
+                                    <div class="item-name">Value</div>
+                                    <div class="item-controls">
+                                        <a class="item-control item-create" title="Create consequence"><i class="fas fa-plus"></i> Add</a>
+                                    </div>
+                                </li>
+                
+                                <li class="item flexrow consequence consequence-row prototype">
+                                    <select class="item-input item-name" name="type">
+                                        <option value="damage">Damage</option>
+                                        <option value="consequence">Consequence</option>
+                                        <option value="defense">Defense</option>
+                                        <option value="message">Message</option>
+                                    </select>
+                                    <input class="item-input item-name" type="text" name="value" value="" />
+                                    <div class="item-controls">
+                                        <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                                    </div>
+                                </li>
+                            </ol>
                         </div>
-                        <input type="hidden" name="id" value="${id}">
                     </form>`,
-                buttons:{
+                render: html => {
+                    // Fill out existing consequences
+                    if (test.consequences && test.consequences.length) {
+                        // Get the prototype consequence node and parent node
+                        const prototype = html.find('.consequence.prototype');
+                        const parent = html.find('ol.consequence-list');
+
+                        // For each consequence, clone the prototype and set up the form
+                        for (let consequence of test.consequences) {
+                            let value = null;
+                            switch (consequence.type) {
+                                case 'consequence': value = consequence.name; break;
+                                case 'damage': value = `${Number(consequence.value) + (Number(consequence.margin) || Number(test.margin))} ${consequence.damage_type} ${consequence.properties}`; break;
+                                case 'message': value = `${consequence.key}: ${consequence.value}`; break;
+                                default: value = '';
+                            }
+
+                            const clone = prototype.clone();
+                            clone.removeClass('prototype');
+                            clone.find("[name=type]").val(consequence.type);
+                            clone.find("[name=value]").val(value);
+                            parent.append(clone);
+                        }
+                    }
+
+                    html.find('.consequence-list .item-create').click(event => {
+                        // Get the prototype consequence node and parent node, return if it wasn't found
+                        const prototype = html.find('.consequence.prototype');
+                        const parent = html.find('ol.consequence-list');
+                        if (!prototype || !prototype.length || !parent || !parent.length) return;
+
+                        const clone = prototype.clone();
+                        clone.removeClass('prototype');
+                        clone.find('.item-delete').click(event => $(event.currentTarget).closest(".consequence").remove());
+                        parent.append(clone);
+                    });
+                    html.find('.consequence-list .item-delete').click(event => $(event.currentTarget).closest(".consequence").remove());
+                },
+                buttons: {
                     Edit: {
                         icon: "<i class='fas fa-check'></i>",
                         label: 'OK',
                         callback: async (html) => {
-                            // Get values in the form
-                            const id = html.find("input[name=id]").val();
-                            const damage = html.find("input[name=value]").val();
-                            const damage_type = html.find("input[name=type]").val();
-                            const critical = html.find("input[name=critical]").is(':checked');
-                            const ignores_armor = html.find("input[name=ignore]").is(':checked');
+                            // Set values based on the contents of the form
+                            test.success = html.find("input[name=success]").is(':checked');
+                            test.critical = html.find("input[name=critical]").is(':checked');
+                            test.margin = Number(html.find("input[name=margin]").val());
+                            test.edited = true;
 
-                            // Protect against bad ID values
-                            if (!id) { console.error("Unable to find message id to edit"); return; }
-                            const message = game.messages.get(id);
-                            if (!message) { console.error("Unable to find chat message to edit"); return; }
+                            const consequences = [];
+                            html.find('.consequence:not(.prototype)').each((i, e) => {
+                                const type = $(e).find('select[name=type]').val();
+                                const value = $(e).find('input[name=value]').val();
 
-                            // Update values in chat card
-                            const wrapper = $("<div></div>").html(message.flavor);
-                            wrapper.find('.damage').text(damage);           // Damage value
-                            wrapper.find('.damage-type').text(damage_type); // Damage type
-                            critical ?                                      // Critical
-                                wrapper.find('.success').addClass('critical').text('Critical Success!') :
-                                wrapper.find('.success').removeClass('critical').text('Success!');
-                            ignores_armor ?                                      // Ignores armor
-                                wrapper.find('.damage').addClass('ignores') :
-                                wrapper.find('.damage').removeClass('ignores');
+                                const params = {};
+                                if      (type === 'consequence') params.name = value.trim();
+                                else if (type === 'message') {
+                                    const parts = value.split(': ');
+                                    if (parts.length >= 2) [params.key, params.value] = [parts[0], parts[1]];
+                                    else [params.key, params.value] = ['Message', parts[0]];
+                                }
+                                else if (type === 'damage') {
+                                    const parts = value.split(' ');
+                                    params.value = Number(parts?.[0]) - test.margin;
+                                    params.damage_type = parts?.[1];
+                                    if (parts.length >= 3) params.properties = Attack.parse_properties(parts.slice(2).join(' '));
+                                }
+
+                                const consequence = new Consequence({type: type, ...params}, test);
+                                consequence.apply(test.success ? 'success' : 'failure')
+                                consequences.push(consequence);
+                                test.consequences = consequences;
+                            });
 
                             // Save edited card
-                            await ChatMessage.updateDocuments([{_id: id, flavor: wrapper.html()}], {});
+                            await ChatMessage.updateDocuments([{_id: message_id, content: test.content(), flavor: test.flavor()}], {});
                         }
                     }
-                },
-                default: 'Edit'
+                }
             }).render(true);
         }
     });

@@ -103,7 +103,7 @@ function evaluate_formula(value, item) {
     function substitute_variables(raw, item) {
         raw = raw.replaceAll('@rank', item.system.rank);
         if (item.parent)
-            raw = raw.replaceAll('@strength', item.parent.system.stats.strength.value)
+            raw =     raw.replaceAll('@strength', item.parent.system.stats.strength.value)
                          .replaceAll('@dexterity', item.parent.system.stats.dexterity.value)
                          .replaceAll('@speed', item.parent.system.stats.speed.value)
                          .replaceAll('@endurance', item.parent.system.stats.endurance.value)
