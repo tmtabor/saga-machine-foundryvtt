@@ -69,11 +69,17 @@ export class SagaMachineActor extends Actor {
         // Wound total
         this.system.scores.health.value = this.wound_total();
 
+        // Fatigue
+        this.system.scores.health.fatigue = this.fatigue();
+
         // Move
         if (!this.system.scores.move.custom)
             this.system.scores.move.value = this.calculate_score('move',
                 [this.system.stats.speed.value, this.system.stats.endurance.value, this.system.stats.determination.value],
-                {modifier: this.system.scores.armor.properties['Bulky'] * -1 || 0});
+                {
+                    modifier: this.system.scores.armor.properties['Bulky'] * -1 || 0,
+                    divide: this.system.scores.health.fatigue && this.system.scores.health.value >= this.system.scores.health.max ? 2 : 1 // Handle Fatigue consequence's effect on Move
+                });
 
         // Encumbrance threshold
         if (!this.system.scores.encumbrance.custom)
@@ -96,6 +102,11 @@ export class SagaMachineActor extends Actor {
         const mods = this.total_modifiers({base_score: name, ...other_modifiers});
         const percent = 1 + (mods.percent / 100);
         return Math.floor(((base + mods.modifier) * percent) / (mods.divide || 1));
+    }
+
+    fatigue() {
+        const fatigue = this.items.filter(item => item.type === 'consequence' && item.name.toLowerCase() === 'fatigue');
+        return fatigue.map(a => a.system.rank).reduce((a, b) => a + b, 0);
     }
 
     async encumbrance_consequences() {
@@ -476,9 +487,15 @@ export class SagaMachineActor extends Actor {
         if (dataset.boons) mods_object.push(`boons=${dataset.boons}`);
         if (dataset.banes) mods_object.push(`banes=${dataset.banes}`);
         if (dataset.modifier) mods_object.push(`modifier=${dataset.modifier}`);
+        if (dataset.divide) mods_object.push(`divide=${dataset.divide}`);
 
         // Add possible bane from the strength requirement
         if (Attack.is_attack(dataset) && !Attack.strength_met(dataset, this)) mods_object.push(`name=Low Str&banes=1`);
+
+        // Add possible bane from Fatigue
+        if ((dataset.stat === 'strength' || dataset.stat === 'dexterity' || dataset.stat === 'speed' || dataset.stat === 'endurance') &&
+            this.system.scores.health.fatigue && this.system.scores.health.value >= this.system.scores.health.max)
+            mods_object.push(`name=Fatigue&banes=1`);
 
         // Add possible bane from Bulky
         if ((dataset.stat === 'speed' || dataset.skill === 'Athletics') && this.system.scores.armor.properties['Bulky'])

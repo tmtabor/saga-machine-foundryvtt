@@ -50,6 +50,7 @@
           "health": {
             "value": 0,
             "max": 0,
+            "fatigue": 0,
             "custom": false
           },
           "luck": {
