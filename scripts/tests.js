@@ -294,6 +294,7 @@ export class Test {
     }
 
     async apply_consequences(dataset) {
+        if (!this.consequences) this.consequences = []; // Init consequences, if needed
         const properties = dataset?.properties || this.properties || [];
         if (!this.consequences_evaluated) {
             // Handle extra hits and shots from the Auto property
@@ -320,7 +321,7 @@ export class Test {
             if (Attack.has_property(properties, 'Stun'))
                 this.consequences.push(new Consequence({ type: 'consequence', name: 'Stun', when: 'success', target: 'target' }, this));
 
-            const ordering = ['defense', 'damage', 'consequence', 'message']
+            const ordering = ['defense', 'damage', 'consequence', 'message'];
             this.consequences.sort((a, b) => {
                 if (ordering.indexOf(a.type) > ordering.indexOf(b.type)) return 1;
                 if (ordering.indexOf(a.type) < ordering.indexOf(b.type)) return -1;
