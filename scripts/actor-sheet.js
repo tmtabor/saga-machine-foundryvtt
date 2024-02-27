@@ -9,7 +9,8 @@ Hooks.once("init", async () => {
 	// Register handlebars partials
 	loadTemplates([
 		'systems/saga-machine/templates/partials/character-header.html',
-		'systems/saga-machine/templates/partials/character-sidebar.html'
+		'systems/saga-machine/templates/partials/character-sidebar.html',
+		'systems/saga-machine/templates/partials/character-inventory.html'
 	]);
 });
 
