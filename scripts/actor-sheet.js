@@ -4,7 +4,8 @@ Hooks.once("init", async () => {
 	// Register handlebars helpers
 	Handlebars.registerHelper("is_GM", () => game.user.isGM);
 	Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapons');
-	Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armors');
+	Handlebars.registerHelper("is_wearable", item => item.system.group.toLowerCase() === 'armors' ||
+		item.system.group.toLowerCase() === 'apparel');
 
 	// Register handlebars partials
 	loadTemplates([

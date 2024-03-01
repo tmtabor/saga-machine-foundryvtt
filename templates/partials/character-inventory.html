@@ -54,7 +54,7 @@
                             {{#if (is_weapon item) }}
                                 <a class="item-control item-equip {{#unless item.system.equipped }}unequipped{{/unless}}" title="Equip Item"><i class="fa-solid fa-hand-back-fist"></i></a>
                             {{/if}}
-                            {{#if (is_armor item) }}
+                            {{#if (is_wearable item) }}
                                 <a class="item-control item-equip {{#unless item.system.equipped }}unequipped{{/unless}}" title="Equip Item"><i class="fas fa-tshirt"></i></a>
                             {{/if}}
                             {{#if items.container }}
