@@ -191,6 +191,7 @@
     },
     "item": {
       "templates": ["basics"],
+      "parent": null,
       "quantity": 1,
       "properties": [],
       "group": "",

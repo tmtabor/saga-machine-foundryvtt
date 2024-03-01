@@ -57,11 +57,13 @@ export class SagaMachineItem extends Item {
             this.system.properties = this.system.properties.split(',').map(t => t.trim());
         }
 
+        this.system.container = this.property_value('Container');
         this.system.armor = this.property_value('Armor');
         this.system.bulky = this.property_value('Bulky');
         this.system.powered = this.property_value('Powered');
         this.system.hands = this.property_value('Hands') || 1;
         this.system.unit_encumbrance = this.calc_unit_encumbrance();
+        this.system.container_encumbrance = this.calc_container_encumbrance();
         this.system.encumbrance = this.calc_encumbrance();
     }
 
@@ -77,7 +79,6 @@ export class SagaMachineItem extends Item {
 
     calc_unit_encumbrance() {
         if (this.system.properties.includes('Neg')) return 0;
-        else if (this.system.properties.includes('Worn') && this.system.equipped) return 0;
         else {
             for (const prop of this.system.properties) {
                 if (prop.startsWith('Implant ')) return 0;
@@ -92,8 +93,14 @@ export class SagaMachineItem extends Item {
         }
     }
 
+    calc_container_encumbrance() {
+        return this.system.unit_encumbrance * this.system.quantity;
+    }
+
     calc_encumbrance() {
         if (!this.system.carried) return 0;
-        return this.calc_unit_encumbrance() * this.system.quantity;
+        if (this.system.parent) return 0;
+        if (this.system.equipped && this.system.properties.includes('Worn')) return 0;
+        return this.system.unit_encumbrance * this.system.quantity;
     }
 }

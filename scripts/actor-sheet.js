@@ -3,8 +3,8 @@ import { Attack, test_dialog } from "./tests.js";
 Hooks.once("init", async () => {
 	// Register handlebars helpers
 	Handlebars.registerHelper("is_GM", () => game.user.isGM);
-	Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapon');
-	Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armor');
+	Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapons');
+	Handlebars.registerHelper("is_armor", item => item.system.group.toLowerCase() === 'armors');
 
 	// Register handlebars partials
 	loadTemplates([
@@ -60,6 +60,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.weaknesses = this.items(context, 'trait', t => t.system.type === 'Weakness');
 		context.data.system.consequences = this.items(context, 'consequence');
 		context.data.system.equipment = this.items(context, 'item');
+		context.data.system.containers = this.items(context, 'item', i => !!i.system.container);
+		context.data.system.equipment_groups = this._groups_and_containers(context)
 
 		if (this.actor.type === 'character') {
 			// Gather the list of attacks
@@ -92,6 +94,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 			this.actor.updateEmbeddedDocuments("Item", [update] );
 		});
 
+		// Item remove from container
+		html.find('.item-remove').click(ev => {
+			const box = $(ev.currentTarget).parents(".item");
+			const item = this.actor.items.get(box.data("id"));
+			const update = { _id: item.id, 'system.parent': null };
+			this.actor.updateEmbeddedDocuments("Item", [update] );
+		});
+
 		// Item carrying / uncarrying
 		html.find('.item-carry').click(ev => {
 			const box = $(ev.currentTarget).parents(".item");
@@ -108,9 +118,13 @@ export class SagaMachineActorSheet extends ActorSheet {
 		});
 
 		// Item deletion
-		html.find('.item-delete').click(ev => {
+		html.find('.item-delete').click(async ev => {
 			const box = $(ev.currentTarget).parents(".item");
 			const item = this.actor.items.get(box.data("id"));
+			if (!!item.system.container) {
+				const contained = this.actor.items.filter(i => i.type === 'item' && i.system.parent === item.id);
+				await this.actor.updateEmbeddedDocuments("Item", contained.map(i => new Object({ '_id': i.id, 'system.parent': null })));
+			}
 			item.delete();
 			box.slideUp(200, () => this.render(false));
 		});
@@ -187,6 +201,27 @@ export class SagaMachineActorSheet extends ActorSheet {
 			}
 		});
 
+		// Handle drop events for containers and item groups
+		html.find('.item-group').on('drop', async event => {
+			// Get the drag event data
+			let data = null;
+			try { data = JSON.parse(event.originalEvent.dataTransfer.getData("text")); } catch(error) {}
+			if (!data || !data.uuid || data.type !== 'Item') return;
+
+			// Get the item being dropped
+			const drop_item = await fromUuid(data.uuid);
+			if (drop_item.type !== 'item') return;
+
+			// Get the container ID, if applicable, and add the item to the container if it fits
+			const container_id = $(event.currentTarget).data('id');
+			if (container_id)
+				if (drop_item.system.container_encumbrance + $(event.currentTarget).data('encumbrance') <= $(event.currentTarget).data('max'))
+					await drop_item.update({ 'system.parent': container_id });
+
+			// Otherwise, remove the item from the container
+			else await drop_item.update({ 'system.parent': null });
+		});
+
 		// Open item dialogs on NPC sheet
 		html.find('.items-inline > .item').on('contextmenu', event => {
 			event.preventDefault();
@@ -225,6 +260,56 @@ export class SagaMachineActorSheet extends ActorSheet {
 			content: item.system.description,
 			speaker: ChatMessage.getSpeaker({ actor: this.actor })
 		});
+	}
+
+	_groups_and_containers(context) {
+		const raw_groups = this.group_items(context.data.system.equipment,
+				i => i.system.parent || i.system.group, i => !i.system.container);
+		if (!context.data.system.equipment.filter(i => !i.system.parent && !i.system.container).length)
+			raw_groups['Miscellanea'] = []; // Add blank group if no non-container groups
+
+		const equipment_groups = []; // { name: String, container: null|Item, contents: Item[], encumbrance: Int, max: 0|Int }
+
+		// Add empty containers
+		for (const c of context.data.system.containers)
+			if (!(c.id in raw_groups))
+				equipment_groups.push({
+					name: c.system.full_name,
+					container: c,
+					contents: [],
+					encumbrance: 0,
+					max: c.system.container
+				});
+
+		// Add other containers and groups
+		for (const g of Object.keys(raw_groups)) {
+			const container = context.data.system.containers.find(c => c.id === g)
+			equipment_groups.push({
+				name: container ? container.system.full_name : g,
+				container: container || null,
+				contents: raw_groups[g],
+				encumbrance: raw_groups[g].reduce((total, i) => total + i.system.container_encumbrance, 0),
+				max: container ? container.system.container : 0
+			});
+		}
+
+		// Sort groups by name and whether or not it is a container
+		equipment_groups.sort((a, b) => {
+			if (a.name === b.name) return 0;
+			if (a.name === 'Weapons') return -1;
+			if (b.name === 'Weapons') return 1;
+			if (a.name === 'Armors') return -1;
+			if (b.name === 'Armors') return 1;
+
+			if (!!a.container && !b.container) return 1;
+			if (!!b.container && !a.container) return -1;
+
+			if (a.name < b.name) return -1;
+			if (a.name > b.name) return 1;
+			return 0;
+		});
+
+		return equipment_groups;
 	}
 
 	/**
@@ -267,6 +352,37 @@ export class SagaMachineActorSheet extends ActorSheet {
 		event.dataTransfer.setData("text/plain", JSON.stringify(event.currentTarget.dataset));
 
 		super._onDragStart(event);
+	}
+
+	/**
+	 * Iterate over list of items and group them into a map by the specified property, optionally apply a filter
+	 *
+	 * @param items
+	 * @param group_path
+	 * @param filter
+	 * @param sort
+	 * @param blank_name
+	 * @returns {{}}
+	 */
+	group_items(items, group_path, filter, sort, blank_name) {
+		if (!filter) filter = a => true;
+		if (!sort) sort = (a, b) =>  a.name > b.name ? 1 : -1;
+		if (!blank_name) blank_name = 'Miscellanea';
+		const access = (object, path) => path.split('.').reduce((o, i) => o[i], object);
+		const groups = {};
+
+		for (let i of items) {
+			if (!filter(i)) continue;
+			let group_name = typeof group_path === 'function' ? group_path(i) : access(i, group_path);
+			if (!group_name || typeof group_name !== 'string') group_name = blank_name;
+			if (group_name in groups) groups[group_name].push(i);
+			else groups[group_name] = [i];
+		}
+
+		// Sort all groups
+		for (const k of Object.keys(groups)) groups[k].sort(sort)
+
+		return groups;
 	}
 
 	/**

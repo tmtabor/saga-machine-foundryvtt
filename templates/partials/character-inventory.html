@@ -21,43 +21,66 @@
         </div>
 
         <h3>Equipment</h3>
-        <ol class="items-list">
-            <li class="item flexrow items-header">
-                <div class="item-name">Name</div>
-                <div class="item-name">Properties</div>
-                <div class="item-prop">Quantity</div>
-                <div class="item-controls">
-                    <a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add</a>
-                </div>
-            </li>
-
-            {{#each data.system.equipment as |item|}}
-                <li class="item flexrow" data-id="{{ item._id }}" data-type="Item" data-uuid="{{ item.uuid }}">
-                    <h4 class="item-name">
-                        <span class="chatable item-img">
-                            <img class="item-img" src="{{ item.img }}" title="Display {{ item.system.full_name }}" />
-                            <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ item.system.full_name }}" />
-                        </span>
-                        <span class="expandable">{{ item.system.full_name }}</span>
-                    </h4>
-
-                    <div class="item-name">{{item.system.properties}}</div>
-                    <input class="item-input item-prop" type="number" data-name="system.quantity" value="{{ item.system.quantity }}" step="1" data-dtype="Number" />
-                    <div class="item-controls">
-                        {{#if (is_weapon item) }}
-                            <a class="item-control item-equip {{#unless item.system.equipped }}unequipped{{/unless}}" title="Equip Item"><i class="fa-solid fa-hand-back-fist"></i></a>
+        {{#each data.system.equipment_groups as |items|}}
+            <ol class="items-list item-group" data-id="{{items.container.id}}" data-name="{{items.name}}" data-encumbrance="{{items.encumbrance}}" data-max="{{items.max}}">
+                <li class="item flexrow items-header" data-id="{{items.container.id}}">
+                    <div class="item-name">{{ items.name }}{{#if items.container }} ({{ items.encumbrance }}/{{ items.max }}){{/if}}</div>
+                    <div class="item-name">{{#if items.container }}{{ items.container.system.properties }}{{else}}Properties{{/if}}</div>
+                    <div class="item-prop">Quantity</div>
+                    <div class="item-controls container">
+                        {{#if items.container }}
+                            <a class="item-control item-carry {{#unless items.container.system.carried }}unequipped{{/unless}}" title="Carry Item"><i class="fas fa-shopping-bag"></i></a>
+                            <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                            <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                            <a class="item-control item-create" title="Create item" data-type="item" data-system='{"parent": "{{ items.container.id }}"}'><i class="fas fa-plus"></i> Add</a>
+                        {{else}}
+                            <a class="item-control item-create" title="Create item" data-type="item" data-system='{"group": "{{ items.name }}"}'><i class="fas fa-plus"></i> Add</a>
                         {{/if}}
-                        {{#if (is_armor item) }}
-                            <a class="item-control item-equip {{#unless item.system.equipped }}unequipped{{/unless}}" title="Equip Item"><i class="fas fa-tshirt"></i></a>
-                        {{/if}}
-                        <a class="item-control item-carry {{#unless item.system.carried }}unequipped{{/unless}}" title="Carry Item"><i class="fas fa-shopping-bag"></i></a>
-                        <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-                        <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
                     </div>
-                    <div class="item-description">{{{ item.system.description }}}</div>
                 </li>
-            {{/each}}
-        </ol>
+                {{#each items.contents as |item|}}
+                    <li class="item flexrow" data-id="{{ item._id }}" data-type="Item" data-uuid="{{ item.uuid }}">
+                        <h4 class="item-name">
+                            <span class="chatable item-img">
+                                <img class="item-img" src="{{ item.img }}" title="Display {{ item.system.full_name }}" />
+                                <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ item.system.full_name }}" />
+                            </span>
+                            <span class="expandable">{{ item.system.full_name }}</span>
+                        </h4>
+
+                        <div class="item-name">{{item.system.properties}}</div>
+                        <input class="item-input item-prop" type="number" data-name="system.quantity" value="{{ item.system.quantity }}" step="1" data-dtype="Number" />
+                        <div class="item-controls">
+                            {{#if (is_weapon item) }}
+                                <a class="item-control item-equip {{#unless item.system.equipped }}unequipped{{/unless}}" title="Equip Item"><i class="fa-solid fa-hand-back-fist"></i></a>
+                            {{/if}}
+                            {{#if (is_armor item) }}
+                                <a class="item-control item-equip {{#unless item.system.equipped }}unequipped{{/unless}}" title="Equip Item"><i class="fas fa-tshirt"></i></a>
+                            {{/if}}
+                            {{#if items.container }}
+                                <a class="item-control item-remove" title="Remove Item"><i class="fa-solid fa-arrow-up-from-bracket"></i></a>
+                            {{else}}
+                                <a class="item-control item-carry {{#unless item.system.carried }}unequipped{{/unless}}" title="Carry Item"><i class="fas fa-shopping-bag"></i></a>
+                            {{/if}}
+                            <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                            <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                        </div>
+                        <div class="item-description">{{{ item.system.description }}}</div>
+                    </li>
+                {{/each}}
+            </ol>
+        {{else}}
+            <ol class="items-list">
+                <li class="item flexrow items-header">
+                    <div class="item-name">Equipment</div>
+                    <div class="item-name">Properties</div>
+                    <div class="item-prop">Quantity</div>
+                    <div class="item-controls">
+                        <a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add</a>
+                    </div>
+                </li>
+            </ol>
+        {{/each}}
     </div>
 
     <div class="score encumbrance">

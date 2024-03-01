@@ -376,11 +376,17 @@ img.system-logo {
   -ms-flex-pack: end;
   justify-content: flex-end;
 }
+
 .saga-machine .sheet-body .items-list .item-controls a {
   font-size: 12px;
   text-align: center;
   margin: 0 6px;
 }
+
+.saga-machine .sheet-body .items-list .item-controls.container a {
+  margin: 0 3px;
+}
+
 .saga-machine .sheet-body .items-list .item {
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -416,6 +422,16 @@ img.system-logo {
   font-size: 12px;
   max-width: 50px;
 }
+
+.saga-machine .sheet-body .items-list .item-prop-expanded {
+  text-align: center;
+  text-transform: capitalize;
+  border-left: 1px solid #c9c7b8;
+  border-right: 1px solid #c9c7b8;
+  font-size: 12px;
+  max-width: 100px;
+}
+
 .saga-machine .sheet-body .items-list .items-header {
   height: 28px;
   margin: 2px 0;
@@ -585,6 +601,8 @@ img.system-logo {
 
 .saga-machine .inventory-top {
   height: calc(100% - 35px);
+  width: calc(100% + 10px);
+  padding-right: 10px;
   overflow: auto;
 }
 
@@ -836,6 +854,21 @@ img.system-logo {
 .saga-machine form.stash-sheet button:focus,
 .saga-machine form.stash-sheet button:active {
     box-shadow: 0 0 5px rgba(238, 207, 128, 1);
+}
+
+.saga-machine form.stash-sheet .sheet-body {
+  height: calc(100% + 10px);
+  position: relative;
+  top: -10px;
+}
+
+.saga-machine form.stash-sheet .sheet-body .tab {
+    height: 100%;
+    padding-top: 10px;
+}
+
+.saga-machine form.stash-sheet .sheet-body .tab ol:last-child {
+    padding-bottom: 10px;
 }
 
 .saga-machine form.stash-sheet .editor {

@@ -26,28 +26,34 @@
     {{!-- Sheet Body --}}
     <section class="sheet-body">
         <div class="tab basics" data-group="primary" data-tab="basics">
-            <div class="inventory-top">
-                <div class="grid grid-4col">
-                    <button class="distribute-money">Distribute Money</button>
-                    <div></div>
-                    <label class="item-label right" for="system.wealth.money">Money</label>
-                    <input class="money-input" type="number" name="system.wealth.money" value="{{ data.system.wealth.money }}" step="1" />
-                </div>
+            <div class="grid grid-4col">
+                <button class="distribute-money">Distribute Money</button>
+                <div></div>
+                <label class="item-label right" for="system.wealth.money">Money</label>
+                <input class="money-input" type="number" name="system.wealth.money" value="{{ data.system.wealth.money }}" step="1" />
+            </div>
 
-                <h3>Equipment</h3>
-                <ol class="items-list">
-                    <li class="item flexrow items-header">
-                        <div class="item-name">Name</div>
-                        <div class="item-name">Group</div>
+            <h3>Equipment</h3>
+            {{#each data.system.equipment_groups as |items|}}
+                <ol class="items-list item-group" data-id="{{items.container.id}}" data-name="{{items.name}}" data-encumbrance="{{items.encumbrance}}" data-max="{{items.max}}">
+                    <li class="item flexrow items-header" data-id="{{items.container.id}}">
+                        <div class="item-name">{{ items.name }}{{#if items.container }} ({{ items.encumbrance }}/{{ items.max }}){{/if}}</div>
+                        <div class="item-name">{{#if items.container }}{{ items.container.system.properties }}{{else}}Properties{{/if}}</div>
+                        <div class="item-prop-expanded">Availability</div>
                         <div class="item-prop">Cost</div>
                         <div class="item-prop">Encum</div>
                         <div class="item-prop">Available</div>
-                        <div class="item-controls">
-                            <a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add</a>
+                        <div class="item-controls container">
+                            {{#if items.container }}
+                                <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                                <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                                <a class="item-control item-create" title="Create item" data-type="item" data-system='{"parent": "{{ items.container.id }}"}'><i class="fas fa-plus"></i> Add</a>
+                            {{else}}
+                                <a class="item-control item-create" title="Create item" data-type="item" data-system='{"group": "{{ items.name }}"}'><i class="fas fa-plus"></i> Add</a>
+                            {{/if}}
                         </div>
                     </li>
-
-                    {{#each data.system.equipment as |item|}}
+                    {{#each items.contents as |item|}}
                         <li class="item flexrow" data-id="{{ item._id }}" data-type="Item" data-uuid="{{ item.uuid }}">
                             <h4 class="item-name">
                                 <span class="chatable item-img">
@@ -56,11 +62,16 @@
                                 </span>
                                 <span class="expandable">{{ item.system.full_name }}</span>
                             </h4>
-                            <h4 class="item-name">{{ item.system.group }}</h4>
+
+                            <div class="item-name">{{item.system.properties}}</div>
+                            <div class="item-prop-expanded">{{ item.system.availability }}</div>
                             <input class="item-input item-prop" type="number" data-name="system.cost" value="{{ item.system.cost }}" step="1" data-dtype="Number" />
                             <input class="item-input item-prop" type="number" data-name="unit_encumbrance" value="{{ item.system.unit_encumbrance }}" disabled data-dtype="Number" />
                             <input class="item-input item-prop" type="number" data-name="system.quantity" value="{{ item.system.quantity }}" step="1" data-dtype="Number" />
                             <div class="item-controls">
+                                {{#if items.container }}
+                                    <a class="item-control item-remove" title="Remove Item"><i class="fa-solid fa-arrow-up-from-bracket"></i></a>
+                                {{/if}}
                                 <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
                                 <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
                             </div>
@@ -68,7 +79,21 @@
                         </li>
                     {{/each}}
                 </ol>
-            </div>
+            {{else}}
+                <ol class="items-list">
+                    <li class="item flexrow items-header">
+                        <div class="item-name">Name</div>
+                        <div class="item-name">Properties</div>
+                        <div class="item-prop-expanded">Availability</div>
+                        <div class="item-prop">Cost</div>
+                        <div class="item-prop">Encum</div>
+                        <div class="item-prop">Available</div>
+                        <div class="item-controls">
+                            <a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add</a>
+                        </div>
+                    </li>
+                </ol>
+            {{/each}}
         </div>
 
         <div class="tab description" data-group="primary" data-tab="description">
