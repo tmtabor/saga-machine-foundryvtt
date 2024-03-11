@@ -55,10 +55,9 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.paths = this.items(context, 'path');
 		context.data.system.origins = this.items(context, 'origin');
 		context.data.system.all_skills = this.items(context, 'skill');
-		context.data.system.skills = this.items(context, 'skill', s => s.system.type !== 'Restricted');
-		context.data.system.restricted_skills = this.items(context, 'skill', s => s.system.type === 'Restricted');
-		context.data.system.traits = this.items(context, 'trait', t => t.system.type !== 'Weakness');
-		context.data.system.weaknesses = this.items(context, 'trait', t => t.system.type === 'Weakness');
+		context.data.system.skill_groups = this._skills_and_traits(context.data.system.all_skills, 'General Skills');
+		context.data.system.all_traits = this.items(context, 'trait');
+		context.data.system.trait_groups = this._skills_and_traits(context.data.system.all_traits, 'General Traits', ['General Traits', 'Weaknesses']);
 		context.data.system.consequences = this.items(context, 'consequence');
 		context.data.system.equipment = this.items(context, 'item');
 		context.data.system.containers = this.items(context, 'item', i => !!i.system.container);
@@ -261,6 +260,33 @@ export class SagaMachineActorSheet extends ActorSheet {
 			content: item.system.description,
 			speaker: ChatMessage.getSpeaker({ actor: this.actor })
 		});
+	}
+
+	_skills_and_traits(all_items, default_group, display_if_empty=null) {
+		const raw_groups = this.group_items(all_items, i => i.system.group, null, null, default_group);
+		const final_groups = []; // { name: String, contents: Skill[] }
+
+		// Add empty groups
+		if (display_if_empty)
+			for (const c of display_if_empty)
+				if (!(c in raw_groups))
+					final_groups.push({ name: c, contents: [] });
+
+		// Add groups
+		for (const g of Object.keys(raw_groups))
+			final_groups.push({ name: g, contents: raw_groups[g] });
+
+		// Sort groups by name
+		final_groups.sort((a, b) => {
+			if (a.name === b.name) return 0;
+			if (a.name === default_group) return -1;
+			if (b.name === default_group) return 1;
+			if (a.name < b.name) return -1;
+			if (a.name > b.name) return 1;
+			return 0;
+		});
+
+		return final_groups;
 	}
 
 	_groups_and_containers(context) {

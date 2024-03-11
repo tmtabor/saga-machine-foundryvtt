@@ -19,59 +19,19 @@
 		<div class="tab basics" data-group="primary" data-tab="basics">
             <div class="grid">
                 <div class="grid-col">
-                    <h3 title="{{ data.system.experiences.spent_skills }} experiences spent">Skills</h3>
-                    <ol class="items-list skill-list">
-                        <li class="item flexrow items-header">
-                            <div class="item-name">Name</div>
-                            <div class="item-prop">Rank</div>
-                            <div class="item-controls">
-                                <a class="item-control item-create" title="Create item" data-type="skill"><i class="fas fa-plus"></i> Add</a>
-                            </div>
-                        </li>
 
-                        {{#each data.system.skills as |skill|}}
-                            <li class="item flexrow" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
-                                <h4 class="item-name">
-                                    <span class="item-img rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
-                                        <img class="item-img" src="{{ skill.img }}" title="Test {{ skill.name }}" />
-                                        <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ skill.name }} Test" />
-                                    </span>
-                                    <span class="expandable">{{ skill.system.full_name }}</span>
-                                </h4>
-                                <input class="item-input item-prop" type="number" data-name="system.rank" value="{{ skill.system.rank }}" step="1" data-dtype="Number" />
-                                <div class="item-controls">
-                                    <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
-                                </div>
-                                <div class="item-description">{{{ skill.system.description }}}</div>
-                            </li>
-                        {{/each}}
-
-                        <li class="item flexrow">
-                            <h4 class="item-name">
-                                <span class="item-img rollable" data-type="Test" data-stat="strength" data-skill="Unskilled">
-                                    <img class="item-img" src="systems/saga-machine/images/defaults/skill.svg" title="Unskilled Test" />
-                                    <img class="item-img" src="systems/saga-machine/images/d10.svg" title="Unskilled Test" />
-                                </span>
-                                <span class="expandable">Unskilled</span>
-                            </h4>
-                            <div class="item-description">Your character does not have experience in this area. When
-                                making an unskilled test, use only half the value of the relevant stat.</div>
-                        </li>
-                    </ol>
-
-                    {{#if data.system.restricted_skills.length}}
-                        <h3>Restricted Skills</h3>
+                    {{#each data.system.skill_groups as |skills|}}
+                        <h3 title="{{ data.system.experiences.spent_skills }} experiences spent">{{ skills.name }}</h3>
                         <ol class="items-list skill-list">
                             <li class="item flexrow items-header">
                                 <div class="item-name">Name</div>
                                 <div class="item-prop">Rank</div>
                                 <div class="item-controls">
-                                    <a class="item-control item-create" title="Create item" data-type="skill" data-name="New Restricted Skill" data-system='{"type": "Restricted"}'><i class="fas fa-plus"></i> Add</a>
+                                    <a class="item-control item-create" title="Create item" data-type="skill" data-system='{"group": "{{ skills.name }}"}'><i class="fas fa-plus"></i> Add</a>
                                 </div>
                             </li>
 
-                            {{#each data.system.restricted_skills as |skill|}}
+                            {{#each skills.contents as |skill|}}
                                 <li class="item flexrow" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
                                     <h4 class="item-name">
                                         <span class="item-img rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
@@ -88,64 +48,94 @@
                                     <div class="item-description">{{{ skill.system.description }}}</div>
                                 </li>
                             {{/each}}
+
+                            {{#if @first}}
+                                <li class="item flexrow">
+                                    <h4 class="item-name">
+                                        <span class="item-img rollable" data-type="Test" data-stat="strength" data-skill="Unskilled">
+                                            <img class="item-img" src="systems/saga-machine/images/defaults/skill.svg" title="Unskilled Test" />
+                                            <img class="item-img" src="systems/saga-machine/images/d10.svg" title="Unskilled Test" />
+                                        </span>
+                                        <span class="expandable">Unskilled</span>
+                                    </h4>
+                                    <div class="item-description">Your character does not have experience in this area. When
+                                        making an unskilled test, use only half the value of the relevant stat.</div>
+                                </li>
+                            {{/if}}
                         </ol>
-                    {{/if}}
+                    {{else}}
+                        <h3 title="{{ data.system.experiences.spent_skills }} experiences spent">General Skills</h3>
+                        <ol class="items-list skill-list">
+                            <li class="item flexrow items-header">
+                                <div class="item-name">Name</div>
+                                <div class="item-prop">Rank</div>
+                                <div class="item-controls">
+                                    <a class="item-control item-create" title="Create item" data-type="skill" data-system='{"group": "General Skills"}'><i class="fas fa-plus"></i> Add</a>
+                                </div>
+                            </li>
+                            <li class="item flexrow">
+                                <h4 class="item-name">
+                                    <span class="item-img rollable" data-type="Test" data-stat="strength" data-skill="Unskilled">
+                                        <img class="item-img" src="systems/saga-machine/images/defaults/skill.svg" title="Unskilled Test" />
+                                        <img class="item-img" src="systems/saga-machine/images/d10.svg" title="Unskilled Test" />
+                                    </span>
+                                    <span class="expandable">Unskilled</span>
+                                </h4>
+                                <div class="item-description">Your character does not have experience in this area. When
+                                    making an unskilled test, use only half the value of the relevant stat.</div>
+                            </li>
+                        </ol>
+                    {{/each}}
                 </div>
 
                 <div class="grid-col">
-                    <h3 title="{{ data.system.experiences.spent_traits }} experiences spent">Traits</h3>
-                    <ol class="items-list">
-                        <li class="item flexrow items-header">
-                            <div class="item-name">Name</div>
-                            <div class="item-controls">
-                                <a class="item-control item-create" title="Create item" data-type="trait"><i class="fas fa-plus"></i> Add</a>
-                            </div>
-                        </li>
-
-                        {{#each data.system.traits as |trait|}}
-                            <li class="item flexrow" data-id="{{ trait._id }}" data-type="Item" data-uuid="{{ trait.uuid }}">
-                                <h4 class="item-name">
-                                    <span class="chatable item-img">
-                                        <img class="item-img" src="{{ trait.img }}" title="Display {{ trait.name }}" />
-                                        <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ trait.name }}" />
-                                    </span>
-                                    <span class="expandable">{{ trait.system.full_name }}</span>
-                                </h4>
+                    {{#each data.system.trait_groups as |traits|}}
+                        <h3 title="{{ data.system.experiences.spent_traits }} experiences spent">{{ traits.name }}</h3>
+                        <ol class="items-list">
+                            <li class="item flexrow items-header">
+                                <div class="item-name">Name</div>
                                 <div class="item-controls">
-                                    <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                                    <a class="item-control item-create" title="Create item" data-type="trait" data-system='{"group": "{{ traits.name }}"}'><i class="fas fa-plus"></i> Add</a>
                                 </div>
-                                <div class="item-description">{{{ trait.system.description }}}</div>
                             </li>
-                        {{/each}}
-                    </ol>
 
-                    <h3>Weaknesses</h3>
-                    <ol class="items-list">
-                        <li class="item flexrow items-header">
-                            <div class="item-name">Name</div>
-                            <div class="item-controls">
-                                <a class="item-control item-create" title="Create item" data-type="trait" data-name="New Weakness" data-system='{"type": "Weakness"}'><i class="fas fa-plus"></i> Add</a>
-                            </div>
-                        </li>
-
-                        {{#each data.system.weaknesses as |weakness|}}
-                            <li class="item flexrow" data-id="{{ weakness._id }}" data-type="Item" data-uuid="{{ weakness.uuid }}">
-                                <h4 class="item-name">
-                                    <span class="chatable item-img">
-                                        <img class="item-img" src="{{ weakness.img }}" title="Display {{ weakness.name }}" />
-                                        <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ weakness.name }}" />
-                                    </span>
-                                    <span class="expandable">{{ weakness.system.full_name }}</span>
-                                </h4>
+                            {{#each traits.contents as |trait|}}
+                                <li class="item flexrow" data-id="{{ trait._id }}" data-type="Item" data-uuid="{{ trait.uuid }}">
+                                    <h4 class="item-name">
+                                        <span class="chatable item-img">
+                                            <img class="item-img" src="{{ trait.img }}" title="Display {{ trait.name }}" />
+                                            <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ trait.name }}" />
+                                        </span>
+                                        <span class="expandable">{{ trait.system.full_name }}</span>
+                                    </h4>
+                                    <div class="item-controls">
+                                        <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+                                        <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                                    </div>
+                                    <div class="item-description">{{{ trait.system.description }}}</div>
+                                </li>
+                            {{/each}}
+                        </ol>
+                    {{else}}
+                        <h3 title="{{ data.system.experiences.spent_traits }} experiences spent">General Traits</h3>
+                        <ol class="items-list">
+                            <li class="item flexrow items-header">
+                                <div class="item-name">Name</div>
                                 <div class="item-controls">
-                                    <a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
-                                    <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+                                    <a class="item-control item-create" title="Create item" data-type="trait" data-system='{"group": "General Traits"}'><i class="fas fa-plus"></i> Add</a>
                                 </div>
-                                <div class="item-description">{{{ weakness.system.description }}}</div>
                             </li>
-                        {{/each}}
-                    </ol>
+                        </ol>
+                        <h3 title="{{ data.system.experiences.spent_traits }} experiences spent">Weaknesses</h3>
+                        <ol class="items-list">
+                            <li class="item flexrow items-header">
+                                <div class="item-name">Name</div>
+                                <div class="item-controls">
+                                    <a class="item-control item-create" title="Create item" data-type="trait" data-system='{"group": "Weaknesses"}'><i class="fas fa-plus"></i> Add</a>
+                                </div>
+                            </li>
+                        </ol>
+                    {{/each}}
                 </div>
             </div>
 		</div>

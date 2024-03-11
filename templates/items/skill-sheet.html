@@ -9,11 +9,14 @@
             </div>
 
             <div class="grid grid-5col item-box">
-                <label class="item-label">Type</label>
-                <input class="item-input grid-span-4" type="text" name="system.type" value="{{ data.system.type }}" list="skill-types"/>
-                    <datalist id="skill-types">
-                        <option>General</option>
-                        <option>Restricted</option>
+                <label class="item-label">Group</label>
+                <input class="item-input grid-span-4" type="text" name="system.group" value="{{ data.system.group }}" list="skill-groups"/>
+                    <datalist id="skill-groups">
+                        <option>General Skills</option>
+                        <option>Stances</option>
+                        <option>Opening Moves</option>
+                        <option>Maneuvers</option>
+                        <option>Powers</option>
                     </datalist>
             </div>
         </div>

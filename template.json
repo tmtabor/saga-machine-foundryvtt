@@ -153,7 +153,7 @@
     },
     "skill": {
       "templates": ["basics", "specialized", "ranked"],
-      "type": "General",
+      "group": "General",
       "default": "",
       "ranked": true,
       "free_ranks": 0,
@@ -161,7 +161,7 @@
     },
     "trait": {
       "templates": ["basics", "specialized", "ranked"],
-      "type": "General",
+      "group": "General",
       "rank": 1,
       "requirements": [],
       "cost": 0,

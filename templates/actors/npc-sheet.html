@@ -43,31 +43,22 @@
 				{{/each}}
 			</ol>
 
-            <div class="item-controls float-right">
-                <a class="item-control item-create" title="Create skill" data-type="skill"><i class="fas fa-plus"></i> Add</a>
-            </div>
-            <h3>Skills</h3>
-            <div class="items-inline">
-                <span class="item">
-                    <em><span class="item-name rollable" data-stat="strength">Skilled</span></em>,
-                </span>
-                <span class="item">
-                    <em><span class="item-name rollable" data-stat="strength" data-skill="Unskilled">Unskilled</span></em>
-                </span>
-                {{#if data.system.skills.length}}<span class="item">|</span>{{/if}}
-                {{#each data.system.skills as |skill|}}
-                    <span class="item" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
-                        <span class="item-name rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
-                            {{ skill.system.full_name }} {{ skill.system.rank }}
-                        </span>{{#unless @last}},{{/unless}}
-                    </span>
-                {{/each}}
-            </div>
-
-            {{#if data.system.restricted_skills.length}}
-                <h3>Restricted Skills</h3>
+            {{#each data.system.skill_groups as |skills|}}
+                <div class="item-controls float-right">
+                    <a class="item-control item-create" title="Create skill" data-type="skill" data-system='{"group": "{{ skills.name }}"}'><i class="fas fa-plus"></i> Add</a>
+                </div>
+                <h3>{{ skills.name }}</h3>
                 <div class="items-inline">
-                    {{#each data.system.restricted_skills as |skill|}}
+                    {{#if @first}}
+                        <span class="item">
+                            <em><span class="item-name rollable" data-stat="strength">Skilled</span></em>,
+                        </span>
+                        <span class="item">
+                            <em><span class="item-name rollable" data-stat="strength" data-skill="Unskilled">Unskilled</span></em>
+                        </span>
+                        {{#if skills.contents.length}}<span class="item">|</span>{{/if}}
+                    {{/if}}
+                    {{#each skills.contents as |skill|}}
                         <span class="item" data-id="{{ skill._id }}" data-type="Item" data-uuid="{{ skill.uuid }}">
                             <span class="item-name rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
                                 {{ skill.system.full_name }} {{ skill.system.rank }}
@@ -75,38 +66,39 @@
                         </span>
                     {{/each}}
                 </div>
-            {{/if}}
-
-            <div class="item-controls float-right">
-                <a class="item-control item-create" title="Create trait" data-type="trait"><i class="fas fa-plus"></i> Add</a>
-            </div>
-            <h3>Traits</h3>
-            <div class="items-inline">
-                {{#unless data.system.traits.length}}<span class="item-name">None</span>{{/unless}}
-
-                {{#each data.system.traits as |trait|}}
-                    <span class="item" data-id="{{ trait._id }}" data-type="Item" data-uuid="{{ trait.uuid }}">
-                        <span class="item-name expandable">{{ trait.system.full_name }}</span>{{#unless @last}},{{/unless}}
-                    </span>
-                {{/each}}
-                {{#each data.system.traits as |trait|}}
-                    <div class="item-description" data-id="{{ trait._id }}">{{{ trait.system.description }}}</div>
-                {{/each}}
-            </div>
-
-            {{#if data.system.weaknesses.length}}
-                <h3>Weaknesses</h3>
-                <div class="items-inline">
-                    {{#each data.system.weaknesses as |weakness|}}
-                        <span class="item" data-id="{{ weakness._id }}" data-type="Item" data-uuid="{{ weakness.uuid }}">
-                            <span class="item-name expandable">{{ weakness.system.full_name }}</span>{{#unless @last}},{{/unless}}
-                        </span>
-                    {{/each}}
-                {{#each data.system.weaknesses as |weakness|}}
-                    <div class="item-description" data-id="{{ weakness._id }}">{{{ weakness.system.description }}}</div>
-                {{/each}}
+            {{else}}
+                <div class="item-controls float-right">
+                    <a class="item-control item-create" title="Create skill" data-type="skill" data-system='{"group": "General Skills"}'><i class="fas fa-plus"></i> Add</a>
                 </div>
-            {{/if}}
+                <h3>General Skills</h3>
+                <div class="items-inline">
+                    <span class="item">
+                        <em><span class="item-name rollable" data-stat="strength">Skilled</span></em>,
+                    </span>
+                    <span class="item">
+                        <em><span class="item-name rollable" data-stat="strength" data-skill="Unskilled">Unskilled</span></em>
+                    </span>
+                </div>
+            {{/each}}
+
+            {{#each data.system.trait_groups as |traits|}}
+                <div class="item-controls float-right">
+                    <a class="item-control item-create" title="Create trait" data-type="trait" data-system='{"group": "{{ traits.name }}"}'><i class="fas fa-plus"></i> Add</a>
+                </div>
+                <h3>{{ traits.name }}</h3>
+                <div class="items-inline">
+                    {{#each traits.contents as |trait|}}
+                        <span class="item" data-id="{{ trait._id }}" data-type="Item" data-uuid="{{ trait.uuid }}">
+                            <span class="item-name expandable">{{ trait.system.full_name }}</span>{{#unless @last}},{{/unless}}
+                        </span>
+                    {{else}}
+                        <span class="item-name">None</span>
+                    {{/each}}
+                    {{#each traits.contents as |trait|}}
+                        <div class="item-description" data-id="{{ trait._id }}">{{{ trait.system.description }}}</div>
+                    {{/each}}
+                </div>
+            {{/each}}
 
 			<h3>Consequences</h3>
 			<ol class="items-list">
