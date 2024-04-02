@@ -1,6 +1,6 @@
 {
   "Actor": {
-    "types": ["character", "stash"],
+    "types": ["character", "stash", "vehicle"],
     "templates": {
       "stats": {
         "stats": {
@@ -129,6 +129,69 @@
         "max": 0
       },
       "notes": ""
+    },
+    "vehicle": {
+      "scores": {
+        "armor": {
+          "value": 0,
+          "properties": {},
+          "custom": false
+        },
+        "crew": {
+          "rating": null,
+          "crewmen": 0,
+          "passengers": 0,
+          "positions": []
+        },
+        "defense": {
+          "value": 0,
+          "tn": 0,
+          "custom": false
+        },
+        "handling": {
+          "banes": 0,
+          "boons": 0,
+          "label": "",
+          "custom": false
+        },
+        "health": {
+          "value": 0,
+          "max": 0,
+          "fatigue": 0,
+          "custom": false
+        },
+        "move": {
+          "value": 0,
+          "custom": false
+        },
+        "size": {
+          "value": 0,
+          "custom": false
+        },
+        "space": {
+          "value": 0,
+          "max": 0,
+          "custom": false
+        }
+      },
+      "cost": 0,
+      "availability": "",
+      "equipment": [],
+      "type": "vehicle",
+      "modifiers": {
+        "scores": {
+          "move": [],
+          "defense": [],
+          "health": [],
+          "armor": [],
+          "encumbrance": []
+        },
+        "other": {
+          "attack": [],
+          "defense": []
+        }
+      },
+      "notes": ""
     }
   },
   "Item": {
@@ -198,6 +261,7 @@
       "attacks": [],
       "carried": true,
       "equipped": false,
+      "load": false,
       "tl": 0,
       "availability": "common",
       "cost": 0

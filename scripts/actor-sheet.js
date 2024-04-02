@@ -61,16 +61,26 @@ export class SagaMachineActorSheet extends ActorSheet {
 		context.data.system.consequences = this.items(context, 'consequence');
 		context.data.system.equipment = this.items(context, 'item');
 		context.data.system.containers = this.items(context, 'item', i => !!i.system.container);
-		context.data.system.equipment_groups = this._groups_and_containers(context)
 
-		if (this.actor.type === 'character') {
+		const top = this.actor.type === 'vehicle' ? ['Vehicle Components', 'Trade Goods'] : ['Weapons', 'Armors'];
+		const blank = this.actor.type === 'vehicle' ? 'Trade Goods' : 'Miscellanea';
+		context.data.system.equipment_groups = this._groups_and_containers(context, top, blank);
+
+		if (this.actor.type === 'character' || this.actor.type === 'vehicle') {
 			// Gather the list of attacks
 			context.data.system.attacks = this._gather_attacks(context);
 
-			// Calculate progress bar percentages
+			// Calculate health progress bar percentages
 			if (!context.data.system.scores.health.max) context.data.system.scores.health.percent = 0;
 			else context.data.system.scores.health.percent =
 				Math.round((context.data.system.scores.health.value / context.data.system.scores.health.max) * 100);
+		}
+
+		if (this.actor.type === 'vehicle') {
+			// Calculate space progress bar percentages
+			if (!context.data.system.scores.space.max) context.data.system.scores.space.percent = 0;
+			else context.data.system.scores.space.percent =
+				Math.round((context.data.system.scores.space.value / context.data.system.scores.space.max) * 100);
 		}
 
 		return context;
@@ -252,7 +262,89 @@ export class SagaMachineActorSheet extends ActorSheet {
 			const target_names = '<li>' + tokens.map(t => `@UUID[${t.actor.uuid}]{${t.name}}`).join('</li><li>') + '</li>';
 			ChatMessage.create({content: `<strong>${money_each}¤</strong> each distributed from @UUID[${this.actor.uuid}]{${this.actor.name}} to:<ul style="line-height: 1.7em">${target_names}</ul>`});
 		});
+
+		if (this.actor.type === 'vehicle') {
+			// Handle positions
+			this.draw_positions(html);
+			html.find('.position-list .position-create').click(this.add_position.bind(this));
+			html.find('.position-list .position-delete').click(this.delete_position.bind(this));
+		}
 	}
+
+    add_position() {
+        if ( !this.isEditable ) return;
+
+        // Get the prototype position node and parent node, return if it wasn't found
+        const prototype = this.element.find('.position.prototype');
+        const parent = this.element.find('ol.position-list');
+        if (!prototype || !prototype.length || !parent || !parent.length) return;
+
+        const clone = prototype.clone();
+        clone.removeClass('prototype');
+        clone.find('input, select').change(this.update_positions.bind(this));
+        parent.append(clone);
+    }
+
+    delete_position(event) {
+        const box = $(event.currentTarget).closest(".position");
+        const position_list = box.closest('.position-list');
+        box.remove();
+        this.update_positions(event, position_list);
+    }
+
+    draw_positions(html) {
+        // Don't draw positions if there are no positions
+        if (!this.actor.system.scores.crew.positions || !this.actor.system.scores.crew.positions.length) return;
+
+        // Get the prototype attack position and parent node, return if it wasn't found
+        const prototype = html.find('.position.prototype');
+        const parent = html.find('ol.position-list');
+        if (!prototype || !prototype.length || !parent || !parent.length) return;
+
+        // For each position, clone the prototype and set up the form
+        for (let position of this.actor.system.scores.crew.positions) {
+            const clone = prototype.clone();
+            clone.removeClass('prototype');
+            clone.find("[name=position]").val(position.position);
+            clone.find("[name=character]").val(position.character);
+            parent.append(clone);
+
+            // Set up the data handlers for the form, if this sheet is editable
+		    if ( !this.isEditable ) continue;
+            clone.find('input, select').change(this.update_positions.bind(this));
+        }
+    }
+
+    /**
+     * Handle changes to the position form
+     *
+     * @param event
+	 * @param position_list
+     */
+    update_positions(event, position_list=null) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        // Get all positions
+        const position_nodes = position_list ? position_list.find('.position:not(.prototype)') :
+            $(event.currentTarget).closest('ol.position-list').find('.position:not(.prototype)');
+
+        // Iterate over each node and add to the list
+        const positions = [];
+        position_nodes.each((i, node) => {
+            let position = $(node).find("[name=position]").val().trim();
+            let character = $(node).find("[name=character]").val().trim();
+
+            // Create position, add name and properties if set, add to list
+            const position_object = {
+                position: position,
+                character: character
+            };
+            positions.push(position_object);
+
+            this.actor.update({'system.scores.crew.positions': positions});
+        });
+    }
 
 	to_chat(item) {
 		ChatMessage.create({
@@ -289,11 +381,11 @@ export class SagaMachineActorSheet extends ActorSheet {
 		return final_groups;
 	}
 
-	_groups_and_containers(context) {
+	_groups_and_containers(context, top_groups=['Weapons', 'Armors'], blank='Miscellanea') {
 		const raw_groups = this.group_items(context.data.system.equipment,
 				i => i.system.parent || i.system.group, i => !i.system.container);
 		if (!context.data.system.equipment.filter(i => !i.system.parent && !i.system.container).length)
-			raw_groups['Miscellanea'] = []; // Add blank group if no non-container groups
+			raw_groups[blank] = []; // Add blank group if no non-container groups
 
 		const equipment_groups = []; // { name: String, container: null|Item, contents: Item[], encumbrance: Int, max: 0|Int }
 
@@ -323,10 +415,10 @@ export class SagaMachineActorSheet extends ActorSheet {
 		// Sort groups by name and whether or not it is a container
 		equipment_groups.sort((a, b) => {
 			if (a.name === b.name) return 0;
-			if (a.name === 'Weapons') return -1;
-			if (b.name === 'Weapons') return 1;
-			if (a.name === 'Armors') return -1;
-			if (b.name === 'Armors') return 1;
+			for (let g of top_groups) {
+				if (a.name === g) return -1;
+				if (b.name === g) return 1;
+			}
 
 			if (!!a.container && !b.container) return 1;
 			if (!!b.container && !a.container) return -1;
@@ -442,7 +534,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		if (!input.length) return;
 
 		const score_name = input.attr('name');
-		const score = this._get_score(score_name, ['max', 'value']);
+		const score = this._get_score(score_name, ['max', 'value', 'tn']);
 		if (!score) return; // If the score was not found, do nothing
 
 		// Toggle custom value

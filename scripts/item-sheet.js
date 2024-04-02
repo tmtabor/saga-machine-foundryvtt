@@ -46,7 +46,7 @@ export class SagaMachineItemSheet extends ItemSheet {
         // Handle attacks
         this.draw_attacks(html);
         html.find('.attacks .item-create').click(this.add_attack.bind(this));
-        html.find('.attacks .item-delete').click(this.delete_attack.bind(this))
+        html.find('.attacks .item-delete').click(this.delete_attack.bind(this));
 
         // Handle toggling items-provided lists
 		html.find('.items-provided').on('contextmenu', event => {

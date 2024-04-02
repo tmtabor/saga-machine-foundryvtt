@@ -69,7 +69,8 @@ img.system-logo {
   border-bottom: 1px solid #dcb95f;
 }
 
-.saga-machine .sheet-sidebar input {
+.saga-machine .sheet-sidebar input,
+.saga-machine .sheet-sidebar select {
   color: #dcb95f;
   border: 1px solid #8e7944;
   text-shadow: 2px 2px black;
@@ -77,7 +78,13 @@ img.system-logo {
   text-rendering: optimizeLegibility;
 }
 
-.saga-machine .sheet-sidebar input:disabled {
+.saga-machine .sheet-sidebar select {
+  width: calc(100% - 2px);
+  text-align: inherit;
+}
+
+.saga-machine .sheet-sidebar input:disabled,
+.saga-machine .sheet-sidebar select:disabled {
   color: #b09348;
   background-color: rgba(255, 255, 255, 0.05);
   border: none;
@@ -113,7 +120,8 @@ img.system-logo {
 }
 
 .saga-machine input[type="number"].stat-input,
-.saga-machine input[type="number"].score-input {
+.saga-machine input[type="number"].score-input,
+.saga-machine select.score-input {
   font-size: 1.9em;
   height: 1.5em;
 }
@@ -123,7 +131,8 @@ img.system-logo {
 .saga-machine input[type="password"]:focus,
 .saga-machine input[type="date"]:focus,
 .saga-machine input[type="time"]:focus,
-.saga-machine input[type="search"]:focus {
+.saga-machine input[type="search"]:focus,
+.saga-machine select:focus {
     box-shadow: 0 0 5px rgb(255 255 255 / 80%);
 }
 
@@ -873,6 +882,32 @@ img.system-logo {
 
 .saga-machine form.stash-sheet .editor {
   height: 100%;
+}
+
+/**
+  VEHICLE SHEET STYLES
+ */
+
+.saga-machine.sheet.vehicle > section.window-content {
+    padding: 0;
+    overflow: hidden;
+}
+
+.saga-machine .sheet-body .position-list .position {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0 2px;
+  border-bottom: 1px solid #c9c7b8;
+  min-height: 27px;
+}
+
+.saga-machine .position.prototype {
+  display: none !important;
+}
+
+.saga-machine form.vehicle-sheet .editor {
+  height: calc(100% - 80px);
 }
 
 /* Toggle Switch Styles */

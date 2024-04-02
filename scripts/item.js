@@ -65,6 +65,8 @@ export class SagaMachineItem extends Item {
         this.system.unit_encumbrance = this.calc_unit_encumbrance();
         this.system.container_encumbrance = this.calc_container_encumbrance();
         this.system.encumbrance = this.calc_encumbrance();
+        this.system.unit_loads = this.calc_unit_loads();
+        this.system.loads = this.calc_loads();
     }
 
     property_value(property) {
@@ -78,7 +80,8 @@ export class SagaMachineItem extends Item {
     }
 
     calc_unit_encumbrance() {
-        if (this.system.properties.includes('Neg')) return 0;
+        if (this.system.load) return 100;
+        else if (this.system.properties.includes('Neg')) return 0;
         else {
             for (const prop of this.system.properties) {
                 if (prop.startsWith('Implant ')) return 0;
@@ -93,6 +96,10 @@ export class SagaMachineItem extends Item {
         }
     }
 
+    calc_unit_loads() {
+        return this.system.unit_encumbrance / 100;
+    }
+
     calc_container_encumbrance() {
         return this.system.unit_encumbrance * this.system.quantity;
     }
@@ -102,5 +109,9 @@ export class SagaMachineItem extends Item {
         if (this.system.parent) return 0;
         if (this.system.equipped && this.system.properties.includes('Worn')) return 0;
         return this.system.unit_encumbrance * this.system.quantity;
+    }
+
+    calc_loads() {
+        return Math.floor(this.system.unit_loads * this.system.quantity);
     }
 }

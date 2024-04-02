@@ -17,6 +17,7 @@ export class SagaMachineActor extends Actor {
         // Calculate the actor's scores
         if (this.type === 'character') await this.calculate_character_scores();
         if (this.type === 'stash') await this.calculate_stash_scores();
+        if (this.type === 'vehicle') await this.calculate_vehicle_scores();
     }
 
     /** @inheritdoc */
@@ -30,6 +31,35 @@ export class SagaMachineActor extends Actor {
         }
 
         return data;
+    }
+
+    async calculate_vehicle_scores() {
+        // Armor properties
+        this.system.scores.armor.properties = this.armor_properties();
+
+        // Equipped armor
+        if (!this.system.scores.armor.custom)
+            this.system.scores.armor.value = this.calculate_score('armor', this.armor_value());
+
+        // Handling
+        this.system.scores.handling.boons = (this.system.scores.handling.label.match(/\+/g) || []).length;
+        this.system.scores.handling.banes = (this.system.scores.handling.label.match(/\-/g) || []).length;
+
+        // Defense
+        if (!this.system.scores.defense.custom)
+            this.system.scores.defense.tn = this.calculate_score('defense',
+                10 + this.system.scores.handling.boons - (this.system.scores.size.value + this.system.scores.handling.banes));
+
+        // Health
+        if (!this.system.scores.health.custom)
+            this.system.scores.health.max = this.calculate_score('health',
+                15 * (2**this.system.scores.size.value));
+
+        // Wound total
+        this.system.scores.health.value = this.wound_total();
+
+        // Loads total
+        this.system.scores.space.value = this.loads_total();
     }
 
     async calculate_stash_scores() {
@@ -212,6 +242,10 @@ export class SagaMachineActor extends Actor {
     encumbrance_total() {
 		return this.items.filter(item => item.type === 'item').reduce((total, item) => item.system.encumbrance + total, 0);
 	}
+
+    loads_total() {
+        return this.items.filter(item => item.type === 'item').reduce((total, item) => item.system.loads + total, 0);
+    }
 
     wealth_total() {
 		return this.items.filter(item => item.type === 'item').reduce((total, item) =>
