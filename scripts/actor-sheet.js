@@ -66,10 +66,12 @@ export class SagaMachineActorSheet extends ActorSheet {
 		const blank = this.actor.type === 'vehicle' ? 'Trade Goods' : 'Miscellanea';
 		context.data.system.equipment_groups = this._groups_and_containers(context, top, blank);
 
-		if (this.actor.type === 'character' || this.actor.type === 'vehicle') {
+		if (this.actor.type === 'character') {
 			// Gather the list of attacks
 			context.data.system.attacks = this._gather_attacks(context);
+		}
 
+		if (this.actor.type === 'character' || this.actor.type === 'vehicle') {
 			// Calculate health progress bar percentages
 			if (!context.data.system.scores.health.max) context.data.system.scores.health.percent = 0;
 			else context.data.system.scores.health.percent =
