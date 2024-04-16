@@ -23,7 +23,7 @@
         <h3>Equipment</h3>
         {{#each data.system.equipment_groups as |items|}}
             <ol class="items-list item-group" data-id="{{items.container.id}}" data-name="{{items.name}}" data-encumbrance="{{items.encumbrance}}" data-max="{{items.max}}">
-                <li class="item flexrow items-header" data-id="{{items.container.id}}">
+                <li class="item flexrow items-header" {{#if items.container }}data-id="{{items.container.id}}" data-type="Item" data-uuid="{{items.container.uuid}}"{{/if}}>
                     <div class="item-name">{{ items.name }}{{#if items.container }} ({{ items.encumbrance }}/{{ items.max }}){{/if}}</div>
                     <div class="item-name">{{#if items.container }}{{ items.container.system.properties }}{{else}}Properties{{/if}}</div>
                     <div class="item-prop">Quantity</div>
