@@ -568,13 +568,13 @@ Hooks.on('updateActor', async (actor, change, options, id) => {
     if (game.user.id !== id) return;                    // Only run if it is you updating the item
     if (actor.type !== 'character') return;             // Only run if updating a PC or NPC
 
-    await actor.encumbrance_consequences();       // Add or remove Hindered consequences for encumbrance
+    await actor.encumbrance_consequences();             // Add or remove Hindered consequences for encumbrance
 });
 
 Hooks.on('createItem', async (item, options, id) => {
     if (game.user.id !== id) return;                    // Only run if it is you updating the item
     if (item.type !== 'item' || !item.parent) return;   // Only run if you are changing the inventory of an actor
-    if (item.parent.type !== 'character') return;             // Only run if updating a PC or NPC
+    if (item.parent.type !== 'character') return;       // Only run if updating a PC or NPC
 
     await item.parent.encumbrance_consequences();       // Add or remove Hindered consequences for encumbrance
 });
@@ -582,7 +582,7 @@ Hooks.on('createItem', async (item, options, id) => {
 Hooks.on('updateItem', async (item, change, options, id) => {
     if (game.user.id !== id) return;                    // Only run if it is you updating the item
     if (item.type !== 'item' || !item.parent) return;   // Only run if you are change the inventory of an actor
-    if (item.parent.type !== 'character') return;             // Only run if updating a PC or NPC
+    if (item.parent.type !== 'character') return;       // Only run if updating a PC or NPC
 
     await item.parent.encumbrance_consequences();       // Add or remove Hindered consequences for encumbrance
 });
@@ -590,7 +590,15 @@ Hooks.on('updateItem', async (item, change, options, id) => {
 Hooks.on('deleteItem', async (item, options, id) => {
     if (game.user.id !== id) return;                    // Only run if it is you updating the item
     if (item.type !== 'item' || !item.parent) return;   // Only run if you are change the inventory of an actor
-    if (item.parent.type !== 'character') return;             // Only run if updating a PC or NPC
+    if (item.parent.type !== 'character') return;       // Only run if updating a PC or NPC
 
     await item.parent.encumbrance_consequences();       // Add or remove Hindered consequences for encumbrance
+});
+
+Hooks.on('createItem', async (item, options, id) => {
+    if (game.user.id !== id) return;                    // Only run if it is you updating the item
+    if (item.type !== 'item' || !item.parent) return;   // Only run if you are changing the inventory of an actor
+
+    if (item.system.parent)                             // If this was dragged from a container
+        await item.update({ 'system.parent': null });   // Remove the container as a parent
 });
