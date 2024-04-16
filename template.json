@@ -119,7 +119,6 @@
     },
     "stash": {
       "equipment": [],
-      "type": "stash",
       "wealth": {
         "money": 0,
         "total": 0
@@ -177,7 +176,6 @@
       "cost": 0,
       "availability": "",
       "equipment": [],
-      "type": "vehicle",
       "modifiers": {
         "scores": {
           "move": [],
