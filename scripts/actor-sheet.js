@@ -470,7 +470,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 
 		// Attach IDs to the dataset
 		this._attach_ids(event.currentTarget.dataset);
-		event.dataTransfer.setData("text/plain", JSON.stringify(event.currentTarget.dataset));
+		const mod_keys = {'key-alt': event.altKey, 'key-ctrl': event.ctrlKey, 'key-shift': event.shiftKey, 'key-meta': event.metaKey};
+		event.dataTransfer.setData("text/plain", JSON.stringify({...event.currentTarget.dataset, ...mod_keys}));
 
 		super._onDragStart(event);
 	}
