@@ -2,7 +2,7 @@
     "id": "saga-machine",
     "title": "Saga Machine",
     "description": "FoundryVTT implementation of Saga Machine Unified, with partial backwards support for Age of Ambition, Shadows Over Sol, Against the Dark Yogi and Dime Adventures.",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "compatibility": {
         "minimum": "11",
         "verified": "11",
@@ -10,7 +10,7 @@
     },
     "templateVersion": 1,
     "author": "Thorin Tabor",
-    "esmodules": ["scripts/main.js"],
+    "esmodules": ["modules/main.js"],
     "styles": ["styles/main.css"],
     "packs": [
         {
@@ -49,6 +49,6 @@
     "secondaryTokenAttribute": "scores.luck",
     "url": "https://github.com/tmtabor/saga-machine-foundryvtt",
     "manifest": "https://raw.githubusercontent.com/tmtabor/saga-machine-foundryvtt/main/system.json",
-    "download": "https://github.com/tmtabor/saga-machine-foundryvtt/archive/refs/tags/0.3.0.zip",
+    "download": "https://github.com/tmtabor/saga-machine-foundryvtt/archive/refs/tags/0.4.0.zip",
     "license": "LICENSE.txt"
 }

@@ -1,10 +1,10 @@
-import { SagaMachineActor } from "./actor.js";
-import { SagaMachineActorSheet } from "./actor-sheet.js";
-import { SMCombatTracker } from "./combat.js";
-import { generate_conditions } from "./conditions.js";
-import { SagaMachineItem } from "./item.js";
-import { SagaMachineItemSheet } from "./item-sheet.js";
-import { sm_test_macro } from "./tests.js";
+import { SagaMachineActor } from "./actor/actor.js";
+import { SagaMachineActorSheet } from "./actor/actor-sheet.js";
+import { SMCombatTracker } from "./system/combat.js";
+import { generate_conditions } from "./system/conditions.js";
+import { SagaMachineItem } from "./item/item.js";
+import { SagaMachineItemSheet } from "./item/item-sheet.js";
+import { sm_test_macro } from "./system/tests.js";
 
 // Turn on debugging
 CONFIG.debug.hooks = true;

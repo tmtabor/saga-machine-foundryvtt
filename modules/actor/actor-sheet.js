@@ -1,4 +1,4 @@
-import { Attack, test_dialog } from "./tests.js";
+import { Attack, test_dialog } from "../system/tests.js";
 
 Hooks.once("init", async () => {
 	// Register handlebars helpers

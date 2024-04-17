@@ -1,6 +1,6 @@
-import { INITIATIVE } from "./combat.js";
-import {ModifierSet, Attack, Test, Consequence} from "./tests.js";
-import { standard_consequence } from "./conditions.js";
+import { INITIATIVE } from "../system/combat.js";
+import {ModifierSet, Attack, Test, Consequence} from "../system/tests.js";
+import { standard_consequence } from "../system/conditions.js";
 
 /**
  * Extends the base Actor class to support the Saga Machine system

@@ -1,5 +1,5 @@
-import "./tagify.min.js";
-import { capitalize, token_actor } from "./utils.js";
+import "../libraries/tagify.min.js";
+import { capitalize, token_actor } from "../utils.js";
 
 /**
  * Object representing a Saga Machine test
