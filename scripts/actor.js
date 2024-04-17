@@ -4,7 +4,6 @@ import { standard_consequence } from "./conditions.js";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
- * Extends the base Actor class to support the Saga Machine system
  *
  * @extends {Actor}
  */
