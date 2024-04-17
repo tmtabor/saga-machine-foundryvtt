@@ -22,3 +22,24 @@ export function token_actor({scene_id=null, token_id=null, actor_id=null}) {
 	else if (actor_id) return game.actors.get(actor_id) || null;
 	else return null;
 }
+
+/**
+ * Returns the median value from an array of numbers
+ *
+ * @param {Array<number>} arr
+ * @returns {number}
+ */
+export function median(arr) {
+	const mid = Math.floor(arr.length / 2), nums = [...arr].sort((a, b) => a - b);
+	return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+}
+
+/**
+ * Returns a random member of the provided list
+ *
+ * @param {Array<*>} member_list
+ * @returns {*}
+ */
+export function random_member(member_list) {
+	return member_list[Math.floor(Math.random() * member_list.length)];
+}

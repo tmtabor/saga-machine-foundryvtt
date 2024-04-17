@@ -1,15 +1,25 @@
 import { INITIATIVE } from "../system/combat.js";
-import {ModifierSet, Attack, Test, Consequence} from "../system/tests.js";
+import { ModifierSet, Attack, Test, Consequence } from "../system/tests.js";
 import { standard_consequence } from "../system/conditions.js";
+import { median } from "../utils.js";
+import { WoundFactory } from "../system/wounds.js";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
+ *
+ * @see   SagaMachineActorSheet - Base sheet class
+ * @see   SagaMachineCharacterSheet - Character sheet class
+ * @see   SagaMachineStashSheet - Stash sheet class
+ * @see   SagaMachineVehicleSheet - Vehicle sheet class
  *
  * @extends {Actor}
  */
 export class SagaMachineActor extends Actor {
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     *  @override
+     */
     async prepareDerivedData() {
         super.prepareDerivedData();
 
@@ -19,7 +29,10 @@ export class SagaMachineActor extends Actor {
         if (this.type === 'vehicle') await this.calculate_vehicle_scores();
     }
 
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @override
+     */
     getRollData() {
         const data = super.getRollData();
 
@@ -42,7 +55,7 @@ export class SagaMachineActor extends Actor {
 
         // Handling
         this.system.scores.handling.boons = (this.system.scores.handling.label.match(/\+/g) || []).length;
-        this.system.scores.handling.banes = (this.system.scores.handling.label.match(/\-/g) || []).length;
+        this.system.scores.handling.banes = (this.system.scores.handling.label.match(/-/g) || []).length;
 
         // Defense
         if (!this.system.scores.defense.custom)
@@ -127,7 +140,7 @@ export class SagaMachineActor extends Actor {
     }
 
     calculate_score(name, stats, other_modifiers={}) {
-        const base = Array.isArray(stats) ? this.median(stats) : stats;
+        const base = Array.isArray(stats) ? median(stats) : stats;
         const mods = this.total_modifiers({base_score: name, ...other_modifiers});
         const percent = 1 + (mods.percent / 100);
         return Math.floor(((base + mods.modifier) * percent) / (mods.divide || 1));
@@ -328,23 +341,23 @@ export class SagaMachineActor extends Actor {
         if (dying_to_apply > 0) {
             // Is the character already dying?
             let already_dying = false;
-            let dying_consequnce = this?.items.filter(c => c.name === 'Dying' && c.type === "consequence")
+            let dying_consequence = this?.items.filter(c => c.name === 'Dying' && c.type === "consequence")
                 .values().next()?.value;
-            if (dying_consequnce) already_dying = true;
+            if (dying_consequence) already_dying = true;
 
             // If not, get a copy of the consequence and apply it to the actor
             else {
-                dying_consequnce = await standard_consequence({
+                dying_consequence = await standard_consequence({
                     name: 'Dying',
                     actor: this,
                     skip_actor: true
                 });
-                [dying_consequnce] = await this.createEmbeddedDocuments('Item', [dying_consequnce]);
+                [dying_consequence] = await this.createEmbeddedDocuments('Item', [dying_consequence]);
             }
 
             // Set the correct Dying value
-            const new_dying_value = already_dying ? dying_consequnce.system.rank + dying_to_apply : dying_to_apply;
-            await dying_consequnce.update({'system.rank': new_dying_value });
+            const new_dying_value = already_dying ? dying_consequence.system.rank + dying_to_apply : dying_to_apply;
+            await dying_consequence.update({'system.rank': new_dying_value });
 
             // Check to see if the character is dead
             if (new_dying_value >= 3) {
@@ -388,7 +401,7 @@ export class SagaMachineActor extends Actor {
         await actor_copy.update({'system.rank': applied_damage});
 
         // Generate a default subject based on damage type
-        let [generated_descriptor, description] = await this.generate_wound(type, critical);
+        const wound = await WoundFactory.generate_wound(type, critical);
 
         // Prompt the user for the descriptor
         new Dialog({
@@ -397,7 +410,7 @@ export class SagaMachineActor extends Actor {
                 <form>
                     <div class="form-group">
                         <label for="descriptor">Descriptor</label>
-                        <input type="text" name="descriptor" value="${generated_descriptor}" autofocus>
+                        <input type="text" name="descriptor" value="${wound.descriptor}" autofocus>
                     </div>
                 </form>`,
             buttons:{
@@ -406,10 +419,10 @@ export class SagaMachineActor extends Actor {
                     label: 'OK',
                     callback: async (html) => {
                         const final_descriptor = html.find("[name=descriptor]").val();  // Get the user set descriptor
-                        if (generated_descriptor !== final_descriptor) description = '';
+                        if (wound.descriptor !== final_descriptor) wound.description = '';
 
                         // Add the descriptor to the wound
-                        await actor_copy.update({'system.specialization': final_descriptor, 'system.description': description});
+                        await actor_copy.update({'system.specialization': final_descriptor, 'system.description': wound.description});
                     }
                 }
             },
@@ -417,73 +430,15 @@ export class SagaMachineActor extends Actor {
         }).render(true);
     }
 
-    async generate_wound(type, critical) {
-        let descriptor = '';
-        let description = '';
-
-        // Handle grave wounds
-        if (critical) {
-            const grave_wounds_table = game.tables.getName('Grave Wounds');
-            if (grave_wounds_table) {
-                description = (await grave_wounds_table.draw()).results[0].text;
-                descriptor = description.split(':')[0];
-                return [descriptor, description];
-            }
-            else {
-                descriptor = this.random_member(['grave ', 'deep ', 'severe ',
-                    'critical ', 'serious ', 'major ']);
-            }
-        }
-
-        if (type !== 'fat') descriptor += this.random_member(['arm ', 'leg ', 'abdomen ', 'chest ', 'head ',
-            'neck ', 'hand ', 'foot ', 'knee ', 'elbow ', 'forearm ', 'shin ', 'side ', 'back ', 'cheek ', 'brow ',
-            'shoulder ', 'hip ', 'thigh ', 'groin ', 'rib ', 'skull ', 'face ']);
-
-        switch (type) {
-            case 'burn':
-            case 'cor':
-            case 'fr':
-            case 'tox':
-                descriptor += this.random_member(['burn', 'sore', 'lesion']);
-                break;
-            case 'cut':
-                descriptor += this.random_member(['slash', 'cut', 'slice']);
-                break;
-            case 'fat':
-                descriptor += this.random_member(['tired', 'weakened', 'winded']);
-                break;
-            case 'pi':
-                descriptor += this.random_member(['stab', 'puncture', 'gash']);
-                break;
-            case 'sm':
-                descriptor += this.random_member(['bruise', 'trauma', 'rent']);
-                break;
-            default:
-                descriptor += this.random_member(['wound', 'gash', 'laceration']);
-        }
-
-        return [descriptor, description];
-    }
-
-    random_member(member_list) {
-        return member_list[Math.floor(Math.random() * member_list.length)];
-    }
-
-    /**
-     * Returns the median value from an array of numbers
-     *
-     * @param arr
-     * @returns {*|number}
-     */
-    median(arr) {
-        const mid = Math.floor(arr.length / 2), nums = [...arr].sort((a, b) => a - b);
-        return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
-    }
-
     is_pc() { return this.type === 'character' && !this.system.npc; }
 
     is_npc() { return this.type === 'character' && this.system.npc; }
 
+
+    /**
+     * @param formula
+     * @returns {Roll}
+     */
     getInitiativeRoll(formula=null) {
         // If a formula is supplied for initiative, return a Roll using it
         if (formula) return new Roll(formula);
