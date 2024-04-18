@@ -24,9 +24,9 @@ export class SagaMachineActor extends Actor {
         super.prepareDerivedData();
 
         // Calculate the actor's scores
-        if (this.type === 'character') await this.calculate_character_scores();
-        if (this.type === 'stash') await this.calculate_stash_scores();
-        if (this.type === 'vehicle') await this.calculate_vehicle_scores();
+        if (this.type === 'character')  await CharacterHelper.calculate_scores(this);
+        if (this.type === 'stash')      await StashHelper.calculate_scores(this);
+        if (this.type === 'vehicle')    await VehicleHelper.calculate_scores(this);
     }
 
     /**
@@ -45,110 +45,21 @@ export class SagaMachineActor extends Actor {
         return data;
     }
 
-    async calculate_vehicle_scores() {
-        // Armor properties
-        this.system.scores.armor.properties = this.armor_properties();
-
-        // Equipped armor
-        if (!this.system.scores.armor.custom)
-            this.system.scores.armor.value = this.calculate_score('armor', this.armor_value());
-
-        // Handling
-        this.system.scores.handling.boons = (this.system.scores.handling.label.match(/\+/g) || []).length;
-        this.system.scores.handling.banes = (this.system.scores.handling.label.match(/-/g) || []).length;
-
-        // Defense
-        if (!this.system.scores.defense.custom)
-            this.system.scores.defense.tn = this.calculate_score('defense',
-                10 + this.system.scores.handling.boons - (this.system.scores.size.value + this.system.scores.handling.banes));
-
-        // Health
-        if (!this.system.scores.health.custom)
-            this.system.scores.health.max = this.calculate_score('health',
-                15 * (2**this.system.scores.size.value));
-
-        // Wound total
-        this.system.scores.health.value = this.wound_total();
-
-        // Loads total
-        this.system.scores.space.value = this.loads_total();
-    }
-
-    async calculate_stash_scores() {
-        // Wealth total
-        this.system.wealth.total = this.wealth_total();
-
-        // Encumbrance total
-        this.system.encumbrance.value = this.encumbrance_total();
-    }
-
     /**
-     * Calculates all derives scores for the character and updates their values
+     * Calculate the actor's score based on either the median of a set or a fixed number and apply
+     * any modifiers from effects currently on the actor.
+     *
+     * @param {string} name - The name of the score (used to look up modifiers)
+     * @param {number|number[]} stats - The basis from which to derive the score
+     * @param {{stat: string|undefined, score: string|undefined, tn: string|number|undefined, boons: number|undefined,
+     *     banes: number|undefined, modifier: number|undefined, divide: number|undefined, percent: number|undefined}} other_modifiers - Any additional modifiers to include alongside those on the actor
+     * @returns {number}
      */
-    async calculate_character_scores() {
-        // Armor properties
-        this.system.scores.armor.properties = this.armor_properties();
-
-        // Equipped armor
-        if (!this.system.scores.armor.custom)
-            this.system.scores.armor.value = this.calculate_score('armor', this.armor_value());
-
-        // Defense
-        if (!this.system.scores.defense.custom)
-            this.system.scores.defense.value = this.calculate_score('defense',
-                [this.system.stats.dexterity.value, this.system.stats.speed.value, this.system.stats.perception.value]);
-
-        // Willpower
-        if (!this.system.scores.willpower.custom)
-            this.system.scores.willpower.value = this.calculate_score('willpower',
-                [this.system.stats.intelligence.value, this.system.stats.charisma.value, this.system.stats.determination.value]);
-
-        // Health
-        if (!this.system.scores.health.custom)
-            this.system.scores.health.max = this.calculate_score('health',
-                this.system.stats.strength.value + this.system.stats.endurance.value);
-
-        // Wound total
-        this.system.scores.health.value = this.wound_total();
-
-        // Fatigue
-        this.system.scores.health.fatigue = this.fatigue();
-
-        // Move
-        if (!this.system.scores.move.custom)
-            this.system.scores.move.value = this.calculate_score('move',
-                [this.system.stats.speed.value, this.system.stats.endurance.value, this.system.stats.determination.value],
-                {
-                    modifier: this.system.scores.armor.properties['Bulky'] * -1 || 0,
-                    divide: this.system.scores.health.fatigue && this.system.scores.health.value >= this.system.scores.health.max ? 2 : 1 // Handle Fatigue consequence's effect on Move
-                });
-
-        // Encumbrance threshold
-        if (!this.system.scores.encumbrance.custom)
-            this.system.scores.encumbrance.max = this.calculate_score('encumbrance',
-                [this.system.stats.strength.value, this.system.stats.dexterity.value, this.system.stats.endurance.value],
-                {modifier: this.system.scores.armor.properties['Powered'] || 0});
-
-        // Encumbrance total
-        this.system.scores.encumbrance.value = this.encumbrance_total();
-
-        // Experiences
-        [this.system.experiences.spent, this.system.experiences.spent_stats,
-            this.system.experiences.spent_skills, this.system.experiences.spent_traits] = this.experiences_spent();
-        this.system.experiences.unspent = this.system.experiences.total - this.system.experiences.spent;
-        this.system.experiences.level = this.power_level();
-    }
-
     calculate_score(name, stats, other_modifiers={}) {
         const base = Array.isArray(stats) ? median(stats) : stats;
         const mods = this.total_modifiers({base_score: name, ...other_modifiers});
         const percent = 1 + (mods.percent / 100);
         return Math.floor(((base + mods.modifier) * percent) / (mods.divide || 1));
-    }
-
-    fatigue() {
-        const fatigue = this.items.filter(item => item.type === 'consequence' && item.name.toLowerCase() === 'fatigue');
-        return fatigue.map(a => a.system.rank).reduce((a, b) => a + b, 0);
     }
 
     async encumbrance_consequences() {
@@ -181,45 +92,12 @@ export class SagaMachineActor extends Actor {
         }
     }
 
-    power_level() {
-        const total_spent = this.system.experiences.spent + game.settings.get('saga-machine', 'level', 120);
-
-        if (total_spent < 150)        return "Mundane";
-        else if (total_spent < 200)   return "Novice";
-        else if (total_spent < 250)   return "Exceptional";
-        else if (total_spent < 300)   return "Distinguished";
-        else if (total_spent < 350)   return "Renowned";
-        else                          return "Legendary";
-    }
-
-    stat_cost(value, free) {
-        const free_total = free ? [...Array(free + 1).keys()].reduce((a, b) => a + b, 0) : 0;
-        return [...Array(value + 1).keys()].reduce((a, b) => a + b, free_total * -1);
-    }
-
-    experiences_spent() {
-        // Add total of all stats
-        let stats = 0;
-        for (let stat of ['strength', 'dexterity', 'speed', 'endurance', 'intelligence', 'perception', 'charisma', 'determination'])
-            stats += this.stat_cost(this.system.stats[stat].value);
-
-        // Subtract the cost of the character's starting stats, based on power level
-        stats -= game.settings.get('saga-machine', 'level', 120);
-
-
-        // Add total of all skills and traits
-        let skills = 0;
-        let traits = 0;
-        for (let item of this.items) {
-            if (item.type === 'skill') skills += this.stat_cost(item.system.rank, item.system.free_ranks);
-            if (item.type === 'trait') traits += item.system.ranked ? item.system.cost * item.system.rank : item.system.cost;
-        }
-
-        const total = stats + skills + traits;
-
-        return [total, stats, skills, traits];
-    }
-
+    /**
+     * Iterate over actor's equipped armor and determine its Armor, Powered and Bulky property values.
+     * Return an object containing the values of each.
+     *
+     * @returns {{Armor: number, Powered: number, Bulky: number}}
+     */
     armor_properties() {
         const equipped_armor = this.items.filter(item => item.type === 'item' &&
             item.system.group === 'Armor' && item.system.equipped);
@@ -237,6 +115,12 @@ export class SagaMachineActor extends Actor {
         return highest;
     }
 
+    /**
+     * Return the actor's Armor value (if already set by armor_properties()).
+     * Otherwise, iterate over all equipped armor and return the highest value.
+     *
+     * @returns {number}
+     */
     armor_value() {
         if (this.system.scores.armor.properties['Armor'])
             return this.system.scores.armor.properties['Armor'];
@@ -251,17 +135,13 @@ export class SagaMachineActor extends Actor {
         return highest;
     }
 
+    /**
+     * Calculate the total encumbrance of the actor's inventory
+     *
+     * @returns {number}
+     */
     encumbrance_total() {
 		return this.items.filter(item => item.type === 'item').reduce((total, item) => item.system.encumbrance + total, 0);
-	}
-
-    loads_total() {
-        return this.items.filter(item => item.type === 'item').reduce((total, item) => item.system.loads + total, 0);
-    }
-
-    wealth_total() {
-		return this.items.filter(item => item.type === 'item').reduce((total, item) =>
-            item.system.cost * item.system.quantity + total, 0) + this.system.wealth.money;
 	}
 
     dying_tn() {
@@ -430,9 +310,18 @@ export class SagaMachineActor extends Actor {
         }).render(true);
     }
 
+    /**
+     * Is this character a PC? (Used by handlebars template - do not remove!)
+     * @returns {boolean}
+     */
     is_pc() { return this.type === 'character' && !this.system.npc; }
 
-    is_npc() { return this.type === 'character' && this.system.npc; }
+    /**
+     * Is this character an NPC?
+     *
+     * @returns {boolean}
+     */
+    is_npc() { return this.type === 'character' && !!this.system.npc; }
 
 
     /**
@@ -450,10 +339,27 @@ export class SagaMachineActor extends Actor {
         else return new Roll(this.system.fast_turn ? INITIATIVE.FAST_TURN : INITIATIVE.SLOW_TURN);
     }
 
+    /**
+     * Adds together all boons, banes and other modifiers relevant to the action or score and returns
+     * an object containing their sums.
+     *
+     * @param {{base_score: string, stat: string|null, score: string|null, tn: string|number, boons: number,
+     *     banes: number, modifier: number, divide: number, percent: number}} dataset
+     * @returns {{modifier: number, divide: number, percent: number, boons: number, banes: number, tags: string[]}}
+     */
     total_modifiers(dataset) {
         return ModifierSet.total_modifiers(this.modifiers(dataset));
     }
 
+    /**
+     * Adds up any modifiers from the actor's active effects, as well as from the dataset object passed into the method.
+     * Returns a list of parsed ModifierSet objects representing all relevant modifiers.
+     *
+     * @param {{base_score: string, stat: string|null, score: string|null, tn: string|number, boons: number,
+     *     banes: number, modifier: number, divide: number, percent: number}} dataset
+     * @returns {string[]}
+     * @see ModifierSet
+     */
     modifiers(dataset) {
         let mods_object = null;
 
@@ -515,6 +421,229 @@ export class SagaMachineActor extends Actor {
         if (dataset.chat) await test.to_chat({ whisper: !!dataset.whisper });
 
         return test;
+    }
+}
+
+/**
+ * Helper class consolidating methods specific to characters
+ *
+ * @see SagaMachineActor - Document class representing the character
+ */
+export class CharacterHelper {
+    /**
+     * Calculates all derived scores for the character and updates their values
+     *
+     * @param {SagaMachineActor} actor
+     */
+    static async calculate_scores(actor) {
+        // Armor properties
+        actor.system.scores.armor.properties = actor.armor_properties();
+
+        // Equipped armor
+        if (!actor.system.scores.armor.custom)
+            actor.system.scores.armor.value = actor.calculate_score('armor', actor.armor_value());
+
+        // Defense
+        if (!actor.system.scores.defense.custom)
+            actor.system.scores.defense.value = actor.calculate_score('defense',
+                [actor.system.stats.dexterity.value, actor.system.stats.speed.value, actor.system.stats.perception.value]);
+
+        // Willpower
+        if (!actor.system.scores.willpower.custom)
+            actor.system.scores.willpower.value = actor.calculate_score('willpower',
+                [actor.system.stats.intelligence.value, actor.system.stats.charisma.value, actor.system.stats.determination.value]);
+
+        // Health
+        if (!actor.system.scores.health.custom)
+            actor.system.scores.health.max = actor.calculate_score('health',
+                actor.system.stats.strength.value + actor.system.stats.endurance.value);
+
+        // Wound total
+        actor.system.scores.health.value = actor.wound_total();
+
+        // Fatigue
+        actor.system.scores.health.fatigue = CharacterHelper.fatigue(actor);
+
+        // Move
+        if (!actor.system.scores.move.custom)
+            actor.system.scores.move.value = actor.calculate_score('move',
+                [actor.system.stats.speed.value, actor.system.stats.endurance.value, actor.system.stats.determination.value],
+                {
+                    modifier: actor.system.scores.armor.properties['Bulky'] * -1 || 0,
+                    divide: actor.system.scores.health.fatigue && actor.system.scores.health.value >= actor.system.scores.health.max ? 2 : 1 // Handle Fatigue consequence's effect on Move
+                });
+
+        // Encumbrance threshold
+        if (!actor.system.scores.encumbrance.custom)
+            actor.system.scores.encumbrance.max = actor.calculate_score('encumbrance',
+                [actor.system.stats.strength.value, actor.system.stats.dexterity.value, actor.system.stats.endurance.value],
+                {modifier: actor.system.scores.armor.properties['Powered'] || 0});
+
+        // Encumbrance total
+        actor.system.scores.encumbrance.value = actor.encumbrance_total();
+
+        // Experiences
+        const experiences_spent = CharacterHelper.experiences_spent(actor);
+        actor.system.experiences.spent = experiences_spent.total;
+        actor.system.experiences.spent_stats = experiences_spent.stats;
+        actor.system.experiences.spent_skills = experiences_spent.skills;
+        actor.system.experiences.spent_traits = experiences_spent.traits;
+        actor.system.experiences.unspent = actor.system.experiences.total - actor.system.experiences.spent;
+        actor.system.experiences.level = CharacterHelper.power_level(actor);
+    }
+
+    /**
+     * Counts the actor's total points of fatigue
+     *
+     * @param {SagaMachineActor} actor
+     * @returns {number}
+     */
+    static fatigue(actor) {
+        const fatigue = actor.items.filter(item => item.type === 'consequence' && item.name.toLowerCase() === 'fatigue');
+        return fatigue.map(a => a.system.rank).reduce((a, b) => a + b, 0);
+    }
+
+    /**
+     * Determine the experience value of a stat or skill.
+     *
+     * @param {number} value - The current value of the stat or skill
+     * @param {number|undefined} free - How many ranks were free (usually characters get a free rank of Language). If undefined, assume no ranks were free.
+     * @returns {number}
+     */
+    static stat_cost(value, free) {
+        const free_total = free ? [...Array(free + 1).keys()].reduce((a, b) => a + b, 0) : 0;
+        return [...Array(value + 1).keys()].reduce((a, b) => a + b, free_total * -1);
+    }
+
+    /**
+     * Returns the number of experiences this character has spent, broken down into categories: stats, skills, traits and total overall.
+     *
+     * @param {SagaMachineActor} actor
+     * @returns {{skills: number, total: number, traits: number, stats: number}}
+     */
+    static experiences_spent(actor) {
+        // Add total of all stats
+        let stats = 0;
+        for (let stat of ['strength', 'dexterity', 'speed', 'endurance', 'intelligence', 'perception', 'charisma', 'determination'])
+            stats += CharacterHelper.stat_cost(actor.system.stats[stat].value);
+
+        // Subtract the cost of the character's starting stats, based on power level
+        stats -= game.settings.get('saga-machine', 'level', 120);
+
+
+        // Add total of all skills and traits
+        let skills = 0;
+        let traits = 0;
+        for (let item of actor.items) {
+            if (item.type === 'skill') skills += CharacterHelper.stat_cost(item.system.rank, item.system.free_ranks);
+            if (item.type === 'trait') traits += item.system.ranked ? item.system.cost * item.system.rank : item.system.cost;
+        }
+
+        const total = stats + skills + traits;
+
+        return {total: total, stats: stats, skills: skills, traits: traits};
+    }
+
+    /**
+     * Given the character's spent experience, returns their calculated power level
+     *
+     * @param {SagaMachineActor} actor
+     * @returns {string}
+     */
+    static power_level(actor) {
+        const total_spent = actor.system.experiences.spent + game.settings.get('saga-machine', 'level', 120);
+
+        if (total_spent < 150)        return "Mundane";
+        else if (total_spent < 200)   return "Novice";
+        else if (total_spent < 250)   return "Exceptional";
+        else if (total_spent < 300)   return "Distinguished";
+        else if (total_spent < 350)   return "Renowned";
+        else                          return "Legendary";
+    }
+}
+
+/**
+ * Helper class consolidating methods specific to stashes and merchants
+ *
+ * @see SagaMachineActor - Document class representing the stash
+ */
+export class StashHelper {
+    /**
+     * Calculate the stash's wealth and encumbrance
+     *
+     * @param {SagaMachineActor} actor
+     * @returns {Promise<void>}
+     */
+    static async calculate_scores(actor) {
+        // Wealth total
+        actor.system.wealth.total = StashHelper.wealth_total(actor);
+
+        // Encumbrance total
+        actor.system.encumbrance.value = actor.encumbrance_total();
+    }
+
+    /**
+     * Calculate the total value of the stash
+     *
+     * @param {SagaMachineActor} actor
+     * @returns {number}
+     */
+    static wealth_total(actor) {
+		return actor.items.filter(item => item.type === 'item').reduce((total, item) =>
+            item.system.cost * item.system.quantity + total, 0) + actor.system.wealth.money;
+	}
+}
+
+/**
+ * Helper class consolidating methods specific to vehicles
+ *
+ * @see SagaMachineActor - Document class representing the vehicle
+ */
+export class VehicleHelper {
+    /**
+     * Calculate the vehicle's scores
+     *
+     * @param {SagaMachineActor} actor
+     * @returns {Promise<void>}
+     */
+    static async calculate_scores(actor) {
+        // Armor properties
+        actor.system.scores.armor.properties = actor.armor_properties();
+
+        // Equipped armor
+        if (!actor.system.scores.armor.custom)
+            actor.system.scores.armor.value = actor.calculate_score('armor', actor.armor_value());
+
+        // Handling
+        actor.system.scores.handling.boons = (actor.system.scores.handling.label.match(/\+/g) || []).length;
+        actor.system.scores.handling.banes = (actor.system.scores.handling.label.match(/-/g) || []).length;
+
+        // Defense
+        if (!actor.system.scores.defense.custom)
+            actor.system.scores.defense.tn = actor.calculate_score('defense',
+                10 + actor.system.scores.handling.boons -
+                        (actor.system.scores.size.value + actor.system.scores.handling.banes));
+
+        // Health
+        if (!actor.system.scores.health.custom)
+            actor.system.scores.health.max = actor.calculate_score('health',
+                15 * (2**actor.system.scores.size.value));
+
+        // Wound total
+        actor.system.scores.health.value = actor.wound_total();
+
+        // Loads total
+        actor.system.scores.space.value = VehicleHelper.loads_total(actor);
+    }
+
+    /**
+     * Calculate the total number of loads on the vehicle
+     *
+     * @param {SagaMachineActor} actor
+     * @returns {number}
+     */
+    static loads_total(actor) {
+        return actor.items.filter(item => item.type === 'item').reduce((total, item) => item.system.loads + total, 0);
     }
 }
 
