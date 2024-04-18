@@ -16,6 +16,10 @@ import { WoundFactory } from "../system/wounds.js";
  */
 export class SagaMachineActor extends Actor {
 
+    /*****************************************
+     * METHODS THAT OVERRIDE THE ACTOR CLASS *
+     *****************************************/
+
     /**
      * @inheritdoc
      *  @override
@@ -46,6 +50,29 @@ export class SagaMachineActor extends Actor {
     }
 
     /**
+     * Return the actor's initiative value (used in the combat tracker).
+     * Should always be set to INITIATIVE.NPC_TURN for NPCs or either INITIATIVE.FAST_TURN or
+     * INITIATIVE.SLOW_TURN for PCs.
+     *
+     * @param {string|null} [formula=null] - Optional formula to use for initiative
+     * @returns {Roll}
+     */
+    getInitiativeRoll(formula=null) {
+        // If a formula is supplied for initiative, return a Roll using it
+        if (formula) return new Roll(formula);
+
+        // If this is an NPC, return a Roll with that turn type
+        else if (this.is_npc()) return new Roll(INITIATIVE.NPC_TURN);
+
+        // Otherwise, evaluate fast or slow turn and return a Roll
+        else return new Roll(this.system.fast_turn ? INITIATIVE.FAST_TURN : INITIATIVE.SLOW_TURN);
+    }
+
+    /*******************************************
+     * METHODS FOR DERIVING THE ACTOR'S SCORES *
+     *******************************************/
+
+    /**
      * Calculate the actor's score based on either the median of a set or a fixed number and apply
      * any modifiers from effects currently on the actor.
      *
@@ -60,36 +87,6 @@ export class SagaMachineActor extends Actor {
         const mods = this.total_modifiers({base_score: name, ...other_modifiers});
         const percent = 1 + (mods.percent / 100);
         return Math.floor(((base + mods.modifier) * percent) / (mods.divide || 1));
-    }
-
-    async encumbrance_consequences() {
-        if (!this.isOwner) return;
-
-        const encumbered = this.system.scores.encumbrance.value > this.system.scores.encumbrance.max;
-        if (encumbered) {
-            // If already encumbered, skip
-            let consequences = this.items.filter(c => c.name === 'Hindered' &&
-                                                      c.system.specialization === 'Encumbered' &&
-                                                      c.type === 'consequence');
-            if (consequences.length) return;
-
-            // If not encumbered, add the consequence
-            let hindered = await standard_consequence({
-                name: 'Hindered',
-                actor: this,
-                skip_actor: true
-            });
-            [hindered] = await this.createEmbeddedDocuments('Item', [hindered]);
-            await hindered.update({ 'system.specialization': 'Encumbered', 'system.specialized': true });
-        }
-        else {
-            // Remove any encumbered consequences
-            let consequences = this.items.filter(c => c.name === 'Hindered' &&
-                                                      c.system.specialization === 'Encumbered' &&
-                                                      c.type === 'consequence');
-            if (consequences.length)
-                await this.deleteEmbeddedDocuments("Item", consequences.map(c => c.id));
-        }
     }
 
     /**
@@ -144,14 +141,10 @@ export class SagaMachineActor extends Actor {
 		return this.items.filter(item => item.type === 'item').reduce((total, item) => item.system.encumbrance + total, 0);
 	}
 
-    dying_tn() {
-        return Math.abs(Math.min(this.system.scores.health.max - this.system.scores.health.value, 0));
-    }
-
     /**
      * Calculates the character's current Wound total from all Wound, Grave Wound and Fatigue consequences
      *
-     * @returns {*}
+     * @returns {number}
      */
     wound_total() {
         const wounds = this.items.filter( item => item.type === 'consequence' &&
@@ -161,6 +154,17 @@ export class SagaMachineActor extends Actor {
         return wounds.map(a => a.system.rank).reduce((a, b) => a + b, 0);
     }
 
+    /*******************************
+     * METHODS FOR HANDLING DAMAGE *
+     *******************************/
+
+    /**
+     * Check whether the actor has a specified trait.
+     *
+     * @param {string} trait_name - The name of the trait
+     * @param {string|null} [specialization=null] - An optional specialization to match
+     * @returns {boolean}
+     */
     has_trait(trait_name, specialization=null) {
         const matches = this.items.filter(i => i.type === "trait" && i.name.toLowerCase() === trait_name.toLowerCase());
         if (!specialization) return !!matches.length
@@ -173,12 +177,49 @@ export class SagaMachineActor extends Actor {
         return specialization_match;
     }
 
+    /**
+     * Check whether the action has immunity to a particular damage type
+     *
+     * @param {string} type - The damage type in abbreviated format (e.g. cut, pi, sm)
+     * @returns {boolean}
+     */
     has_immunity(type) { return this.has_trait('Immunity', type); }
 
+    /**
+     * Check whether the action has a vulnerability to a particular damage type
+     *
+     * @param {string} type - The damage type in abbreviated format (e.g. cut, pi, sm)
+     * @returns {boolean}
+     */
     has_vulnerability(type) { return this.has_trait('Vulnerability', type); }
 
+    /**
+     * Check whether the action has resistance to a particular damage type
+     *
+     * @param {string} type - The damage type in abbreviated format (e.g. cut, pi, sm)
+     * @returns {boolean}
+     */
     has_resistance(type) { return this.has_trait('Resistance', type); }
 
+    /**
+     * Return the TN of test prompted by the actor's Dying consequence
+     *
+     * @returns {number}
+     */
+    dying_tn() {
+        return Math.abs(Math.min(this.system.scores.health.max - this.system.scores.health.value, 0));
+    }
+
+    /**
+     * Apply the specified damage to the actor, taking into account armor and common traits and setting consequences
+     * and other effects as appropriate.
+     *
+     * @param {number} damage - The amount of damage being dealt
+     * @param {string} type - The type of damage being dealt in abbreviated format (e.g. cut, pi, sm)
+     * @param {boolean|string} critical - Whether the damage is being dealt by a critical hit
+     * @param {number} pierce - The Pierce property of the attack; for Ignores set to Consequence.IGNORES_ALL_ARMOR.
+     * @returns {Promise<void>}
+     */
     async apply_damage(damage, type, critical, pierce) {
         critical = (critical === 'true' || critical === true);   // Cast critical to boolean
         pierce = Number(pierce);                                 // Cast pierce to number
@@ -310,8 +351,48 @@ export class SagaMachineActor extends Actor {
         }).render(true);
     }
 
+    /*****************
+     * OTHER METHODS *
+     *****************/
+
+    /**
+     * Adjust the number of Hindered consequences on the actor based on their encumbrance
+     *
+     * @returns {Promise<void>}
+     */
+    async encumbrance_consequences() {
+        if (!this.isOwner) return;
+
+        const encumbered = this.system.scores.encumbrance.value > this.system.scores.encumbrance.max;
+        if (encumbered) {
+            // If already encumbered, skip
+            let consequences = this.items.filter(c => c.name === 'Hindered' &&
+                                                      c.system.specialization === 'Encumbered' &&
+                                                      c.type === 'consequence');
+            if (consequences.length) return;
+
+            // If not encumbered, add the consequence
+            let hindered = await standard_consequence({
+                name: 'Hindered',
+                actor: this,
+                skip_actor: true
+            });
+            [hindered] = await this.createEmbeddedDocuments('Item', [hindered]);
+            await hindered.update({ 'system.specialization': 'Encumbered', 'system.specialized': true });
+        }
+        else {
+            // Remove any encumbered consequences
+            let consequences = this.items.filter(c => c.name === 'Hindered' &&
+                                                      c.system.specialization === 'Encumbered' &&
+                                                      c.type === 'consequence');
+            if (consequences.length)
+                await this.deleteEmbeddedDocuments("Item", consequences.map(c => c.id));
+        }
+    }
+
     /**
      * Is this character a PC? (Used by handlebars template - do not remove!)
+     *
      * @returns {boolean}
      */
     is_pc() { return this.type === 'character' && !this.system.npc; }
@@ -323,21 +404,9 @@ export class SagaMachineActor extends Actor {
      */
     is_npc() { return this.type === 'character' && !!this.system.npc; }
 
-
-    /**
-     * @param formula
-     * @returns {Roll}
-     */
-    getInitiativeRoll(formula=null) {
-        // If a formula is supplied for initiative, return a Roll using it
-        if (formula) return new Roll(formula);
-
-        // If this is an NPC, return a Roll with that turn type
-        else if (this.is_npc()) return new Roll(INITIATIVE.NPC_TURN);
-
-        // Otherwise, evaluate fast or slow turn and return a Roll
-        else return new Roll(this.system.fast_turn ? INITIATIVE.FAST_TURN : INITIATIVE.SLOW_TURN);
-    }
+    /********************************************
+     * METHODS FOR HANDLING TESTS AND MODIFIERS *
+     ********************************************/
 
     /**
      * Adds together all boons, banes and other modifiers relevant to the action or score and returns
@@ -406,6 +475,15 @@ export class SagaMachineActor extends Actor {
         return ModifierSet.parse(mods_object);
     }
 
+    /**
+     * The actor performs a test defined by the dataset.
+     *
+     * @param {{stat: string|null, score: string|null, tn: string|number, boons: number, banes: number,
+     *     modifier: number, divide: number, percent: number, evaluate: boolean, apply_consequences: boolean,
+     *     chat: boolean, whisper: boolean}} dataset
+     * @returns {Promise<Test>}
+     * @see Test
+     */
     async test(dataset) {
         // Merge the actor into the dataset
         const spec = { actor: this, ...dataset };
@@ -507,10 +585,10 @@ export class CharacterHelper {
      * Determine the experience value of a stat or skill.
      *
      * @param {number} value - The current value of the stat or skill
-     * @param {number|undefined} free - How many ranks were free (usually characters get a free rank of Language). If undefined, assume no ranks were free.
+     * @param {number} [free=0] - How many ranks were free (usually characters get a free rank of Language). If undefined, assume no ranks were free.
      * @returns {number}
      */
-    static stat_cost(value, free) {
+    static stat_cost(value, free=0) {
         const free_total = free ? [...Array(free + 1).keys()].reduce((a, b) => a + b, 0) : 0;
         return [...Array(value + 1).keys()].reduce((a, b) => a + b, free_total * -1);
     }

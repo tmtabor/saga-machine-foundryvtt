@@ -1,7 +1,7 @@
 /**
  * Capitalize the first letter of the string
  *
- * @param word
+ * @param {string} word
  * @returns {string}
  * @private
  */
@@ -12,10 +12,10 @@ export function capitalize(word) {
 /**
  * Get the actor from the specified IDs, return null if none found
  *
- * @param scene_id
- * @param token_id
- * @param actor_id
- * @returns {null|*|(function(*))|(function(): (null|null))}
+ * @param {string} scene_id
+ * @param {string} token_id
+ * @param {string} actor_id
+ * @returns {SagaMachineActor|null}
  */
 export function token_actor({scene_id=null, token_id=null, actor_id=null}) {
 	if (scene_id && token_id) return game.scenes.get(scene_id)?.tokens.get(token_id)?.actor || null;
@@ -26,7 +26,7 @@ export function token_actor({scene_id=null, token_id=null, actor_id=null}) {
 /**
  * Returns the median value from an array of numbers
  *
- * @param {Array<number>} arr
+ * @param {number[]} arr
  * @returns {number}
  */
 export function median(arr) {
@@ -37,7 +37,7 @@ export function median(arr) {
 /**
  * Returns a random member of the provided list
  *
- * @param {Array<*>} member_list
+ * @param {*[]} member_list
  * @returns {*}
  */
 export function random_member(member_list) {
