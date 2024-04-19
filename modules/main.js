@@ -1,5 +1,5 @@
 import { SagaMachineActor } from "./actor/actor.js";
-import { SagaMachineActorSheet } from "./actor/actor-sheet.js";
+import { CharacterSheet, StashSheet, VehicleSheet } from "./actor/actor-sheet.js";
 import { SMCombatTracker } from "./system/combat.js";
 import { generate_conditions } from "./system/conditions.js";
 import { SagaMachineItem } from "./item/item.js";
@@ -27,13 +27,16 @@ Hooks.once("init", async () => {
     CONFIG.Item.documentClass = SagaMachineItem;
     CONFIG.ui.combat = SMCombatTracker
 
-    // Register Saga Machine sheet classes
-    Actors.registerSheet("saga-machine", SagaMachineActorSheet, { makeDefault: true });
-    Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
-
     // Unregister the core sheets
     Actors.unregisterSheet("core", ActorSheet);
     Items.unregisterSheet("core", ItemSheet);
+
+    // Register Saga Machine sheet classes
+    Actors.registerSheet("saga-machine", CharacterSheet, { types: ["character"], makeDefault: true });
+    Actors.registerSheet("saga-machine", StashSheet, { types: ["stash"], makeDefault: true });
+    Actors.registerSheet("saga-machine", VehicleSheet, { types: ["vehicle"], makeDefault: true });
+
+    Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
 
     // Register custom status effects
     CONFIG.statusEffects = generate_conditions();
