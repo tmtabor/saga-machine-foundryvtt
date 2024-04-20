@@ -1,10 +1,17 @@
 /**
  * Extend the basic ItemSheet with some very simple modifications
- * @extends {ItemSheet}
  */
 export class SagaMachineItemSheet extends ItemSheet {
+    /**********************************
+     * METHODS THAT SET BASIC OPTIONS *
+     **********************************/
 
-    /** @inheritdoc */
+	/**
+	 * The default options for item sheets
+	 *
+	 * @override
+	 * @returns {DocumentSheetOptions}
+	 * */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["saga-machine", "sheet", "item"],
@@ -17,13 +24,22 @@ export class SagaMachineItemSheet extends ItemSheet {
 
     /**
      * Dynamically set the HTML template for the item type
+     *
      * @returns {string}
      */
     get template() {
         return `systems/saga-machine/templates/items/${this.item.type}-sheet.html`;
     }
 
-    /** @inheritdoc */
+    /**********************************
+     * METHODS THAT HANDLE SHEET DATA *
+     **********************************/
+
+	/**
+	 * @inheritdoc
+	 * @override
+	 * @return Context
+	 * */
 	getData() {
         const context = super.getData();
 
@@ -36,82 +52,116 @@ export class SagaMachineItemSheet extends ItemSheet {
         return context;
     }
 
-    /** @inheritdoc */
+    /****************************************
+     * METHODS THAT SET SHEET INTERACTIVITY *
+     ****************************************/
+
+	/**
+	 * @inheritdoc
+	 * @override
+	 * @param {JQuery} html
+	 * */
 	activateListeners(html) {
         super.activateListeners(html);
 
         // Everything below here is only needed if the sheet is editable
 		if ( !this.isEditable ) return;
 
+        // Toggle edit/display of provided fields in origins/paths
+        html.find('.items-provided').on("contextmenu", this.toggle_items_provided.bind(this));
+
+        html.find('.effect-create').on('click', this.on_create_effect.bind(this));  // Create active effect
+        html.find('.effect-edit').on('click', this.on_edit_effect.bind(this));      // Open active effect sheet
+        html.find('.effect-delete').on('click', this.on_delete_effect.bind(this));  // Delete active effect
+        html.find('.effect-toggle').on('click', this.on_toggle_effect.bind(this));  // Toggle effect on/off
+
         // Handle attacks
         this.draw_attacks(html);
         html.find('.attacks .item-create').click(this.add_attack.bind(this));
         html.find('.attacks .item-delete').click(this.delete_attack.bind(this));
-
-        // Handle toggling items-provided lists
-		html.find('.items-provided').on('contextmenu', event => {
-			event.preventDefault();
-			const target = $(event.target);
-			this._toggle_items_provided(target);
-		});
-
-        // Handle creating active effects
-        html.find('.effect-create').on('click', async event => {
-            event.preventDefault();
-
-            return await ActiveEffect.create({ name: 'New Effect' }, { parent: this.item });
-        });
-
-        // Handle editing active effects
-        html.find('.effect-edit').on('click', event => {
-            const box = $(event.target).closest('.effect');
-            const id = box.data("id");
-            const name = box.data("name");
-            const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
-            if (effect) effect.sheet.render(true);
-        });
-
-        // Handle deleting active effects
-        html.find('.effect-delete').on('click', event => {
-            const box = $(event.target).closest('.effect');
-            const id = box.data("id");
-            const name = box.data("name");
-            const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
-			effect.delete();
-			box.slideUp(200, () => this.render(false));
-        });
-
-        // Effect activate / disabled
-		html.find('.effect-toggle').click(event => {
-			const box = $(event.target).closest('.effect');
-            const id = box.data("id");
-            const name = box.data("name");
-            const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
-            effect.update({ 'disabled': !effect.disabled });
-		});
     }
 
-    add_attack() {
-        if ( !this.isEditable ) return;
-
-        // Get the prototype attack node and parent node, return if it wasn't found
-        const prototype = this.element.find('.attack.prototype');
-        const parent = this.element.find('ol.attack-list');
-        if (!prototype || !prototype.length || !parent || !parent.length) return;
-
-        const clone = prototype.clone();
-        clone.removeClass('prototype');
-        clone.find('input, select').change(this.update_attacks.bind(this));
-        parent.append(clone);
+    /**
+     * Toggle edit/display of provided fields in origins/paths
+     *
+     * @param {Event} event
+     */
+    toggle_items_provided(event) {
+        event.preventDefault();
+        const target = $(event.target);
+        target.parent().find('.items-provided').each((i, e) => {
+            if ($(e).is(':visible')) e.style.display = 'none';
+            else e.style.display = 'block';
+        });
     }
 
-    delete_attack(event) {
-        const box = $(event.currentTarget).closest(".attack");
-        const attack_list = box.closest('.attack-list');
-        box.remove();
-        this.update_attacks(event, attack_list);
+    /**************************************
+     * METHODS THAT HANDLE ACTIVE EFFECTS *
+     **************************************/
+
+    /**
+     * Handle creating active effects
+     *
+     * @param {Event} event
+     * @return {Promise<void>}
+     */
+    async on_create_effect(event) {
+        event.preventDefault();
+        return await ActiveEffect.create({name: 'New Effect'}, {parent: this.item});
     }
 
+    /**
+     * Handle editing active effects
+     *
+     * @param {Event} event
+     * @return {Promise<void>}
+     */
+    async on_edit_effect(event) {
+        const box = $(event.target).closest('.effect');
+        const id = box.data("id");
+        const name = box.data("name");
+        const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
+        if (effect) effect.sheet.render(true);
+    }
+
+    /**
+     * Handle deleting active effects
+     *
+     * @param {Event} event
+     * @return {Promise<void>}
+     */
+    async on_delete_effect(event) {
+        const box = $(event.target).closest('.effect');
+        const id = box.data("id");
+        const name = box.data("name");
+        const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
+        effect.delete();
+        box.slideUp(200, () => this.render(false));
+    }
+
+    /**
+     * Effect activate / disabled
+     *
+     * @param {Event} event
+     * @return {Promise<void>}
+     */
+    async on_toggle_effect(event) {
+        const box = $(event.target).closest('.effect');
+        const id = box.data("id");
+        const name = box.data("name");
+        const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
+        effect.update({'disabled': !effect.disabled});
+    }
+
+    /*******************************
+     * METHODS THAT HANDLE ATTACKS *
+     *******************************/
+
+    /**
+     * Render the list of attacks
+     *
+     * @param {JQuery} html
+     */
     draw_attacks(html) {
         // Don't draw attacks if there are no attacks
         if (!this.item.system.attacks || !this.item.system.attacks.length) return;
@@ -141,41 +191,40 @@ export class SagaMachineItemSheet extends ItemSheet {
         }
     }
 
-    search_consequences(attack, type, property, find_all=false) {
-        // Ensure that consequences are in the right format
-        if (!attack.consequences || !attack.consequences.length) return '';
-        let parsed_consequences = typeof attack.consequences === 'string' ?
-            JSON.parse(attack.consequences) : attack.consequences;
-        parsed_consequences = Array.isArray(parsed_consequences) ? parsed_consequences : [parsed_consequences];
+    /**
+     * Add a new attack to the list
+     */
+    add_attack() {
+        if ( !this.isEditable ) return;
 
-        const all_found = [];
-        for (let con of parsed_consequences) {
-            if (con.type === type) {
-                let found = con[property];
-                if (found === undefined || found === null) found = '';
-                if (!find_all) return found
-                else all_found.push(found)
-            }
-        }
-        return all_found.join(', ');
+        // Get the prototype attack node and parent node, return if it wasn't found
+        const prototype = this.element.find('.attack.prototype');
+        const parent = this.element.find('ol.attack-list');
+        if (!prototype || !prototype.length || !parent || !parent.length) return;
+
+        const clone = prototype.clone();
+        clone.removeClass('prototype');
+        clone.find('input, select').change(this.update_attacks.bind(this));
+        parent.append(clone);
     }
 
-    find_damage(attack) {
-        return this.search_consequences(attack, 'damage', 'value');
-    }
-
-    find_damage_type(attack) {
-        return this.search_consequences(attack, 'damage', 'damage_type');
-    }
-
-    find_consequences(attack) {
-        return this.search_consequences(attack, 'consequence', 'name', true);
+    /**
+     * Delete an attack from the list
+     *
+     * @param {Event} event
+     */
+    delete_attack(event) {
+        const box = $(event.currentTarget).closest(".attack");
+        const attack_list = box.closest('.attack-list');
+        box.remove();
+        this.update_attacks(event, attack_list);
     }
 
     /**
      * Handle changes to the attack form
      *
-     * @param event
+     * @param {Event} event
+     * @param {JQuery} attack_list
      */
     update_attacks(event, attack_list=null) {
         event.preventDefault();
@@ -214,6 +263,70 @@ export class SagaMachineItemSheet extends ItemSheet {
         });
     }
 
+    /**
+     * Get the attack's damage
+     *
+     * @param {Attack} attack
+     * @return {string}
+     */
+    find_damage(attack) {
+        return this.search_consequences(attack, 'damage', 'value');
+    }
+
+    /**
+     * Get the attack's damage type
+     * @param {Attack} attack
+     * @return {string}
+     */
+    find_damage_type(attack) {
+        return this.search_consequences(attack, 'damage', 'damage_type');
+    }
+
+    /**
+     * Get any consequences imposed with a successful attack
+     * @param {Attack} attack
+     * @return {string}
+     */
+    find_consequences(attack) {
+        return this.search_consequences(attack, 'consequence', 'name', true);
+    }
+
+    /**
+     * Search those all effects imposed by the attack and return those matching the specified type
+     *
+     * @param {Attack} attack - The Attack object to search
+     * @param {string} type - The type of the Consequence object
+     * @param {string} property - The property of the object containing the desired value
+     * @param {boolean} find_all - Whether to return all instances of the matching type or only the first
+     * @return {string}
+     */
+    search_consequences(attack, type, property, find_all=false) {
+        // Ensure that consequences are in the right format
+        if (!attack.consequences || !attack.consequences.length) return '';
+        let parsed_consequences = typeof attack.consequences === 'string' ?
+            JSON.parse(attack.consequences) : attack.consequences;
+        parsed_consequences = Array.isArray(parsed_consequences) ? parsed_consequences : [parsed_consequences];
+
+        const all_found = [];
+        for (let con of parsed_consequences) {
+            if (con.type === type) {
+                let found = con[property];
+                if (found === undefined || found === null) found = '';
+                if (!find_all) return found
+                else all_found.push(found)
+            }
+        }
+        return all_found.join(', ');
+    }
+
+    /**
+     * Create new Consequence objects for the entered damage and consequences
+     *
+     * @param {string} damage - The damage to apply
+     * @param {string} damage_type - The damage type in abbreviated format (e.g. cut, pi, sm)
+     * @param {string} consequences - The names of any consequences to impose
+     * @return {Consequence[]}
+     */
     create_consequences(damage, damage_type, consequences) {
         const consequences_list = [];
 
@@ -239,13 +352,40 @@ export class SagaMachineItemSheet extends ItemSheet {
         return consequences_list;
     }
 
-    _toggle_items_provided(element) {
-        element.parent().find('.items-provided').each((i, e) => {
-            if ($(e).is(':visible')) e.style.display = 'none';
-            else e.style.display = 'block';
-        });
+    /****************************************
+     * METHODS THAT SUPPORT ORIGINS / PATHS *
+     ****************************************/
+
+    /**
+     * Parses items in the provided fields of origins and paths
+     *
+     * @param {string} type - The type of SagaMachineItem
+     * @param {string} property - The comma separated list of items to parse
+     * @return {string}
+     */
+    items_provided(type, property) {
+
+        if (!property) return '&horbar;';
+
+        const return_list = [];
+        const items_array = property.split(',').map(t => t.trim());
+        for (let raw_name of items_array) {
+            const match = this.matching_item(type, raw_name);
+            const [item, name, specialization, rank] = [match.item, match.name, match.specialization, match.rank];
+            if (!item) return_list.push(`<a class="content-link broken" draggable="true" data-type="${type}" data-name="${name}" data-specialization="${specialization}" data-rank="${rank}"><i class="fas fa-unlink"></i>${raw_name}</a>`);
+            else return_list.push(`<a class="content-link" draggable="true" data-uuid="${item.uuid}" data-id="${item.id}" data-type="Item" data-specialization="${specialization}" data-rank="${rank}" data-tooltip="Item"><i class="fas fa-suitcase"></i>${raw_name}</a>`);
+        }
+
+        return return_list.join(', ');
     }
 
+    /**
+     * Find the SagaMachineItem that matches the name and specialization
+     *
+     * @param {string} type - The SagaMachineItem type
+     * @param {string} raw_name - The raw name in "Name (Specialization) Rank" format
+     * @return {{item: SagaMachineItem, name:string, specialization: string, rank: number|string}}
+     */
     matching_item(type, raw_name) {
         // Extract rank
         let parts = raw_name.split(' ');
@@ -265,22 +405,7 @@ export class SagaMachineItemSheet extends ItemSheet {
 
         // Query for matching items, return null if not found
         const matches = game.items.filter(i => i.type === type && i.name === name);
-        if (matches.length) return [matches[0], name, specialization, rank]
-        else return [null, name, specialization, rank];
-    }
-
-    items_provided(type, property) {
-
-        if (!property) return '&horbar;';
-
-        const return_list = [];
-        const items_array = property.split(',').map(t => t.trim());
-        for (let raw_name of items_array) {
-            const [item, name, specialization, rank] = this.matching_item(type, raw_name)
-            if (!item) return_list.push(`<a class="content-link broken" draggable="true" data-type="${type}" data-name="${name}" data-specialization="${specialization}" data-rank="${rank}"><i class="fas fa-unlink"></i>${raw_name}</a>`);
-            else return_list.push(`<a class="content-link" draggable="true" data-uuid="${item.uuid}" data-id="${item.id}" data-type="Item" data-specialization="${specialization}" data-rank="${rank}" data-tooltip="Item"><i class="fas fa-suitcase"></i>${raw_name}</a>`);
-        }
-
-        return return_list.join(', ');
+        if (matches.length) return { item: matches[0], name: name, specialization: specialization, rank: rank }
+        else return { item: null, name: name, specialization: specialization, rank: rank };
     }
 }

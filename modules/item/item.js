@@ -1,10 +1,11 @@
 /**
  * Extend the base Item class to support the Saga Machine system
- *
- * @extends {Item}
  */
 export class SagaMachineItem extends Item {
-    /** @inheritdoc */
+    /**
+     * @inheritdoc
+     * @override
+     */
     async prepareDerivedData() {
         super.prepareDerivedData();
 
@@ -18,11 +19,15 @@ export class SagaMachineItem extends Item {
         this.parse_properties();
     }
 
-    /** @override */
+    /**
+     * Code to run when a new SagaMachineItem is created - changes default icon
+     *
+     * @override
+     */
     async _onCreate(data, options, userId) {
         await super._onCreate(data, options, userId);
 
-        // Return if you're not the owner of this item or it hasn't been saved to the database
+        // Return if you're not the owner of this item, or it hasn't been saved to the database
         if (!this.isOwner || !this.id) return;
 
         // Set new default icons
@@ -69,6 +74,12 @@ export class SagaMachineItem extends Item {
         this.system.loads = this.calc_loads();
     }
 
+    /**
+     * Obtains the value of the given property, defaulting to 0 is unspecified
+     *
+     * @param {string} property
+     * @return {number}
+     */
     property_value(property) {
         for (const prop of this.system.properties) {
             if (prop.toLowerCase().startsWith(`${property.toLowerCase()} `)) {
@@ -79,6 +90,15 @@ export class SagaMachineItem extends Item {
         return 0;
     }
 
+    /**************************************
+     * METHODS THAT DEAL WITH ENCUMBRANCE *
+     **************************************/
+
+    /**
+     * Calculate the encumbrance per item, taking all item properties into account
+     *
+     * @return {number}
+     */
     calc_unit_encumbrance() {
         if (this.system.load) return 100;
         else if (this.system.properties.includes('Neg')) return 0;
@@ -96,14 +116,31 @@ export class SagaMachineItem extends Item {
         }
     }
 
+    /**
+     * Calculates the loads per unit.
+     * Loads are Encumbrance 100 and are used in the trading and vehicles sub-systems.
+     *
+     * @return {number}
+     */
     calc_unit_loads() {
         return this.system.unit_encumbrance / 100;
     }
 
+    /**
+     * Calculate the encumbrance value of the stack in regards to how much container space it takes.
+     *
+     * @return {number}
+     */
     calc_container_encumbrance() {
         return this.system.unit_encumbrance * this.system.quantity;
     }
 
+    /**
+     * Calculate the encumbrance value of the stack, taking into account item properties,
+     * quantity and whether the item is equipped.
+     *
+     * @return {number}
+     */
     calc_encumbrance() {
         if (!this.system.carried) return 0;
         if (this.system.parent) return 0;
@@ -111,6 +148,12 @@ export class SagaMachineItem extends Item {
         return this.system.unit_encumbrance * this.system.quantity;
     }
 
+    /**
+     * Calculate the number of loads in the stack.
+     * Loads are Encumbrance 100 and are used in the trading and vehicles sub-systems.
+     *
+     * @return {number}
+     */
     calc_loads() {
         return Math.floor(this.system.unit_loads * this.system.quantity);
     }
