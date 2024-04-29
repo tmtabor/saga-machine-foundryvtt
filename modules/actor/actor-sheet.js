@@ -13,36 +13,6 @@ import { Attack, test_dialog } from "../system/tests.js";
  * @link https://api.jquery.com/
  */
 
-
-/**
- * Handlebars library - used by Foundry VTT
- *
- * @external Handlebars
- * @link https://handlebarsjs.com/api-reference/
- */
-
-/**
- * Register a Handlebars helper
- *
- * @function Handlebars.registerHelper
- * @link https://handlebarsjs.com/api-reference/
- */
-
-Hooks.once("init", async () => {
-	// Register handlebars helpers
-	Handlebars.registerHelper("is_GM", () => game.user.isGM);
-	Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapons');
-	Handlebars.registerHelper("is_wearable",
-			item => item.system.group.toLowerCase() === 'armors' || item.system.group.toLowerCase() === 'apparel');
-
-	// Register handlebars partials
-	await loadTemplates([
-		'systems/saga-machine/templates/partials/character-header.html',
-		'systems/saga-machine/templates/partials/character-sidebar.html',
-		'systems/saga-machine/templates/partials/character-inventory.html'
-	]);
-});
-
 /**
  * Extend Foundry's ActorSheet with modifications to support the Saga Machine system.
  * This is a base class that's meant to be extended for specific actor types.

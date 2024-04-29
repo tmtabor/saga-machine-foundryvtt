@@ -5,6 +5,7 @@ import { generate_conditions } from "./system/conditions.js";
 import { SagaMachineItem } from "./item/item.js";
 import { SagaMachineItemSheet } from "./item/item-sheet.js";
 import { sm_test_macro } from "./system/tests.js";
+import "./hooks.js";
 
 // Turn on debugging
 CONFIG.debug.hooks = true;
@@ -35,7 +36,6 @@ Hooks.once("init", async () => {
     Actors.registerSheet("saga-machine", CharacterSheet, { types: ["character"], makeDefault: true });
     Actors.registerSheet("saga-machine", StashSheet, { types: ["stash"], makeDefault: true });
     Actors.registerSheet("saga-machine", VehicleSheet, { types: ["vehicle"], makeDefault: true });
-
     Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
 
     // Register custom status effects
@@ -45,6 +45,9 @@ Hooks.once("init", async () => {
     CONFIG.specialStatusEffects.INVISIBLE = 'hidden'
     game.sagamachine.standard_consequences = CONFIG.statusEffects.map(s => s.name);
 
+    // Register hooks
+    Hooks.on('updateActor', update_actor);
+
     // Register system config
     game.settings.register('saga-machine', 'level', {
         name: 'Starting Power Level',
@@ -52,7 +55,7 @@ Hooks.once("init", async () => {
         scope: 'world',
         config: true,
         type: Number,
-        default: 150,
+        default: 120,
         choices: {
             85: "Mundane",
             120: "Novice",
