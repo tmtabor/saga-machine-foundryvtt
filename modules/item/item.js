@@ -90,6 +90,15 @@ export class SagaMachineItem extends Item {
         return 0;
     }
 
+    /**
+     * Removes an item from its parent container
+     *
+     * @return {Promise<void>}
+     */
+    async remove_from_container() {
+        if (this.type === 'item') this.update({ 'system.parent': null });
+    }
+
     /**************************************
      * METHODS THAT DEAL WITH ENCUMBRANCE *
      **************************************/

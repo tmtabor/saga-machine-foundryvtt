@@ -1,3 +1,8 @@
+/**
+ * Put the standard Saga Machine consequences in the formated expected for Foundry status effects
+ *
+ * @return {{icon: string, statuses: string[], name: string, id: string, flags:{core: {overlay: string[]}, system: *}}[]}
+ */
 export const generate_conditions = () => {
     const system_conditions = [];
     const standard_consequences = ['Bleeding', 'Bolstered', 'Dazed', 'Defeated', 'Desire', 'Disabled', 'Dying', 'Fatigue',
@@ -23,6 +28,17 @@ export const generate_conditions = () => {
     return system_conditions;
 }
 
+/**
+ * Get a reference to a standard Saga Machine consequence if one exists on the actor, if not check for one globally, if
+ * not lazily create one.
+ *
+ * @param name - The name of the consequence
+ * @param actor - The actor to check
+ * @param skip_actor - Skip checking the actor?
+ * @param skip_global - Skip checking the global/game scope?
+ * @param skip_new - Skip lazy creation?
+ * @return {Promise<SagaMachineItem|null>}
+ */
 export async function standard_consequence({name, actor, skip_actor=false, skip_global=false, skip_new=false}) {
     let consequence = null;
 
@@ -47,7 +63,13 @@ export async function standard_consequence({name, actor, skip_actor=false, skip_
     return consequence;
 }
 
-async function sync_status(actor) {
+/**
+ * Sync the actor's status effects with its consequences
+ *
+ * @param actor - The actor to sync
+ * @return {Promise<void>}
+ */
+export async function sync_status(actor) {
     // Get the consequences and statuses
     const consequences = new Set(actor.items.filter(item => item.type === "consequence" && item.system.rank > 0 &&
         game.sagamachine.standard_consequences.includes(item.name)).map(c => c.name.slugify()));
@@ -76,18 +98,25 @@ async function sync_status(actor) {
     // Remove duplicate statuses, if necessary
     const status_set = new Set(actor.effects.map(e => e.name));
     if (status_set.size !== actor.effects.size) {
-        status_set.forEach(async s => {
+        for (const s of status_set) {
             if (!game.sagamachine.standard_consequences.includes(s)) return;
             const matches = actor.effects.filter(e => e.name === s);
             if (matches.length > 1) {
                 matches.shift();
                 await actor.deleteEmbeddedDocuments("ActiveEffect", matches.map(e => e.id));
             }
-        });
+        }
     }
 }
 
-async function sync_effects(item, delete_only=false) {
+/**
+ * Sync the item's active effects with its parent actor
+ *
+ * @param item - The item with active effects to sync
+ * @param delete_only - Only delete active effects, do not add
+ * @return {Promise<void>}
+ */
+export async function sync_effects(item, delete_only=false) {
     // Find item effects, delete those effects, return if delete_only
     const matches = item.parent.effects.filter(e => e.origin === item.uuid);
     for (let e of matches) e.delete();
@@ -99,7 +128,14 @@ async function sync_effects(item, delete_only=false) {
     item.parent.createEmbeddedDocuments('ActiveEffect', copies);
 }
 
-function evaluate_formula(value, item) {
+/**
+ * Evaluate variables embedded in active effects
+ *
+ * @param value - Active effect value
+ * @param item - Item to which the active effect belongs
+ * @return {string} - The evaluated active effect value
+ */
+export function evaluate_formula(value, item) {
     function substitute_variables(raw, item) {
         raw = raw.replaceAll('@rank', item.system.rank);
         if (item.parent)
@@ -123,60 +159,29 @@ function evaluate_formula(value, item) {
     return params.toString();
 }
 
-Hooks.on("createItem", async (item, options, id) => {
-    // Only run this if it is you creating the item, not for other players
-    if (game.user.id !== id) return;
+/**
+ * Evaluate all @-style variables in active effect and replace with the literal values
+ *
+ * @param {ActiveEffect} effect
+ * @return {Promise<boolean>}
+ */
+export async function evaluate_effect_variables(effect) {
+    const item = await fromUuid(effect.origin);               // Get the item
+    if (!item) return true;                                                 // If not valid item, do nothing
+    for (let change of effect.changes)                                 // For each change in the Active Effect
+        change.value = evaluate_formula(change.value, item);                // Replace variables, do math
+    await effect.updateSource({'changes': effect.changes});                 // Update the effect being added
 
-    // Sync consequences with status effects
-    if (item.type === "consequence" && item.parent) await sync_status(item.parent);
-});
+    return true;
+}
 
-Hooks.on("deleteItem", async (item, options, id) => {
-    // Only run this if it is you deleting the item, not for other players
-    if (game.user.id !== id) return;
-
-    // Sync consequences with status effects
-    if (item.type === "consequence" && item.parent) await sync_status(item.parent);
-});
-
-Hooks.on("updateItem", async (item, change, options, id) => {
-    // Only run this if it is you updating the item, not for other players
-    if (game.user.id !== id) return;
-
-    // Sync consequences with status effects
-    if (item.type === "consequence" && item.parent) await sync_status(item.parent);
-});
-
-Hooks.on("updateActiveEffect", async (effect, change, options, id) => {
-    // Only run this if it is you updating the effect, not for other players
-    if (game.user.id !== id) return;
-
-    // Updating an effect on an item which belongs to an actor
-    if (!effect.modifiesActor && effect.transfer && effect.parent &&
-        effect.parent.parent && effect.parent.parent.type === 'character')
-        await sync_effects(effect.parent);
-});
-
-Hooks.on("preCreateActiveEffect", async (effect, data, options, id) => {
-    // Only run this if it is you creating the active effect, not for other players
-    if (game.user.id !== id) return;
-
-    // If creating an effect on an actor which came from an item, replace @rank with correct value
-    if (effect.modifiesActor && effect.parent && effect.parent.type === 'character' && effect.origin) {
-        const item = await fromUuid(effect.origin);                             // Get the item
-        if (!item) return true;                                                 // If not valid item, do nothing
-        for (let change of effect.changes)                                      // For each change in the Active Effect
-            change.value = evaluate_formula(change.value, item);                // Replace variables, do math
-        effect.updateSource({'changes': effect.changes});                       // Update the effect being added
-    }
-});
-
-Hooks.on("createActiveEffect", async (effect, options, id) => {
-    // Only run this if it is you creating the active effect, not for other players
-    if (game.user.id !== id) return;
-
-    // If this is a status applied directly from the UI
-    if (!effect.origin && effect.statuses?.size && effect.target) {
+/**
+ * Sync effects applied from the UI with consequences on the actor - after adding an effect
+ *
+ * @param {ActiveEffect} effect
+ * @return {Promise<void>}
+ */
+export async function add_effect_from_ui(effect) {
         const actor = effect.target;
         const status_name = effect.statuses.first();
 
@@ -267,23 +272,34 @@ Hooks.on("createActiveEffect", async (effect, options, id) => {
 
         // Add a copy to the actor
         [consequence] = await actor.createEmbeddedDocuments('Item', [consequence]);
-    }
+}
 
-    // Updating an effect on an item which belongs to an actor
-    if (!effect.modifiesActor && effect.transfer && effect.parent &&
-        effect.parent.parent && effect.parent.parent.type === 'character')
-        await sync_effects(effect.parent);
-});
-
-Hooks.on("preDeleteActiveEffect", (effect, options, id) => {
-    // Only run this if it is you deleting the active effect, not for other players
-    if (game.user.id !== id) return;
-
+/**
+ * Sync effects applied from the UI with consequences on the actor - after removing an effect
+ *
+ * @param {ActiveEffect} effect
+ * @return {Promise<void>}
+ */
+export async function remove_effect_from_ui(effect) {
     const actor = effect.target
 
-    // If using the status UI to delete a consequence with a subject, stop and prompt
-    if (!effect.origin && effect.statuses?.size &&
-        (effect?.flags?.system?.subject_prompt || effect?.flags?.system?.value_prompt)) {
+    // Get the existing consequence on this actor, if one exists
+    let consequences = actor.items.filter(c => c.name === effect.name && c.type === "consequence");
+
+    // Remove any matching consequences
+    if (consequences.length)
+        await actor.deleteEmbeddedDocuments("Item", consequences.map(c => c.id));
+}
+
+/**
+ * When removing an effect from the UI that is ambiguious (e.g. has multiple instances or subjects), prompt the user
+ *
+ * @param {ActiveEffect} effect
+ * @return {boolean}
+ */
+export function prompt_on_effect_deletion(effect) {
+        const actor = effect.target
+
         let consequences = actor.items.filter(c => c.name === effect.name && c.type === "consequence");
         if (!consequences.length) return true;
         if (consequences.length > 1 || effect?.flags?.system?.value_prompt) {
@@ -313,27 +329,6 @@ Hooks.on("preDeleteActiveEffect", (effect, options, id) => {
 
             return false;
         }
-    }
-});
 
-Hooks.on("deleteActiveEffect", async (effect, options, id) => {
-    // Only run this if it is you deleting the active effect, not for other players
-    if (game.user.id !== id) return;
-
-    // If this is a status applied directly from the UI
-    if (!effect.origin && effect.statuses?.size && effect.target) {
-        const actor = effect.target
-
-        // Get the existing consequence on this actor, if one exists
-        let consequences = actor.items.filter(c => c.name === effect.name && c.type === "consequence");
-
-        // Remove any matching consequences
-        if (consequences.length)
-            await actor.deleteEmbeddedDocuments("Item", consequences.map(c => c.id));
-    }
-
-    // Updating an effect on an item which belongs to an actor
-    if (!effect.modifiesActor && effect.transfer && effect.parent &&
-        effect.parent.parent && effect.parent.parent.type === 'character')
-        await sync_effects(effect.parent, true);
-});
+        return true;
+}

@@ -5,7 +5,8 @@ import { generate_conditions } from "./system/conditions.js";
 import { SagaMachineItem } from "./item/item.js";
 import { SagaMachineItemSheet } from "./item/item-sheet.js";
 import { sm_test_macro } from "./system/tests.js";
-import "./hooks.js";
+import { create_active_effect, create_item, delete_active_effect, delete_item, pre_create_active_effect,
+    pre_delete_active_effect, update_active_effect, update_actor, update_item } from "./hooks.js";
 
 // Turn on debugging
 CONFIG.debug.hooks = true;
@@ -47,6 +48,16 @@ Hooks.once("init", async () => {
 
     // Register hooks
     Hooks.on('updateActor', update_actor);
+
+    Hooks.on('createItem', create_item);
+    Hooks.on('updateItem', update_item);
+    Hooks.on('deleteItem', delete_item);
+
+    Hooks.on('preCreateActiveEffect', pre_create_active_effect);
+    Hooks.on('createActiveEffect', create_active_effect);
+    Hooks.on('updateActiveEffect', update_active_effect);
+    Hooks.on('preDeleteActiveEffect', pre_delete_active_effect);
+    Hooks.on('deleteActiveEffect', delete_active_effect);
 
     // Register system config
     game.settings.register('saga-machine', 'level', {
