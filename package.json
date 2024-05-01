@@ -1,0 +1,27 @@
+{
+  "name": "saga-machine",
+  "version": "0.4.0",
+  "description": "The official implementation of the Saga Machine Unified ruleset for Foundry Virtual Tabletop",
+  "source": "modules/main.js",
+  "main": "dist/sagamachine.js",
+  "targets": {
+    "main": {
+      "isLibrary": false,
+      "optimize": true
+	}
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmtabor/saga-machine-foundryvtt.git"
+  },
+  "keywords": [],
+  "author": "Thorin Tabor",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/tmtabor/saga-machine-foundryvtt/issues"
+  },
+  "homepage": "https://github.com/tmtabor/saga-machine-foundryvtt#readme",
+  "devDependencies": {
+    "parcel": "^2.12.0"
+  }
+}

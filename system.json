@@ -10,7 +10,7 @@
     },
     "templateVersion": 1,
     "author": "Thorin Tabor",
-    "esmodules": ["modules/main.js"],
+    "esmodules": ["dist/sagamachine.js"],
     "styles": ["styles/main.css"],
     "packs": [
         {
