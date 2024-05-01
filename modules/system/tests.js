@@ -1,4 +1,4 @@
-import "../libraries/tagify.min.js";
+import Tagify from "../libraries/tagify.min.js";
 import { capitalize, token_actor } from "../utils.js";
 
 /**
