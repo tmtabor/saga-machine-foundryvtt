@@ -959,9 +959,9 @@ export async function test_dialog(dataset) {
             inputs.on('change', event => {
                 // Get the new test parameters
                 const modified_dataset = foundry.utils.deepClone(dataset);
-                dataset.stat = html.find('select[name=stat]').val();
-                dataset.score = html.find('select[name=score]').val();
-                dataset.tn = html.find('input[name=tn]').val();
+                modified_dataset.stat = html.find('select[name=stat]').val();
+                modified_dataset.score = html.find('select[name=score]').val();
+                modified_dataset.tn = html.find('input[name=tn]').val();
 
                 // Get the new modifiers and set the tag widget
                 const new_modifiers = actor.modifiers(modified_dataset);
@@ -1010,7 +1010,7 @@ export async function test_dialog(dataset) {
             }
         },
         default: "roll"
-    }).render(true, {width: 450});
+    }).render(true, { width: 450 });
 }
 
 /**
