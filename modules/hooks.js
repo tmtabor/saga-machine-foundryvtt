@@ -14,6 +14,10 @@ export async function update_actor(actor, change, options, id) {
     // Add or remove Hindered consequences for encumbrance
     if (game.user.id === id && actor.type === 'character')
         await actor.encumbrance_consequences();
+
+    // Update the combat initiative if the actor has changed its turn type
+    if (game.user.id === id && game.combat && (game.user.isGM || actor.isOwner))
+        game.combat.update_combatant_initiative(actor, change?.system?.fast_turn);
 }
 
 /**
@@ -174,4 +178,20 @@ export async function delete_active_effect(effect, options, id) {
     // Deleting an effect on an item which belongs to an actor
     if (game.user.id === id && !effect.modifiesActor && effect.transfer && effect.parent && effect.parent.parent &&
         effect.parent.parent.type === 'character') await sync_effects(effect.parent, true);
+}
+
+/**
+ * Run after the current combat has been updated
+ *
+ * @param {SagaMachineCombat} combat
+ * @param update
+ * @param options
+ * @param {string} id
+ * @return {Promise<void>}
+ */
+export async function pre_update_combat(combat, update, options, id){
+    // Perform start of combat and start of round tasks
+    if (game.user.id === id && update.round) {
+        await combat.start_of_round();
+    }
 }

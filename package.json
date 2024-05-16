@@ -10,6 +10,9 @@
       "optimize": true
 	}
   },
+  "scripts": {
+    "build": "parcel build --no-cache"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/tmtabor/saga-machine-foundryvtt.git"

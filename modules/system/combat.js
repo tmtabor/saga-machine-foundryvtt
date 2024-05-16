@@ -1,20 +1,114 @@
 import { Consequence } from "./tests.js";
+import {SagaMachineActor} from "../actor/actor";
 
+/**
+ * Initiative constants for FAST / NPC / SLOW turns
+ * @type {{FAST_TURN: string, SLOW_TURN: string, NPC_TURN: string}}
+ */
 export const INITIATIVE = {
     FAST_TURN: "3",
     NPC_TURN: "2",
     SLOW_TURN: "1"
 };
 
-Hooks.on("preUpdateCombat", async (combat, update_data) => {
-    if (!update_data.round && !update_data.turn) return;
+/**
+ * Combatant includes patched functionality to support Saga Machine's fast/slow turns
+ *
+ * @inheritDoc
+ */
+export class SagaMachineCombatant extends Combatant {
+    /**
+     * @inheritDoc
+     * @override
+     * @param formula
+     * @return {*|Roll}
+     */
+    getInitiativeRoll(formula) {
+        // If there is no attached actor, this must be an NPC
+        if (!this.actor) return new Roll(INITIATIVE.NPC_TURN);
 
-    const start_of_round = async () => {
+        // If this is marked as an NPC, it must be an NPC
+        if (this.isNPC) return this.actor.getInitiativeRoll(INITIATIVE.NPC_TURN);
+
+        // Otherwise, set the turn type as indicated
+        else return this.actor.getInitiativeRoll();
+    }
+
+    /**
+     * Returns the value of the combatant's initiative - a constant representing  a fast / NPC / slow turn
+     *
+     * @return {number}
+     */
+    getInitiativeValue() {
+        return this.isNPC ? Number(INITIATIVE.NPC_TURN) :
+            (this.actor.system.fast_turn ? Number(INITIATIVE.FAST_TURN) : Number(INITIATIVE.SLOW_TURN));
+    }
+}
+
+/**
+ * Combat includes override that sets initiative based on fast / npc / slow turns
+ *
+ * @inheritDoc
+ */
+export class SagaMachineCombat extends Combat {
+    /**
+     * @inheritDoc
+     * @override
+     * @param ids
+     * @param formula
+     * @param updateTurn
+     * @param messageOptions
+     * @return {Promise<SagaMachineCombat>}
+     */
+    async rollInitiative(ids, {formula=null, updateTurn=true, messageOptions={}}={}) {
+        // Iterate over Combatants, performing an initiative roll for each
+        const updates = [];
+        for ( let [i, id] of (typeof ids === "string" ? [ids] : ids).entries() ) {
+          // Get Combatant data
+          const combatant = this.combatants.get(id);
+          if (!combatant?.isOwner) continue;
+
+          // Produce an initiative roll for the Combatant
+          const roll = combatant.getInitiativeRoll(formula);
+          await roll.evaluate({async: true});
+          updates.push({_id: id, initiative: roll.total});
+        }
+        if (!updates.length) return this;
+
+        // Update multiple combatants
+        await this.updateEmbeddedDocuments("Combatant", updates);
+
+        // Ensure the turn order remains with the same combatant
+        if ( updateTurn && this.combatant?.id ) await this.update({turn: this.turns.findIndex(t => t.id === this.combatant?.id)});
+
+        return this;
+    }
+
+    /**
+     * Update the initiative of all combatants with the matching actor
+     *
+     * @param {SagaMachineActor} actor
+     * @param {string|null|undefined} turn_type
+     * @return {Promise<void>}
+     */
+    async update_combatant_initiative(actor, turn_type) {
+        if (typeof turn_type === 'undefined' || turn_type === null) return;
+        const linked_combatants = game.combat.combatants.filter(c => c.actorId === actor.id);
+        for (const c of linked_combatants)
+            await game.combat.setInitiative(c.id, c.getInitiativeValue())
+    }
+
+    /**
+     * Perform all start of combat and start of round tasks
+     *
+     * @return {Promise<void>}
+     */
+    async start_of_round(){
         // Ensure that all combatants have a fast / slow turn marked in the order
-        await combat.rollAll();
+        await this.rollAll();
 
         // Cycle through all combatants
-        for (let c of combat.combatants) {
+        for (let c of this.combatants) {
 
             // Make a defense test for everyone
             await c.actor.test({
@@ -24,8 +118,8 @@ Hooks.on("preUpdateCombat", async (combat, update_data) => {
         }
 
         // New Round Card - prompt players to choose fast / slow turn and display statuses
-        let content = `<h3>Round ${combat.round+1}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table>`;
-        for (let c of combat.combatants) {
+        let content = `<h3>Round ${this.round+1}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table>`;
+        for (let c of this.combatants) {
             if (c.hidden) continue; // Don't show hidden combatants
             const statuses = Array.from(c.actor.statuses.map(s => s.split(/\s|-/).map(w => w.capitalize()).join(' '))).sort().join(', ');
             content += `<tr><td><strong>${c.name}</strong></td><td>${statuses ? statuses : '&mdash;'}</td></tr>`;
@@ -35,7 +129,7 @@ Hooks.on("preUpdateCombat", async (combat, update_data) => {
 
         // Whisper all defenses to GM
         content = '<h4><strong>Defenses This Round</strong></h4><table>';
-        for (let c of combat.combatants)
+        for (let c of this.combatants)
             content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn}</td></tr>`;
         content += '</table>';
         await ChatMessage.create({
@@ -45,7 +139,7 @@ Hooks.on("preUpdateCombat", async (combat, update_data) => {
         });
 
         // Chat messages for Bleeding and Dying consequences
-        for (let c of combat.combatants) {
+        for (let c of this.combatants) {
 
             // Test Endurance when dying, prompt to add or remove Dying conditions
             if (c.actor.statuses.has('dying') && !c.actor.statuses.has('defeated')) {
@@ -78,70 +172,19 @@ Hooks.on("preUpdateCombat", async (combat, update_data) => {
                 });
             }
         }
-    };
-
-    // Start of Combat
-    if (combat.round === 0  && combat.active) await start_of_round();
-
-    // Start of Each New Round
-    if (combat.round !== 0 && combat.turns && combat.active && combat.current.turn > -1 &&
-        combat.current.turn === combat.turns.length - 1) await start_of_round();
-});
-
-Hooks.on('updateActor', async (actor, update) => {
-    // Update the combat initiative if the actor has changed its turn type
-    const turn_changed = typeof update?.system?.fast_turn !== 'undefined' && update?.system?.fast_turn !== null;
-    if (!(turn_changed && (game.user.isGM || actor.isOwner) && game.combat)) return;
-    const linked_combatants = game.combat.combatants.filter(c => c.actorId === actor.id);
-    linked_combatants.forEach(c => game.combat.setInitiative(c.id, c.getInitiativeValue()));
-});
-
-// Patch Core Functions
-Combatant.prototype.getInitiativeRoll = function (formula) {
-    // If there is no attached actor, this must be an NPC
-    if (!this.actor) return new Roll(INITIATIVE.NPC_TURN);
-
-    // If this is marked as an NPC, it must be an NPC
-    if (this.isNPC) return this.actor.getInitiativeRoll(INITIATIVE.NPC_TURN);
-
-    // Otherwise, set the turn type as indicated
-    else return this.actor.getInitiativeRoll();
-};
-
-Combatant.prototype.getInitiativeValue = function () {
-    return this.isNPC ? Number(INITIATIVE.NPC_TURN) :
-        (this.actor.system.fast_turn ? Number(INITIATIVE.FAST_TURN) : Number(INITIATIVE.SLOW_TURN));
-};
-
-Combat.prototype.rollInitiative = async function rollInitiative(ids, {formula=null, updateTurn=true, messageOptions={}}={}) {
-    // Iterate over Combatants, performing an initiative roll for each
-    const updates = [];
-    for ( let [i, id] of (typeof ids === "string" ? [ids] : ids).entries() ) {
-      // Get Combatant data
-      const combatant = this.combatants.get(id);
-      if (!combatant?.isOwner) continue;
-
-      // Produce an initiative roll for the Combatant
-      const roll = combatant.getInitiativeRoll(formula);
-      await roll.evaluate({async: true});
-      updates.push({_id: id, initiative: roll.total});
     }
-    if (!updates.length) return this;
-
-    // Update multiple combatants
-    await this.updateEmbeddedDocuments("Combatant", updates);
-
-    // Ensure the turn order remains with the same combatant
-    if ( updateTurn && this.combatant?.id ) await this.update({turn: this.turns.findIndex(t => t.id === this.combatant?.id)});
-
-    return this;
 }
 
-export class SMCombatTracker extends CombatTracker {
-    constructor(options) {
-        super(options)
-    }
-
+/**
+ * Modified combat tracker that includes a fast/slow turn toggle
+ *
+ * @inheritDoc
+ */
+export class SagaMachineCombatTracker extends CombatTracker {
+    /**
+     * @inheritDoc
+     * @param html
+     */
     activateListeners(html) {
         const combatants = this.viewed?.combatants;
 
