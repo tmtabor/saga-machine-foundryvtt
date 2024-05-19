@@ -1,5 +1,5 @@
 import { Effect } from "./tests.js";
-import {SagaMachineActor} from "../actor/actor";
+import { SagaMachineActor } from "../actor/actor.js";
 
 /**
  * Initiative constants for FAST / NPC / SLOW turns
@@ -112,7 +112,7 @@ export class SagaMachineCombat extends Combat {
 
             // Make a defense test for everyone
             await c.actor.test({
-                stat: 'defense', consequences: [{"type": "defense"}], whisper: true, chat: true,
+                stat: 'defense', effects: [{"type": "defense"}], whisper: true, chat: true,
                 ...c.actor.total_modifiers({score: 'defense'})
             });
         }
@@ -148,7 +148,7 @@ export class SagaMachineCombat extends Combat {
                         `<ul><li><em>Crit Success:</em> Lose a Dying.</li><li><em>Failure:</em> Gain a Dying.</li><li><em>3 Dying:</em> ${c.name} dies.</li></ul></li></ul>` });
                 await c.actor.test({
                     stat: 'endurance', tn: c.actor.dying_tn(), chat: true,
-                    consequences: [{"type": "consequence", "name": "Dying", "when": "failure", "target": "self"}],
+                    effects: [{"type": "consequence", "name": "Dying", "when": "failure", "target": "self"}],
                     ...c.actor.total_modifiers({score: 'defense'})
                 });
             }

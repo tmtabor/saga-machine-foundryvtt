@@ -1,5 +1,7 @@
 import { add_effect_from_ui, evaluate_effect_variables, prompt_on_effect_deletion, remove_effect_from_ui, sync_effects,
-    sync_status } from "./system/conditions.js"
+    sync_status } from "../game/consequences.js"
+import { create_hotbar_macro } from "./macros.js";
+import { add_apply_damage, add_edit_test, add_push_luck, attach_test_data, drop_chat_damage } from "./chat.js";
 
 /**
  * Run every time an actor is updated: Hooks.on('updateActor')
@@ -181,7 +183,7 @@ export async function delete_active_effect(effect, options, id) {
 }
 
 /**
- * Run after the current combat has been updated
+ * Run after the current combat has been updated: Hooks.on('preUpdateCombat')
  *
  * @param {SagaMachineCombat} combat
  * @param update
@@ -194,4 +196,60 @@ export async function pre_update_combat(combat, update, options, id){
     if (game.user.id === id && update.round) {
         await combat.start_of_round();
     }
+}
+
+/**
+ * Run after the user drops a draggable onto the hotbar: Hooks.on('hotbarDrop')
+ *
+ * @param {Hotbar} bar
+ * @param data
+ * @param {number} slot
+ * @return {Promise<void>}
+ */
+export async function hotbar_drop(bar, data, slot) {
+    // Handle test macros dropped to the hotbar
+    await create_hotbar_macro(data, slot);
+}
+
+/**
+ * Run when a chat card is displayed: Hooks.on('renderChatMessage')
+ *
+ * @param {ChatMessage} app
+ * @param {jQuery} html
+ * @param msg
+ * @return {Promise<void>}
+ */
+export async function render_chat_message(app, html, msg) {
+    // Attach test data to the chat card
+    await attach_test_data(html);
+}
+
+/**
+ * Run when data is dropped on an actor sheet: Hooks.on('dropActorSheetData')
+ *
+ * @param {SagaMachineActor} actor
+ * @param {SagaMachineActorSheet} sheet
+ * @param data
+ * @return {Promise<void>}
+ */
+export async function drop_actor_sheet_data(actor, sheet, data) {
+    await drop_chat_damage(actor, data);
+}
+
+/**
+ * Run when a chat card is right-clicked: Hooks.on('getChatLogEntryContext')
+ *
+ * @param {jQuery} html
+ * @param {ContextMenuEntry[]} options
+ * @return {Promise<void>}
+ */
+export async function get_chat_log_entry_context(html, options) {
+    // Add push Your Luck option
+    await add_push_luck(options);
+
+    // Add apply Damage option
+    await add_apply_damage(options);
+
+    // Add edit Test option
+    await add_edit_test(options);
 }

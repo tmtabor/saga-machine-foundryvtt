@@ -1,4 +1,4 @@
-import { Attack, test_dialog } from "../system/tests.js";
+import { Attack, test_dialog } from "../game/tests.js";
 
 /**
  * ActorSheet context used in getData() and dependent methods.

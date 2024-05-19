@@ -1,8 +1,9 @@
-import { INITIATIVE } from "../system/combat.js";
-import { ModifierSet, Attack, Test, Effect } from "../system/tests.js";
-import { standard_consequence } from "../system/conditions.js";
-import { median } from "../utils.js";
-import { WoundFactory } from "../system/wounds.js";
+import { INITIATIVE } from "../game/combat.js";
+import { Attack, Test, Effect } from "../game/tests.js";
+import { standard_consequence } from "../game/consequences.js";
+import { median } from "../system/utils.js";
+import { WoundFactory } from "../game/wounds.js";
+import { ModifierSet } from "../game/modifiers.js";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
@@ -492,8 +493,8 @@ export class SagaMachineActor extends Actor {
         const test = new Test(spec);
         if (dataset.evaluate !== false) await test.evaluate();
 
-        // Apply consequences, unless apply_consequences=false
-        if (dataset.apply_consequences !== false) await test.apply_effects(dataset);
+        // Apply effects, unless apply_consequences=false
+        if (dataset.apply_effects !== false) await test.apply_effects(dataset);
 
         // Send to chat, if chat=true, whisper if whisper=true
         if (dataset.chat) await test.to_chat({ whisper: !!dataset.whisper });

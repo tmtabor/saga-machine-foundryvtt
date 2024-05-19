@@ -1,5 +1,6 @@
 import Tagify from "../libraries/tagify.min.js";
-import { capitalize, token_actor } from "../utils.js";
+import { capitalize, token_actor } from "../system/utils.js";
+import { ModifierSet } from "./modifiers.js";
 
 /**
  * Object representing a Saga Machine test
@@ -24,6 +25,7 @@ export class Test {
 
     /**
      * Initialize from a dataset
+     *
      * @param dataset
      */
     constructor(dataset) {
@@ -31,6 +33,9 @@ export class Test {
         this.validate();
     }
 
+    /**
+     * Ensure that the test has all the critical properties necessary to evaluate it
+     */
     validate() {
         // Make sure the dataset has all the required components, throw an error if not
         let valid = (this.sceneId && this.tokenId || this.actorId || this.actor) && this.actor && this.actor.system &&
@@ -46,7 +51,7 @@ export class Test {
 
         // Parse the effects, if any
         if (this.effects) {
-            // If the efects are already parsed, return
+            // If the effects are already parsed, return
             if (Array.isArray(this.effects) && this.effects.every(c => c instanceof Effect))
                 return;
 
@@ -330,7 +335,7 @@ export class Test {
             this.effects_evaluated = true;
         }
 
-        // Apply consequences
+        // Apply effects
         const when = this.success ? 'success' : (this.tn ? 'failure' : 'always');
         for (let c of this.effects) c.apply(when, dataset);
     }
@@ -683,6 +688,8 @@ export class Effect {
 
 /**
  * Object representing an Attack test
+ *
+ * @extends Test
  */
 export class Attack extends Test {
     _effects_string = null;
@@ -759,7 +766,7 @@ export class Attack extends Test {
     static property_value(properties, property) {
         for (const prop of Attack.parse_properties(properties)) {
             if (prop.toLowerCase().startsWith(`${property.toLowerCase()} `)) {
-                const [p, val] = prop.split(' ');
+                const [, val] = prop.split(' ');
                 return Number(val);
             }
         }
@@ -768,154 +775,6 @@ export class Attack extends Test {
 
     static has_property(properties, property) {
         return Attack.parse_properties(properties).map(p => p.split(' ')[0]).includes(property);
-    }
-}
-
-export class ModifierSet {
-    _name = null;
-    _description = null;
-    boons = 0;
-    banes = 0
-    modifier = 0;
-    divide = 0;
-    percent = 0;
-
-    constructor({name=null, description=null, boons=0, banes=0, modifier=0, divide=0, percent=0}) {
-        this._name = name;
-        this._description = description;
-        this.boons = parseInt(boons) || 0;
-        this.banes = parseInt(banes) || 0;
-        this.modifier = parseInt(modifier) || 0;
-        this.divide = parseInt(divide) || 0;
-        this.percent = parseInt(percent) || 0;
-    }
-
-    get name() { return this._name ? `${this._name} ${this.mod_str()}` : this.mod_str() }
-
-    get description() { return this._description || this._name }
-
-    mod_str() {
-        const boons_banes = '⊕'.repeat(this.boons) + '⊖'.repeat(this.banes);
-        const mod = this.modifier >= 0 ? `+${this.modifier}` : `${this.modifier}`;
-        if (!boons_banes) return mod;
-        else if (!this.modifier) return boons_banes;
-        else return boons_banes + mod;
-    }
-
-    tag() {
-        return { value: this.name, title: this.description, style: ModifierSet.color(this.name) }
-    }
-
-    json() {
-        return {
-            "boons": this.boons,
-            "banes": this.banes,
-            "modifier": this.modifier,
-            "divide": this.divide,
-            "percent": this.percent,
-            "name": this.name,
-            "description": this.description
-        };
-    }
-
-    /**
-     * Accepts list of raw key/value strings and returns a list of ModifierSet objects
-     *
-     * Ex: name=short_name&description=for_tooltip&boons=0&banes=0&modifier=0&divide=0&percent=0
-     *
-     * @param raw_mods_list
-     * @returns {*[]}
-     */
-    static parse(raw_mods_list) {
-        let mods_list = [];
-        try {
-            raw_mods_list.forEach(m => {
-                const params = new URLSearchParams(m);
-                mods_list.push(new ModifierSet({
-                    name: params.get('name'),
-                    description: params.get('description'),
-                    boons: params.get('boons'),
-                    banes: params.get('banes'),
-                    modifier: params.get('modifier'),
-                    divide: params.get('divide'),
-                    percent: params.get('percent')
-                }));
-            });
-
-            return mods_list;
-        }
-        catch (e) { console.error(`Error parsing modifiers object: ${raw_mods_list}`); return []; }
-    }
-
-    static color(name) {
-        const includes_plus = name.includes('+') || name.includes('⊕');
-        const includes_minus = name.includes('-') || name.includes('⊖');
-
-        const GRAY = '--tag-bg:#a1a1a1;--tag-text-color:#2b2a2a;--tag-hover:#bababa;--tag-remove-bg:#a1a1a1;--tag-remove-btn-color:#2b2a2a';
-        const RED = '--tag-bg:#d19d9d;--tag-text-color:#530d0d;--tag-hover:#e1b4b4;--tag-remove-bg:#d19d9d;--tag-remove-btn-color:#530d0d';
-        const GREEN = '--tag-bg:#9dd1ab;--tag-text-color:#224939;--tag-hover:#b5e0c1;--tag-remove-bg:#9dd1ab;--tag-remove-btn-color:#224939';
-
-        if (includes_plus && includes_minus) return GRAY;
-        else if (includes_plus) return GREEN;
-        else if (includes_minus) return RED;
-        else return GRAY;
-    }
-
-    static total_modifiers(mods_list) {
-        let boons = 0;
-        let banes = 0;
-        let modifier = 0;
-        let divide = 0;
-        let percent = 0;
-        let tags = [];
-
-        // Add up the totals
-        mods_list.forEach(m => {
-            boons += m.boons || 0;
-            banes += m.banes || 0;
-            modifier += m.modifier || 0;
-            divide += m.divide || 0;
-            percent += m.percent || 0;
-            if (!!m.name) tags.push(m.name);
-        });
-
-        return { boons: boons, banes: banes, modifier: modifier, divide: divide, percent: percent, tags: tags };
-    }
-
-    static list_from_string(input_str) {
-        let json_list = null;
-        try { json_list = JSON.parse(input_str); }
-        catch (e) { console.error("Error parsing list from tagify"); }
-
-        if (!json_list) return [];
-        if (!Array.isArray(json_list)) json_list = [json_list];
-
-        return json_list.map(t => ModifierSet.from_tag(t));
-    }
-
-    static from_tag(tag_json) {
-        // '[{"value":"Dazed ⊖","title":"Dazed","color":"red"},{"value":"Confused ⊕"},{"value":"Skilled +2"}]'
-        if (!tag_json.value) return {};
-
-        // Parse the tag name
-        const parts = tag_json.value.split(" ");
-        const all_mods = parts.pop();
-        const name = parts.join(" ");
-
-        // Count boons, banes and mod
-        let modifier = parseInt(all_mods.replace(/^\D+/, '')) || null;
-        let leading = all_mods.replace(/[0-9]/g, '');
-        if (modifier !== null && leading.at(-1) === '-') modifier *= -1; // If mod is negative, make it so
-        if (modifier !== null) leading = leading.slice(0, -1);
-        let boons = (leading.match(/[+⊕]/g) || []).length ;
-        let banes = (leading.match(/[-⊖]/g) || []).length ;
-
-        return new ModifierSet({
-            name: name.replace(/[⊕⊖]/g, ''),
-            boons: boons,
-            banes: banes,
-            modifier: modifier || 0
-        });
     }
 }
 
@@ -1012,325 +871,3 @@ export async function test_dialog(dataset) {
         default: "roll"
     }).render(true, { width: 450 });
 }
-
-/**
- * Create a Macro from an Item drop. Get an existing item macro if one exists, otherwise create a new one.
- *
- * @param {Object} data     The dropped data
- * @param {number} slot     The hotbar slot to use
- * @returns {Promise}
- */
-export async function create_hotbar_macro(data, slot) {
-    // Only create macro for tests
-    if (data.type !== 'Test') return;
-
-    // Verify that the actor may be retrieved
-    const actor = token_actor({
-        scene_id: data['sceneId'],
-        token_id: data['tokenId'],
-        actor_id: data['actorId']
-    });
-    if (!actor) return ui.notifications.warn("You can only create macro buttons for known actors");
-
-    // Generate the test label
-    const test = new Test({
-        actor: actor,
-        stat: data['stat'] || data['score'],
-        skill: data['skill'],
-        tn: data['tn']
-    });
-    const label = test.label
-
-    // Get the icon, if any
-    let skill = null;
-    if (!!data['skill']) skill = game.items.find(i => i.name === data['skill'] && i.type === 'skill');
-
-    // Create the macro command
-    const data_string = JSON.stringify(data);
-    const command = `game.sagamachine.sm_test_macro(${data_string});`;
-    let macro = game.macros.find(m => (m.name === label) && (m.command === command));
-    let macro_spec = { name: label, type: "script", command: command, flags: { "sagamachine.sm_test_macro": true }};
-    if (skill) macro_spec['img'] = skill.img;
-    if (!macro) macro = await Macro.create(macro_spec);
-
-    // Assign to the hotbar
-    game.user.assignHotbarMacro(macro, slot);
-    return false;
-}
-
-/**
- * Create a Macro from an Item drop. Get an existing item macro if one exists, otherwise create a new one.
- *
- * @param {string} dataset
- */
-export async function sm_test_macro(dataset) {
-    // Get the actor from any embedded IDs
-    let actor = token_actor({
-        scene_id: dataset['sceneId'],
-        token_id: dataset['tokenId'],
-        actor_id: dataset['actorId']
-    });
-
-    // If no actor is available, look up using the speaker
-    if (!actor) {
-        const speaker = ChatMessage.getSpeaker();
-        if (speaker.token) actor = game.actors.tokens[speaker.token];
-        if (!actor) actor = game.actors.get(speaker.actor);
-        dataset['actorId'] = actor.id
-    }
-
-    await test_dialog(dataset);
-}
-
-/**
- * Test Drop: Create macro in hotbar
- */
-Hooks.once("ready", async function() {
-  Hooks.on("hotbarDrop", (bar, data, slot) => create_hotbar_macro(data, slot));
-});
-
-/**
- * Drag Chat Card: Attach test data to chat card
- */
-Hooks.on("renderChatMessage", async (app, html, msg) => {
-    if (!html.find('.damage').length) return;  // Do nothing if no damage to attach
-
-    // Is the first hit a critical hit?
-    let critical = !!html.find('.critical').length;
-
-    // Gather data for all hits
-    const hits = [];
-    html.find('.damage').each((i, e) => {
-        const damage = Number($(e).text());
-        const damage_type = $(e).parent().find('.damage-type').text();
-        const pierce_armor = Number($(e).data('pierce')) || 0;
-        hits.push({ damage: damage, damageType: damage_type, critical: critical, pierce: pierce_armor });
-        critical = false; // Subsequent hits aren't critical
-    });
-
-    // Attach drag listener
-    html[0].setAttribute("draggable", true);	// Add draggable and dragstart listener
-    html[0].addEventListener("dragstart", ev => {
-        ev.currentTarget.dataset['hits'] = JSON.stringify(hits);
-		ev.dataTransfer.setData("text/plain", JSON.stringify({ hits: hits }));
-    }, false);
-});
-
-/**
- * Drop Chat Card: Apply damage to target
- */
-Hooks.on("dropActorSheetData", async (actor, sheet, data) => {
-    if (data['hits'])
-        for (let hit of data['hits'])
-            await actor.apply_damage(hit['damage'], hit['damageType'], hit['critical'], hit['pierce']);
-});
-
-/**
- * Chat Card Menu: Add apply damage and push your luck
- */
-Hooks.on("getChatLogEntryContext", (html, options) => {
-    // Push Your Luck option
-    options.push({
-        name: 'Push Your Luck',
-        icon: '<i class="fas fa-dice"></i>',
-        condition: html => !!html.find('.test-json').length,
-        callback: async html => {
-            // Recreate test object from json
-            const test = Test.from_json(JSON.parse(html.find('.test-json').val()));
-
-            // Check for ownership
-            if (!test?.actor?.isOwner)
-                return ui.notifications.warn("You can't Push Your Luck for this character.");
-
-            // Check for enough luck
-            if (test?.actor?.system?.scores?.luck?.value <= 0)
-                return ui.notifications.warn("The character doesn't have enough Luck.");
-
-            // Add additional boon, mark luck tag and re-evaluate
-            test.boons++;
-            test.use_luck = true;
-            await test.evaluate()
-
-            // Decrement luck
-            test.actor.update({'system.scores.luck.value': test.actor.system.scores.luck.value - 1});
-
-            // Apply any immediate test consequences
-            await test.apply_effects();
-
-            // Display the new chat card
-            await test.to_chat({ whisper: html.hasClass('whisper'), rolls: [test.results] });
-        }
-    });
-
-
-    // Apply Damage option
-    options.push({
-        name: 'Apply Damage',
-        icon: '<i class="fas fa-user-minus"></i>',
-        condition: html => !!html.find('.damage').length,
-        callback: html => {
-            // Get all selected tokens
-            let tokens = game?.canvas?.tokens?.controlled;
-
-            // If there are no valid tokens, and you are the GM, give a warning
-            if (!tokens.length && game.user.isGM) { ui.notifications.warn("No valid character selected."); return; }
-
-            // Filter for owned token actors, falling back to player character is none are selected
-            let valid_tokens = tokens.filter(t => t?.document?.actor?.isOwner)
-            if (!valid_tokens.length && game.user.character) valid_tokens = [game.user.character];
-
-            // For all valid actors
-            for (let token of valid_tokens) {
-                let actor = token?.document?.actor;
-                if (actor && actor.isOwner) {
-                    // Is the first hit a critical hit?
-                    let critical = !!html.find('.critical').length;
-
-                    // Apply each damage
-                    html.find('.damage').each((i, e) => {
-                        const damage = Number($(e).text());
-                        const damage_type = $(e).parent().find('.damage-type').text();
-                        const pierce_armor = Number($(e).data('pierce')) || 0;
-
-                        actor.apply_damage(damage, damage_type, critical, pierce_armor);
-                        critical = false; // Subsequent hits aren't critical
-                    });
-                }
-            }
-        }
-    });
-
-    // Edit Test option
-    options.push({
-        name: 'Edit Results',
-        icon: '<i class="fa fa-edit"></i>',
-        condition: html => game.user.isGM,
-        callback: html => {
-            const message_id = html.data('messageId');
-            const test = Test.from_json(JSON.parse(html.find('.test-json').val()));
-
-            // Open edit dialog
-            new Dialog({
-                title: `Edit Results`,
-                content: `
-                    <form class="saga-machine">
-                        <div class="form-group">
-                            <label for="critical">Success</label>
-                            <input type="checkbox" name="success" ${test.success ? 'checked' : ''}>
-                        </div>
-                        <div class="form-group">
-                            <label for="critical">Critical</label>
-                            <input type="checkbox" name="critical" ${test.critical ? 'checked' : ''}>
-                        </div>
-                        <div class="form-group">
-                            <label for="value">Margin</label>
-                            <input type="number" name="margin" value="${test.margin}" autofocus>
-                        </div>
-                        <div class="sheet-body">
-                            <ol class="items-list consequence-list">
-                                <li class="item flexrow items-header consequence-row">
-                                    <div class="item-name">Type</div>
-                                    <div class="item-name">Value</div>
-                                    <div class="item-controls">
-                                        <a class="item-control item-create" title="Create consequence"><i class="fas fa-plus"></i> Add</a>
-                                    </div>
-                                </li>
-                
-                                <li class="item flexrow consequence consequence-row prototype">
-                                    <select class="item-input item-name" name="type">
-                                        <option value="damage">Damage</option>
-                                        <option value="consequence">Consequence</option>
-                                        <option value="defense">Defense</option>
-                                        <option value="message">Message</option>
-                                    </select>
-                                    <input class="item-input item-name" type="text" name="value" value="" />
-                                    <div class="item-controls">
-                                        <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
-                                    </div>
-                                </li>
-                            </ol>
-                        </div>
-                    </form>`,
-                render: html => {
-                    // Fill out existing consequences
-                    if (test.effects && test.effects.length) {
-                        // Get the prototype consequence node and parent node
-                        const prototype = html.find('.consequence.prototype');
-                        const parent = html.find('ol.consequence-list');
-
-                        // For each consequence, clone the prototype and set up the form
-                        for (let effect of test.effects) {
-                            let value = null;
-                            switch (effect.type) {
-                                case 'effect': value = effect.name; break;
-                                case 'damage': value = `${Number(effect.value) + (Number(effect.margin) || Number(test.margin))} ${effect.damage_type} ${effect.properties}`; break;
-                                case 'message': value = `${effect.key}: ${effect.value}`; break;
-                                default: value = '';
-                            }
-
-                            const clone = prototype.clone();
-                            clone.removeClass('prototype');
-                            clone.find("[name=type]").val(effect.type);
-                            clone.find("[name=value]").val(value);
-                            parent.append(clone);
-                        }
-                    }
-
-                    html.find('.consequence-list .item-create').click(event => {
-                        // Get the prototype consequence node and parent node, return if it wasn't found
-                        const prototype = html.find('.consequence.prototype');
-                        const parent = html.find('ol.consequence-list');
-                        if (!prototype || !prototype.length || !parent || !parent.length) return;
-
-                        const clone = prototype.clone();
-                        clone.removeClass('prototype');
-                        clone.find('.item-delete').click(event => $(event.currentTarget).closest(".consequence").remove());
-                        parent.append(clone);
-                    });
-                    html.find('.consequence-list .item-delete').click(event => $(event.currentTarget).closest(".consequence").remove());
-                },
-                buttons: {
-                    Edit: {
-                        icon: "<i class='fas fa-check'></i>",
-                        label: 'OK',
-                        callback: async (html) => {
-                            // Set values based on the contents of the form
-                            test.success = html.find("input[name=success]").is(':checked');
-                            test.critical = html.find("input[name=critical]").is(':checked');
-                            test.margin = Number(html.find("input[name=margin]").val());
-                            test.edited = true;
-
-                            const consequences = [];
-                            html.find('.consequence:not(.prototype)').each((i, e) => {
-                                const type = $(e).find('select[name=type]').val();
-                                const value = $(e).find('input[name=value]').val();
-
-                                const params = {};
-                                if      (type === 'consequence') params.name = value.trim();
-                                else if (type === 'message') {
-                                    const parts = value.split(': ');
-                                    if (parts.length >= 2) [params.key, params.value] = [parts[0], parts[1]];
-                                    else [params.key, params.value] = ['Message', parts[0]];
-                                }
-                                else if (type === 'damage') {
-                                    const parts = value.split(' ');
-                                    params.value = Number(parts?.[0]) - test.margin;
-                                    params.damage_type = parts?.[1];
-                                    if (parts.length >= 3) params.properties = Attack.parse_properties(parts.slice(2).join(' '));
-                                }
-
-                                const consequence = new Effect({type: type, ...params}, test);
-                                consequence.apply(test.success ? 'success' : 'failure')
-                                consequences.push(consequence);
-                                test.consequences = consequences;
-                            });
-
-                            // Save edited card
-                            await ChatMessage.updateDocuments([{_id: message_id, content: test.content(), flavor: test.flavor()}], {});
-                        }
-                    }
-                }
-            }).render(true);
-        }
-    });
-});

@@ -1,4 +1,4 @@
-import { random_member } from "../utils.js";
+import { random_member } from "../system/utils.js";
 
 /**
  * A simple data class representing narrative aspects of a wound ahead of being transformed into a consequence.

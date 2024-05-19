@@ -302,14 +302,14 @@ export class SagaMachineItemSheet extends ItemSheet {
      * @return {string}
      */
     search_effects(attack, type, property, find_all=false) {
-        // Ensure that consequences are in the right format
+        // Ensure that effects are in the right format
         if (!attack.effects || !attack.effects.length) return '';
-        let parsed_consequences = typeof attack.effects === 'string' ?
+        let parsed_effects = typeof attack.effects === 'string' ?
             JSON.parse(attack.effects) : attack.effects;
-        parsed_consequences = Array.isArray(parsed_consequences) ? parsed_consequences : [parsed_consequences];
+        parsed_effects = Array.isArray(parsed_effects) ? parsed_effects : [parsed_effects];
 
         const all_found = [];
-        for (let con of parsed_consequences) {
+        for (let con of parsed_effects) {
             if (con.type === type) {
                 let found = con[property];
                 if (found === undefined || found === null) found = '';

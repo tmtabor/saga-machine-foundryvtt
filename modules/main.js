@@ -1,12 +1,13 @@
 import { SagaMachineActor } from "./actor/actor.js";
 import { CharacterSheet, StashSheet, VehicleSheet } from "./actor/actor-sheet.js";
-import { SagaMachineCombat, SagaMachineCombatant, SagaMachineCombatTracker } from "./system/combat.js";
-import { generate_conditions } from "./system/conditions.js";
+import { SagaMachineCombat, SagaMachineCombatant, SagaMachineCombatTracker } from "./game/combat.js";
+import { generate_conditions } from "./game/consequences.js";
 import { SagaMachineItem } from "./item/item.js";
 import { SagaMachineItemSheet } from "./item/item-sheet.js";
-import { sm_test_macro } from "./system/tests.js";
-import { create_active_effect, create_item, delete_active_effect, delete_item, pre_create_active_effect,
-         pre_delete_active_effect, pre_update_combat, update_active_effect, update_actor, update_item } from "./hooks.js";
+import { create_active_effect, create_item, delete_active_effect, delete_item, drop_actor_sheet_data,
+    get_chat_log_entry_context, hotbar_drop, pre_create_active_effect, pre_delete_active_effect, pre_update_combat,
+    render_chat_message, update_active_effect, update_actor, update_item } from "./system/hooks.js";
+import { sm_test_macro } from "./system/macros.js";
 
 // Turn on debugging
 CONFIG.debug.hooks = true;
@@ -62,6 +63,10 @@ Hooks.once("init", async () => {
     Hooks.on('deleteActiveEffect', delete_active_effect);
 
     Hooks.on('preUpdateCombat', pre_update_combat);
+    Hooks.on("hotbarDrop", hotbar_drop);
+    Hooks.on("renderChatMessage", render_chat_message);
+    Hooks.on("dropActorSheetData", drop_actor_sheet_data);
+    Hooks.on("getChatLogEntryContext", get_chat_log_entry_context);
 
     // Register system config
     game.settings.register('saga-machine', 'level', {
