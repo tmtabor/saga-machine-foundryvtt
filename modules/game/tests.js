@@ -1,6 +1,7 @@
 import Tagify from "../libraries/tagify.min.js";
 import { capitalize, token_actor } from "../system/utils.js";
 import { ModifierSet } from "./modifiers.js";
+import { Effect } from "./damage.js";
 
 /**
  * Object representing a Saga Machine test
@@ -24,7 +25,7 @@ export class Test {
     use_pair = false;
 
     /**
-     * Initialize from a dataset
+     * Initialize test from a dataset and validate
      *
      * @param dataset
      */
@@ -68,10 +69,20 @@ export class Test {
         }
     }
 
+    /**
+     * Set the actor making the test
+     *
+     * @param {SagaMachineActor} actor
+     */
     set actor(actor) {
         this._actor = actor;
     }
 
+    /**
+     * Get the actor making the test, returning null if not specified
+     *
+     * @return {SagaMachineActor|null}
+     */
     get actor() {
         if (this._actor) return this._actor;    // Return the cached actor, if available
 
@@ -122,7 +133,7 @@ export class Test {
     /**
      * Take the roll results and look for pairs, adding them appropriately if there were boons
      *
-     * @returns {null|(number|boolean)[]}
+     * @returns {[number, boolean]} - the individual value of the highest pair, whether a pair should be used
      */
     make_pairs() {
         // If there weren't any boons, there are no pairs
@@ -157,6 +168,11 @@ export class Test {
         return [highest_pair, use_pair];
     }
 
+    /**
+     * Look up the rank of the skill specified in the test
+     *
+     * @return {number}
+     */
     lookup_skill() {
         // Separate skill name from specialization
         let specialization = this.skill.match(/\(([^\)]+)\)/);
@@ -191,7 +207,7 @@ export class Test {
     /**
      * Calculate the total of the test
      *
-     * @returns {(*|number|number)[]}
+     * @returns {[number, number, number, number]} - total, randomizer, stat, skill values
      */
     calc_total() {
         // Look up the stat or score value
@@ -218,7 +234,7 @@ export class Test {
     /**
      * Look up the Defense or Willpower TN of the targeted token
      *
-     * @returns {(*|number|(function(): (null|null))|number)[]|boolean|number[]}
+     * @returns {[number, SagaMachineActor|null, string|number]} - TN value, target actor, TN string (defense, willpower)
      */
     lookup_tn() {
         if (typeof this.tn !== 'string') return [this.tn, null, null];
@@ -251,7 +267,7 @@ export class Test {
     /**
      * Calculate the margin of success or failure from the TN and total
      *
-     * @returns {(boolean|number)[]}
+     * @returns {[boolean, boolean, number]} -  is success?, is critical?, margin
      */
     calc_margin() {
         // Handle unknown TN
@@ -277,7 +293,7 @@ export class Test {
     /**
      * Evaluate the test
      *
-     * @returns RollResults
+     * @returns {Test}
      */
     async evaluate() {
         // Perform the roll and get the results
@@ -298,6 +314,12 @@ export class Test {
         return this;
     }
 
+    /**
+     * Apply the effects of the action, depending on success or failure
+     *
+     * @param dataset
+     * @return {Promise<void>}
+     */
     async apply_effects(dataset) {
         if (!this.effects) this.effects = []; // Init effects, if needed
         const properties = dataset?.properties || this.properties || [];
@@ -340,12 +362,22 @@ export class Test {
         for (let c of this.effects) c.apply(when, dataset);
     }
 
+    /**
+     * Get the test's first 'damage' type Effect object, return null is no matches
+     *
+     * @return {Effect|null}
+     */
     basic_attack_damage() {
         const damage_effects = this.effects.filter(c => c.type === 'damage');
         if (damage_effects.length) return damage_effects[0];
         else return null;
     }
 
+    /**
+     * Return the "flavor" portion of the test's chat card
+     *
+     * @return {string}
+     */
     flavor() {
         // Create target and result messages
         const target_message = this.target ?
@@ -385,7 +417,6 @@ export class Test {
      * Generate the expanded roll for the test, to be output as a card in chat
      *
      * @returns {string}
-     * @private
      */
     dice_html() {
         let to_return = '<ol class="dice-rolls">';
@@ -398,6 +429,11 @@ export class Test {
         return to_return;
     }
 
+    /**
+     * Return the "content" portion of the test's chat card
+     *
+     * @return {string}
+     */
     content() {
         const stat_span = this.stat_value ? `+ <span title="Stat">${this.stat_value}</span>` : '';
         const skill_span = this.skill_value ? `+ <span title="Skill">${this.skill_value}</span>` : '';
@@ -427,9 +463,16 @@ export class Test {
             <input type="hidden" class="test-json" value='${test_json}' />`;
     }
 
+    /**
+     * Send the test to chat
+     *
+     * @param {boolean} whisper
+     * @param {Roll[]|null} rolls
+     * @return {Promise<void>}
+     */
     async to_chat({ whisper= false, rolls= null }) {
         // Create the chat message
-        const message = await this.results.toMessage({}, {create: false });
+        const message = await this.results.toMessage({}, { create: false });
         message.flavor = this.flavor();
         message.content = this.content();
         message.speaker = ChatMessage.getSpeaker({ actor: this.actor });
@@ -450,6 +493,12 @@ export class Test {
         await ChatMessage.create(message);
     }
 
+    /**
+     * Create a json representation of the specified test
+     *
+     * @param test
+     * @return {*}
+     */
     static to_json(test) {
         const json = {};
         for (let [key, value] of Object.entries(test)) {
@@ -488,6 +537,12 @@ export class Test {
         return json;
     }
 
+    /**
+     * Create a Test object from the given json representation
+     *
+     * @param obj
+     * @return {Test}
+     */
     static from_json(obj) {
         const dataset = {};
         for (let [key, value] of Object.entries(obj)) {
@@ -525,168 +580,6 @@ export class Test {
 }
 
 /**
- * Object representing the effects of a test
- */
-export class Effect {
-    test = null;
-    type = null;        // Valid values are 'consequence', 'damage' and 'defense'
-    target = 'self';    // Valid values are 'self' and 'target'
-    when = 'always';    // Valid values are 'success', 'failure' and 'always'
-    message = ''
-
-    static IGNORES_ALL_ARMOR = -1;
-
-    constructor(dataset, test=null) {
-        Object.assign(this, dataset);   // Assign properties from the dataset
-        if (test) this.test = test;     // Assign the test
-        this.validate(dataset);         // Validate the dataset
-    }
-
-    validate() {
-        if (!['consequence', 'damage', 'defense', 'message'].includes(this.type))
-            throw `Unknown type ${this.type}`;
-    }
-
-    right_time(when) {
-        return this.when === 'always' || this.when === when;
-    }
-
-    format_message(key, value) {
-        return `<div><strong>${key}:</strong> ${value}</div>`;
-    }
-
-    effect() {
-        if (this.type === 'damage') return `${this.value} ${this.damage_type}`;
-        else if (this.type === 'consequence') return this.name;
-        else return 'Special';
-    }
-
-    consequence_link(name=null) {
-        // If no provided name, use the default one
-        if (!name) name = this.name;
-
-        // Get the consequence, if it exists as an item
-        let consequence = game.items.filter(item => item.type === 'consequence' && item.name === name);
-        if (!consequence || !consequence.length) return name;
-        return `<a class="content-link" draggable="true" data-uuid="Item.${consequence[0].id}" data-id="${consequence[0].id}" data-type="Item" data-tooltip="Item"><i class="fas fa-suitcase"></i>${name}</a>`;
-    }
-
-    base_damage() {
-        let damage = 0;
-
-        // Search damage string for each stat and apply
-        let str_dmg = String(this.value).toLowerCase();
-        if (str_dmg.includes('str')) damage += Number(this?.test?.actor?.system?.stats?.strength?.value);
-        if (str_dmg.includes('dex')) damage += Number(this?.test?.actor?.system?.stats?.dexterity?.value);
-        if (str_dmg.includes('spd')) damage += Number(this?.test?.actor?.system?.stats?.speed?.value);
-        if (str_dmg.includes('end')) damage += Number(this?.test?.actor?.system?.stats?.endurance?.value);
-        if (str_dmg.includes('int')) damage += Number(this?.test?.actor?.system?.stats?.intelligence?.value);
-        if (str_dmg.includes('per')) damage += Number(this?.test?.actor?.system?.stats?.perception?.value);
-        if (str_dmg.includes('chr')) damage += Number(this?.test?.actor?.system?.stats?.charisma?.value);
-        if (str_dmg.includes('det')) damage += Number(this?.test?.actor?.system?.stats?.determination?.value);
-
-        // Strip the damage string of any alphabetic characters, add and return
-        str_dmg = str_dmg.replace(/[^\d.-]/g, '');
-        damage += Number(str_dmg);
-        return damage;
-    }
-
-    apply(when='always', dataset) {
-        if (!dataset) dataset = this;
-
-        if (this.type === 'consequence' && this.right_time(when))    this.apply_consequence();
-        if (this.type === 'damage' && this.right_time(when))         this.apply_damage(dataset);
-        if (this.type === 'defense' && this.right_time(when))        this.apply_defense();
-        if (this.type === 'message' && this.right_time(when))        this.apply_message();
-
-        return this;
-    }
-
-    apply_message() {
-        this.message = this.format_message(this.key ? this.key : 'Message', this.value);
-    }
-
-    apply_consequence() {
-        // Attach subject to name if specified
-        const clean_name = this.name ? this.name : 'Unknown';
-        const full_name = this.subject ? `${clean_name} (${this.subject})` : clean_name;
-
-        // Create the embedded consequence link
-        let link = this.consequence_link(full_name);
-        if (!link) link = full_name;
-
-        // Set the message
-        this.message = this.format_message('Consequence', link);
-    }
-
-    apply_damage(dataset) {
-        // Calculate the damage
-        let base_damage = this.base_damage();                         // Base damage
-        let margin = this.margin ? Number(this.margin) :              // Get the margin
-            (this.test && this.test.margin ? Number(this.test.margin) : 0);
-
-        // Handle the Feeble property
-        this.properties = Attack.parse_properties(dataset.properties);
-        if (Attack.has_property(this.properties, 'Feeble'))
-            margin = Math.min(base_damage, margin);
-
-        // Handle the Ignores and Pierce properties
-        const ignores = Attack.has_property(this.properties, 'Ignores');
-        const pierce = ignores ? Effect.IGNORES_ALL_ARMOR : Attack.property_value(this.properties, 'Pierce');
-
-        let damage = base_damage + margin;                              // Add base damage and margin
-        if (damage < 0) damage = 0;                                     // Minimum 0
-
-        // Get the damage type
-        const damage_type = this.damage_type ? this.damage_type : '';
-
-        // Set the message
-        this.message = this.format_message('Damage',
-            `<span class="damage" data-pierce="${pierce}">${damage}</span> <span class="damage-type">${damage_type}</span>`);
-    }
-
-    /**
-     * Update the actor's Defense and Willpower TNs after a Defense roll
-     */
-    apply_defense() {
-        if (!this.test) return; // If no test is know, nothing to do now
-
-        // Get the target
-        let target = null;
-        if (this.target === 'self')                             target = this.test.actor;
-        else if (this.target === 'target' && this.test.target)  target = this.test.target;
-
-        // Calculate the TNs
-        const defense_tn = target.system.scores.defense.value + this.test.randomizer;
-        const willpower_tn = target.system.scores.willpower.value + this.test.randomizer;
-
-        // Update defense and willpower
-        target.update({'system.scores.defense.tn': defense_tn});
-        target.update({'system.scores.willpower.tn': willpower_tn});
-
-        // Set the message
-        this.message = this.format_message('Defense', `TN ${defense_tn}`) +
-            this.format_message('Willpower', `TN ${willpower_tn}`);
-    }
-
-    static to_json(test) {
-        const json = {};
-        for (let [key, value] of Object.entries(test)) {
-            // For basic data, copy it over to the JSON
-            if (typeof value === 'string' || typeof value === 'number' ||
-                typeof value === 'boolean' || value === null || key === 'properties')
-                json[key] = value;
-        }
-
-        return json;
-    }
-
-    static from_json(obj) {
-        return new Effect(obj);
-    }
-}
-
-/**
  * Object representing an Attack test
  *
  * @extends Test
@@ -695,10 +588,20 @@ export class Attack extends Test {
     _effects_string = null;
     _effect = null;
 
+    /**
+     * Get the name of the attack, defaulting to "Unnamed Attack"
+     *
+     * @return {string}
+     */
     get full_name() {
         return this.name || "Unnamed Attack";
     }
 
+    /**
+     * Return a json string containing all the attack's effects - used in HTML templates
+     *
+     * @return {string}
+     */
     get effects_string() {
         // Return cached version
         if (this._effects_string) return this._effects_string;
@@ -709,6 +612,11 @@ export class Attack extends Test {
         return this.effects_string;
     }
 
+    /**
+     * Returns a list containing all the attack's Effect objects
+     *
+     * @return {Effect[]}
+     */
     get effect() {
         // Return cached version
         if (this._effect) return this._effect;
@@ -718,10 +626,23 @@ export class Attack extends Test {
         return this._effect
     }
 
+    /**
+     * Returns whether this test is an attack (shorthand: targets Defense or Willpower)
+     *
+     * @param dataset
+     * @return {boolean}
+     */
     static is_attack(dataset) {
         return dataset.tn === 'Defense' || dataset.tn === 'Willpower';
     }
 
+    /**
+     * Returns whether the character meets the strength requirements for the attack
+     *
+     * @param dataset
+     * @param {SagaMachineActor} actor
+     * @return {boolean}
+     */
     static strength_met(dataset, actor=null) {
         // Get a reference to the actor if one has not been provided
         if (!actor) actor = token_actor({
@@ -741,11 +662,17 @@ export class Attack extends Test {
         else            return strength >= (light || damage)
     }
 
+    /**
+     * Returns the base damage value of the attack
+     *
+     * @param dataset
+     * @return {number}
+     */
     static damage(dataset) {
-        if (!dataset.consequences) return 0;
+        if (!dataset.effects) return 0;
 
         // Parse effects into a list
-        let effects_list = JSON.parse(dataset.consequences);
+        let effects_list = JSON.parse(dataset.effects);
         if (!Array.isArray(effects_list)) effects_list = [effects_list];
 
         // Get the damage
@@ -757,12 +684,25 @@ export class Attack extends Test {
         return 0;
     }
 
+    /**
+     * Parses the attacks properties, if necessary, from string to list
+     *
+     * @param properties
+     * @return {string[]}
+     */
     static parse_properties(properties) {
         if (typeof properties === 'string') return properties.split(',').map(t => t.trim());
         else if (Array.isArray(properties)) return properties;
         else return [];
     }
 
+    /**
+     * Returns the value of the specified property, returning 0 if not specified or no match
+     *
+     * @param {string|string[]} properties
+     * @param {string} property
+     * @return {number}
+     */
     static property_value(properties, property) {
         for (const prop of Attack.parse_properties(properties)) {
             if (prop.toLowerCase().startsWith(`${property.toLowerCase()} `)) {
@@ -773,6 +713,13 @@ export class Attack extends Test {
         return 0;
     }
 
+    /**
+     * Returns whether the attack has the specified property
+     *
+     * @param {string|string[]} properties
+     * @param {string} property
+     * @return {boolean}
+     */
     static has_property(properties, property) {
         return Attack.parse_properties(properties).map(p => p.split(' ')[0]).includes(property);
     }
@@ -793,7 +740,7 @@ export async function test_dialog(dataset) {
     });
 
     const dialog_content = await renderTemplate("systems/saga-machine/templates/test-dialog.html",
-        { ...actor.sheet.getData(), ...dataset });
+        { actor: { ...actor.sheet.getData().data }, ...dataset });
 
     new Dialog({
         title: "Make Test",

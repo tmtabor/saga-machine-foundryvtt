@@ -1,4 +1,5 @@
-import { Attack, Effect, Test } from "../game/tests.js";
+import { Attack, Test } from "../game/tests.js";
+import { Effect } from "../game/damage.js";
 
 /**
  * Attach test data to the chat card

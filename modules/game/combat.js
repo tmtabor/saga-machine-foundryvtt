@@ -1,5 +1,5 @@
-import { Effect } from "./tests.js";
 import { SagaMachineActor } from "../actor/actor.js";
+import { Effect } from "./damage.js";
 
 /**
  * Initiative constants for FAST / NPC / SLOW turns

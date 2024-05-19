@@ -1,8 +1,8 @@
 import { INITIATIVE } from "../game/combat.js";
-import { Attack, Test, Effect } from "../game/tests.js";
+import { Attack, Test } from "../game/tests.js";
 import { standard_consequence } from "../game/consequences.js";
 import { median } from "../system/utils.js";
-import { WoundFactory } from "../game/wounds.js";
+import { Effect, WoundFactory } from "../game/damage.js";
 import { ModifierSet } from "../game/modifiers.js";
 
 /**
