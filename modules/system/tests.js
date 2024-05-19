@@ -44,22 +44,22 @@ export class Test {
         if (this.banes && !isNaN(this.banes)) this.banes = Number(this.banes); else this.banes = 0;
         if (this.modifier && !isNaN(this.modifier)) this.modifier = Number(this.modifier); else this.modifier = 0;
 
-        // Parse the consequences, if any
-        if (this.consequences) {
-            // If the consequences are already parsed, return
-            if (Array.isArray(this.consequences) && this.consequences.every(c => c instanceof Consequence))
+        // Parse the effects, if any
+        if (this.effects) {
+            // If the efects are already parsed, return
+            if (Array.isArray(this.effects) && this.effects.every(c => c instanceof Effect))
                 return;
 
             // Otherwise, parse them if a string
-            let consequence_list = null;
-            if (typeof this.consequences === 'string') consequence_list = JSON.parse(this.consequences);
-            else consequence_list = this.consequences;
+            let effects_list = null;
+            if (typeof this.effects === 'string') effects_list = JSON.parse(this.effects);
+            else effects_list = this.effects;
 
-            // And transform the into consequence objects
-            if (!Array.isArray(consequence_list)) consequence_list = [consequence_list];
-            for (let i = 0; i < consequence_list.length; i++)
-                consequence_list[i] = new Consequence(consequence_list[i], this);
-            this.consequences = consequence_list;
+            // And transform the into effect objects
+            if (!Array.isArray(effects_list)) effects_list = [effects_list];
+            for (let i = 0; i < effects_list.length; i++)
+                effects_list[i] = new Effect(effects_list[i], this);
+            this.effects = effects_list;
         }
     }
 
@@ -293,15 +293,15 @@ export class Test {
         return this;
     }
 
-    async apply_consequences(dataset) {
-        if (!this.consequences) this.consequences = []; // Init consequences, if needed
+    async apply_effects(dataset) {
+        if (!this.effects) this.effects = []; // Init effects, if needed
         const properties = dataset?.properties || this.properties || [];
-        if (!this.consequences_evaluated) {
+        if (!this.effects_evaluated) {
             // Handle extra hits and shots from the Auto property
             if (Attack.has_property(properties, 'Auto')) {
                 const base_attack = this.basic_attack_damage() || {value: 0, damage_type: 'sm'};
                 for (let m_count = this.margin - 5; m_count > 0; m_count -= 5)
-                    this.consequences.push(new Consequence({
+                    this.effects.push(new Effect({
                         type: 'damage',
                         value: base_attack.value,
                         damage_type: base_attack.damage_type,
@@ -310,7 +310,7 @@ export class Test {
                         target: 'target',
                         properties: properties
                     }, this));
-                this.consequences.push(new Consequence({
+                this.effects.push(new Effect({
                     type: 'message',
                     key: 'Ammo',
                     value: `Automatic fire consumes ${Attack.property_value(properties, 'Auto')} shots.`
@@ -319,25 +319,25 @@ export class Test {
 
             // Handle the Stun property
             if (Attack.has_property(properties, 'Stun'))
-                this.consequences.push(new Consequence({ type: 'consequence', name: 'Stun', when: 'success', target: 'target' }, this));
+                this.effects.push(new Effect({ type: 'consequence', name: 'Stun', when: 'success', target: 'target' }, this));
 
             const ordering = ['defense', 'damage', 'consequence', 'message'];
-            this.consequences.sort((a, b) => {
+            this.effects.sort((a, b) => {
                 if (ordering.indexOf(a.type) > ordering.indexOf(b.type)) return 1;
                 if (ordering.indexOf(a.type) < ordering.indexOf(b.type)) return -1;
                 if (ordering.indexOf(a.type) === ordering.indexOf(b.type)) return 0;
             });
-            this.consequences_evaluated = true;
+            this.effects_evaluated = true;
         }
 
         // Apply consequences
         const when = this.success ? 'success' : (this.tn ? 'failure' : 'always');
-        for (let c of this.consequences) c.apply(when, dataset);
+        for (let c of this.effects) c.apply(when, dataset);
     }
 
     basic_attack_damage() {
-        const damage_consequences = this.consequences.filter(c => c.type === 'damage');
-        if (damage_consequences.length) return damage_consequences[0];
+        const damage_effects = this.effects.filter(c => c.type === 'damage');
+        if (damage_effects.length) return damage_effects[0];
         else return null;
     }
 
@@ -351,11 +351,11 @@ export class Test {
         const result_message = this.tn ?
             `<div><strong>Result:</strong> <span class="${success_class}">${success_message}</span> Margin ${this.margin}</div>` : '';
 
-        // Create the consequence message, if any
-        let consequence_message = '';
-        if (this.consequences)
-            for (let c of this.consequences)
-                consequence_message += c.message;
+        // Create the effect message, if any
+        let effect_message = '';
+        if (this.effects)
+            for (let c of this.effects)
+                effect_message += c.message;
 
         // Create the tags
         let tags = '';
@@ -371,7 +371,7 @@ export class Test {
         return `<h4 class="action">${this.label}</h4>
                 ${target_message} 
                 ${result_message} 
-                ${consequence_message}
+                ${effect_message}
                 <hr />
                 <div class="tags">${tags}</div>`;
     }
@@ -462,12 +462,12 @@ export class Test {
                 else json[key] = { token_id: value.token.id, scene_id: value.token.parent.id };
             }
 
-            // Special handling for consequences
-            else if (key === 'consequences') {
-                const con_json = [];
-                for (let con of test.consequences)
-                    con_json.push(Consequence.to_json(con));
-                json[key] = con_json;
+            // Special handling for effects
+            else if (key === 'effects') {
+                const effect_json = [];
+                for (let con of test.effects)
+                    effect_json.push(Effect.to_json(con));
+                json[key] = effect_json;
             }
 
             // Special handling for results
@@ -501,8 +501,8 @@ export class Test {
                 });
             }
 
-            // Special handling for consequences
-            else if (key === 'consequences') dataset[key] = value;
+            // Special handling for effects
+            else if (key === 'effects') dataset[key] = value;
 
             // Special handling for results
             else if (key === 'results') {
@@ -520,9 +520,9 @@ export class Test {
 }
 
 /**
- * Object representing the consequences of a test
+ * Object representing the effects of a test
  */
-export class Consequence {
+export class Effect {
     test = null;
     type = null;        // Valid values are 'consequence', 'damage' and 'defense'
     target = 'self';    // Valid values are 'self' and 'target'
@@ -627,7 +627,7 @@ export class Consequence {
 
         // Handle the Ignores and Pierce properties
         const ignores = Attack.has_property(this.properties, 'Ignores');
-        const pierce = ignores ? Consequence.IGNORES_ALL_ARMOR : Attack.property_value(this.properties, 'Pierce');
+        const pierce = ignores ? Effect.IGNORES_ALL_ARMOR : Attack.property_value(this.properties, 'Pierce');
 
         let damage = base_damage + margin;                              // Add base damage and margin
         if (damage < 0) damage = 0;                                     // Minimum 0
@@ -677,7 +677,7 @@ export class Consequence {
     }
 
     static from_json(obj) {
-        return new Consequence(obj);
+        return new Effect(obj);
     }
 }
 
@@ -685,29 +685,29 @@ export class Consequence {
  * Object representing an Attack test
  */
 export class Attack extends Test {
-    _consequences_string = null;
+    _effects_string = null;
     _effect = null;
 
     get full_name() {
         return this.name || "Unnamed Attack";
     }
 
-    get consequences_string() {
+    get effects_string() {
         // Return cached version
-        if (this._consequences_string) return this._consequences_string;
+        if (this._effects_string) return this._effects_string;
 
         // Or lazily generate the string and return
-        this._consequences_string = this.consequences ?
-            JSON.stringify(this.consequences.map(c => Consequence.to_json(c))) : "[]";
-        return this.consequences_string;
+        this._effects_string = this.effects ?
+            JSON.stringify(this.effects.map(c => Effect.to_json(c))) : "[]";
+        return this.effects_string;
     }
 
     get effect() {
         // Return cached version
         if (this._effect) return this._effect;
 
-        // If there are no consequences specified, return empty string, otherwise, compile the list of effects
-        this._effect = this.consequences ? this.consequences.map(c => c.effect()).join(', ') : '';
+        // If there are no effects specified, return empty string, otherwise, compile the list of effects
+        this._effect = this.effects ? this.effects.map(c => c.effect()).join(', ') : '';
         return this._effect
     }
 
@@ -737,14 +737,14 @@ export class Attack extends Test {
     static damage(dataset) {
         if (!dataset.consequences) return 0;
 
-        // Parse consequences into a list
-        let consequence_list = JSON.parse(dataset.consequences);
-        if (!Array.isArray(consequence_list)) consequence_list = [consequence_list];
+        // Parse effects into a list
+        let effects_list = JSON.parse(dataset.consequences);
+        if (!Array.isArray(effects_list)) effects_list = [effects_list];
 
         // Get the damage
-        for (let i = 0; i < consequence_list.length; i++) {
-            const consequence = new Consequence(consequence_list[i]);
-            if (consequence.type === 'damage') return consequence.base_damage();
+        for (let i = 0; i < effects_list.length; i++) {
+            const effect = new Effect(effects_list[i]);
+            if (effect.type === 'damage') return effect.base_damage();
         }
 
         return 0;
@@ -982,7 +982,7 @@ export async function test_dialog(dataset) {
                             ModifierSet.list_from_string(html.find('input[name=modifiers]').val())
                         );
                         const tn = html.find('input[name=tn]').val();
-                        const consequences = html.find('input[name=consequences]').val();
+                        const effects = html.find('input[name=effects]').val();
 
                         // Create and evaluate the test
                         const test = new Test({
@@ -994,12 +994,12 @@ export async function test_dialog(dataset) {
                             modifier: modifier || 0,
                             tags: tags,
                             tn: tn || null,
-                            consequences: consequences || null
+                            effects: effects || null
                         });
                         await test.evaluate();
 
-                        // Apply any immediate test consequences
-                        await test.apply_consequences(dataset);
+                        // Apply any immediate test effects
+                        await test.apply_effects(dataset);
 
                         // Send the message to chat
                         const whisper = !!dataset['whisper'];
@@ -1155,7 +1155,7 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
             test.actor.update({'system.scores.luck.value': test.actor.system.scores.luck.value - 1});
 
             // Apply any immediate test consequences
-            await test.apply_consequences();
+            await test.apply_effects();
 
             // Display the new chat card
             await test.to_chat({ whisper: html.hasClass('whisper'), rolls: [test.results] });
@@ -1253,24 +1253,24 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
                     </form>`,
                 render: html => {
                     // Fill out existing consequences
-                    if (test.consequences && test.consequences.length) {
+                    if (test.effects && test.effects.length) {
                         // Get the prototype consequence node and parent node
                         const prototype = html.find('.consequence.prototype');
                         const parent = html.find('ol.consequence-list');
 
                         // For each consequence, clone the prototype and set up the form
-                        for (let consequence of test.consequences) {
+                        for (let effect of test.effects) {
                             let value = null;
-                            switch (consequence.type) {
-                                case 'consequence': value = consequence.name; break;
-                                case 'damage': value = `${Number(consequence.value) + (Number(consequence.margin) || Number(test.margin))} ${consequence.damage_type} ${consequence.properties}`; break;
-                                case 'message': value = `${consequence.key}: ${consequence.value}`; break;
+                            switch (effect.type) {
+                                case 'effect': value = effect.name; break;
+                                case 'damage': value = `${Number(effect.value) + (Number(effect.margin) || Number(test.margin))} ${effect.damage_type} ${effect.properties}`; break;
+                                case 'message': value = `${effect.key}: ${effect.value}`; break;
                                 default: value = '';
                             }
 
                             const clone = prototype.clone();
                             clone.removeClass('prototype');
-                            clone.find("[name=type]").val(consequence.type);
+                            clone.find("[name=type]").val(effect.type);
                             clone.find("[name=value]").val(value);
                             parent.append(clone);
                         }
@@ -1319,7 +1319,7 @@ Hooks.on("getChatLogEntryContext", (html, options) => {
                                     if (parts.length >= 3) params.properties = Attack.parse_properties(parts.slice(2).join(' '));
                                 }
 
-                                const consequence = new Consequence({type: type, ...params}, test);
+                                const consequence = new Effect({type: type, ...params}, test);
                                 consequence.apply(test.success ? 'success' : 'failure')
                                 consequences.push(consequence);
                                 test.consequences = consequences;

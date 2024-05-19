@@ -253,7 +253,7 @@ export class SagaMachineItemSheet extends ItemSheet {
                 stat: stat,
                 skill: skill,
                 tn: targets,
-                consequences: this.create_consequences(damage, damage_type, consequences)
+                effects: this.create_effects(damage, damage_type, consequences)
             };
             if (name) attack['name'] = name;
             if (properties) attack['properties'] = properties;
@@ -270,7 +270,7 @@ export class SagaMachineItemSheet extends ItemSheet {
      * @return {string}
      */
     find_damage(attack) {
-        return this.search_consequences(attack, 'damage', 'value');
+        return this.search_effects(attack, 'damage', 'value');
     }
 
     /**
@@ -279,32 +279,33 @@ export class SagaMachineItemSheet extends ItemSheet {
      * @return {string}
      */
     find_damage_type(attack) {
-        return this.search_consequences(attack, 'damage', 'damage_type');
+        return this.search_effects(attack, 'damage', 'damage_type');
     }
 
     /**
      * Get any consequences imposed with a successful attack
+     *
      * @param {Attack} attack
      * @return {string}
      */
     find_consequences(attack) {
-        return this.search_consequences(attack, 'consequence', 'name', true);
+        return this.search_effects(attack, 'consequence', 'name', true);
     }
 
     /**
      * Search those all effects imposed by the attack and return those matching the specified type
      *
      * @param {Attack} attack - The Attack object to search
-     * @param {string} type - The type of the Consequence object
+     * @param {string} type - The type of the Effect object
      * @param {string} property - The property of the object containing the desired value
      * @param {boolean} find_all - Whether to return all instances of the matching type or only the first
      * @return {string}
      */
-    search_consequences(attack, type, property, find_all=false) {
+    search_effects(attack, type, property, find_all=false) {
         // Ensure that consequences are in the right format
-        if (!attack.consequences || !attack.consequences.length) return '';
-        let parsed_consequences = typeof attack.consequences === 'string' ?
-            JSON.parse(attack.consequences) : attack.consequences;
+        if (!attack.effects || !attack.effects.length) return '';
+        let parsed_consequences = typeof attack.effects === 'string' ?
+            JSON.parse(attack.effects) : attack.effects;
         parsed_consequences = Array.isArray(parsed_consequences) ? parsed_consequences : [parsed_consequences];
 
         const all_found = [];
@@ -320,18 +321,18 @@ export class SagaMachineItemSheet extends ItemSheet {
     }
 
     /**
-     * Create new Consequence objects for the entered damage and consequences
+     * Create new Effect objects for the entered damage and consequences
      *
      * @param {string} damage - The damage to apply
      * @param {string} damage_type - The damage type in abbreviated format (e.g. cut, pi, sm)
      * @param {string} consequences - The names of any consequences to impose
-     * @return {Consequence[]}
+     * @return {Effect[]}
      */
-    create_consequences(damage, damage_type, consequences) {
-        const consequences_list = [];
+    create_effects(damage, damage_type, consequences) {
+        const effects_list = [];
 
         if (damage !== '') {
-            consequences_list.push({
+            effects_list.push({
                 type: "damage",
                 value: damage,
                 damage_type: damage_type,
@@ -342,14 +343,14 @@ export class SagaMachineItemSheet extends ItemSheet {
         if (consequences !== '') {
             const all_consequences = consequences.split(',').map(c => c.trim());
             for (let con of all_consequences)
-                consequences_list.push({
+                effects_list.push({
                     type: "consequence",
                     name: con,
                     when: "success"
                 });
         }
 
-        return consequences_list;
+        return effects_list;
     }
 
     /****************************************

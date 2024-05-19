@@ -1,4 +1,4 @@
-import { Consequence } from "./tests.js";
+import { Effect } from "./tests.js";
 import {SagaMachineActor} from "../actor/actor";
 
 /**
@@ -157,7 +157,7 @@ export class SagaMachineCombat extends Combat {
             if (c.actor.statuses.has('bleeding') && !c.actor.statuses.has('defeated')) {
                 c.actor.items.filter(c => c.type === "consequence" && c.name === "Bleeding").forEach(b => {
                     if (b.system.rank > 0) {
-                        const damage = new Consequence({
+                        const damage = new Effect({
                             "type": "damage",
                             "value": b.system.rank,
                             "damage_type": b.system.specialization,

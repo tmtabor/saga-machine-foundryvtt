@@ -1,5 +1,5 @@
 import { INITIATIVE } from "../system/combat.js";
-import { ModifierSet, Attack, Test, Consequence } from "../system/tests.js";
+import { ModifierSet, Attack, Test, Effect } from "../system/tests.js";
 import { standard_consequence } from "../system/conditions.js";
 import { median } from "../utils.js";
 import { WoundFactory } from "../system/wounds.js";
@@ -217,7 +217,7 @@ export class SagaMachineActor extends Actor {
      * @param {number} damage - The amount of damage being dealt
      * @param {string} type - The type of damage being dealt in abbreviated format (e.g. cut, pi, sm)
      * @param {boolean|string} critical - Whether the damage is being dealt by a critical hit
-     * @param {number} pierce - The Pierce property of the attack; for Ignores set to Consequence.IGNORES_ALL_ARMOR.
+     * @param {number} pierce - The Pierce property of the attack; for Ignores set to Effect.IGNORES_ALL_ARMOR.
      * @returns {Promise<void>}
      */
     async apply_damage(damage, type, critical, pierce) {
@@ -225,7 +225,7 @@ export class SagaMachineActor extends Actor {
         pierce = Number(pierce);                                 // Cast pierce to number
 
         // Calculate the damage to apply
-        let applied_damage = pierce === Consequence.IGNORES_ALL_ARMOR ?
+        let applied_damage = pierce === Effect.IGNORES_ALL_ARMOR ?
             Number(damage) :
             Number(damage) - Math.max(this.system.scores.armor.value - Math.max(pierce, 0), 0);
 
@@ -493,7 +493,7 @@ export class SagaMachineActor extends Actor {
         if (dataset.evaluate !== false) await test.evaluate();
 
         // Apply consequences, unless apply_consequences=false
-        if (dataset.apply_consequences !== false) await test.apply_consequences(dataset);
+        if (dataset.apply_consequences !== false) await test.apply_effects(dataset);
 
         // Send to chat, if chat=true, whisper if whisper=true
         if (dataset.chat) await test.to_chat({ whisper: !!dataset.whisper });
