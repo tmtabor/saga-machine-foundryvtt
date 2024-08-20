@@ -434,11 +434,11 @@ export class SagaMachineActor extends Actor {
         let mods_object = null;
 
         // Look up the modifiers for this test
-        if (dataset.base_score)                                     mods_object = deepClone(this.system.modifiers.scores[dataset.base_score]);
-        if (dataset.tn === 'Defense' || dataset.tn === 'Willpower') mods_object = deepClone(this.system.modifiers.other.attack);
+        if (dataset.base_score)                                     mods_object = foundry.utils.deepClone(this.system.modifiers.scores[dataset.base_score]);
+        if (dataset.tn === 'Defense' || dataset.tn === 'Willpower') mods_object = foundry.utils.deepClone(this.system.modifiers.other.attack);
         if (!mods_object?.length && (dataset.score === 'defense' ||
-            dataset.score === 'willpower'))                         mods_object = deepClone(this.system.modifiers.other.defense);
-        if (!mods_object?.length && dataset.stat)                   mods_object = deepClone(this.system.modifiers.stats[dataset.stat]);
+            dataset.score === 'willpower'))                         mods_object = foundry.utils.deepClone(this.system.modifiers.other.defense);
+        if (!mods_object?.length && dataset.stat)                   mods_object = foundry.utils.deepClone(this.system.modifiers.stats[dataset.stat]);
         if (!mods_object) mods_object = [];
 
         // Verify that the mods object is a list
