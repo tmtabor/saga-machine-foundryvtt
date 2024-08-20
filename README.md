@@ -21,6 +21,12 @@ Saga Machine Unified for Foundry Virtual Tabletop is currently in an "advanced a
 
 **Version 0.3.0**: Mostly feature complete, albeit without extensive compendia.
 
+## Development
+
+Changes need to be made to the source code and then transpiled to a minified state using parcel. A run target has been added to make this easier.
+
+> npm run build
+
 ## Notable Features
 
 - Test margin and damage calculation that takes into account size, weapons, armor and traits.

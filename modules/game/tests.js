@@ -484,13 +484,10 @@ export class Test {
         }
 
         // Set as a whisper, if requested
-        if (whisper) {
-            message.type = CONST.CHAT_MESSAGE_TYPES.WHISPER;
-            message.whisper = game.users.filter(u => u.isGM || u.character?.id === this.actor?.id ).map(u => u.id);
-        }
+        const operation = whisper ? { rollMode: CONST.DICE_ROLL_MODES.PRIVATE, create: true } : { create: true };
 
         // Send the message to chat
-        await ChatMessage.create(message);
+        await ChatMessage.create(message, operation);
     }
 
     /**
