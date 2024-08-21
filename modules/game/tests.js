@@ -4,6 +4,44 @@ import { ModifierSet } from "./modifiers.js";
 import { Effect } from "./damage.js";
 
 /**
+ * Register Handlebars helpers for test dialog
+ */
+Hooks.once("init", async () => {
+    // Register handlebars helpers
+    Handlebars.registerHelper("skillSelect", (selected, options) => {
+        const escapedValue = RegExp.escape(Handlebars.escapeExpression(selected));
+        const rgx = new RegExp(` value=[\"']${escapedValue}[\"\']`);
+        const html = options.fn(this);
+        return html.replace(rgx, "$& selected");
+    });
+});
+
+/**
+ * The following constants were moved from the templates to code due to deprecations in Foundry 12
+ */
+
+/**
+ * Used to build the stat dropdown in the test dialog
+ */
+export const STAT_OPTIONS = {
+    '': '--',
+    'strength': 'Strength',
+    'dexterity': 'Dexterity',
+    'speed': 'Speed',
+    'endurance': 'Endurance',
+    'intelligence': 'Intelligence',
+    'perception': 'Perception',
+    'charisma': 'Charisma',
+    'determination': 'Determination'
+};
+
+export const SCORE_OPTIONS = {
+    '': '--',
+    'defense': 'Defense',
+    'willpower': 'Willpower'
+};
+
+/**
  * Object representing a Saga Machine test
  */
 export class Test {
@@ -126,8 +164,8 @@ export class Test {
     roll_syntax() {
         const total = this.boons - this.banes;
         if (total === 0) return '1d10';
-        else if (total > 0) return `${total+1}d10kh1`;
-        else return `${total*-1+1}d10kl1`;
+        else if (total > 0) return `${total + 1}d10kh1`;
+        else return `${total * -1 + 1}d10kl1`;
     }
 
     /**
@@ -160,8 +198,7 @@ export class Test {
                 if (i.result === highest_pair && active < 2) {
                     i.discarded = false;
                     active++;
-                }
-                else i.discarded = true;
+                } else i.discarded = true;
             }
         }
 
@@ -176,7 +213,7 @@ export class Test {
     lookup_skill() {
         // Separate skill name from specialization
         let specialization = this.skill.match(/\(([^\)]+)\)/);
-        if (specialization) specialization = specialization[specialization.length-1];
+        if (specialization) specialization = specialization[specialization.length - 1];
         let skill = specialization ? this.skill.split(' ')[0] : this.skill;
 
         // If no specialization, filter skills
@@ -257,7 +294,7 @@ export class Test {
      *
      * @returns {boolean}
      */
-     double_ones() {
+    double_ones() {
         let one_count = 0;
         for (let i of this.results.dice[0].results)
             if (i.result === 1) one_count++;
@@ -276,7 +313,7 @@ export class Test {
         // Calculate margin, success and criticals
         let margin = Math.abs(this.total - this.tn);
         let success = this.total >= this.tn;
-        let critical = margin >= this.tn || this.total < this.tn/2;
+        let critical = margin >= this.tn || this.total < this.tn / 2;
 
         // Also check for double 1's on a bane being a critical failure
         if (this.banes > this.boons && this.double_ones()) {
@@ -346,7 +383,12 @@ export class Test {
 
             // Handle the Stun property
             if (Attack.has_property(properties, 'Stun'))
-                this.effects.push(new Effect({ type: 'consequence', name: 'Stun', when: 'success', target: 'target' }, this));
+                this.effects.push(new Effect({
+                    type: 'consequence',
+                    name: 'Stun',
+                    when: 'success',
+                    target: 'target'
+                }, this));
 
             const ordering = ['defense', 'damage', 'consequence', 'message'];
             this.effects.sort((a, b) => {
@@ -470,12 +512,12 @@ export class Test {
      * @param {Roll[]|null} rolls
      * @return {Promise<void>}
      */
-    async to_chat({ whisper= false, rolls= null }) {
+    async to_chat({whisper = false, rolls = null}) {
         // Create the chat message
-        const message = await this.results.toMessage({}, { create: false });
+        const message = await this.results.toMessage({}, {create: false});
         message.flavor = this.flavor();
         message.content = this.content();
-        message.speaker = ChatMessage.getSpeaker({ actor: this.actor });
+        message.speaker = ChatMessage.getSpeaker({actor: this.actor});
 
         // Set the roll, if a custom one was provided
         if (rolls) {
@@ -484,7 +526,7 @@ export class Test {
         }
 
         // Set as a whisper, if requested
-        const operation = whisper ? { rollMode: CONST.DICE_ROLL_MODES.PRIVATE, create: true } : { create: true };
+        const operation = whisper ? {rollMode: CONST.DICE_ROLL_MODES.PRIVATE, create: true} : {create: true};
 
         // Send the message to chat
         await ChatMessage.create(message, operation);
@@ -507,10 +549,10 @@ export class Test {
             // Special handling for _actor and target
             else if (key === '_actor' || key === 'target') {
                 // If not a token actor, copy over actor ID
-                if (!value.isToken) json[key] = { actor_id: value.id };
+                if (!value.isToken) json[key] = {actor_id: value.id};
 
                 // If a token actor, copy over token and scene IDs
-                else json[key] = { token_id: value.token.id, scene_id: value.token.parent.id };
+                else json[key] = {token_id: value.token.id, scene_id: value.token.parent.id};
             }
 
             // Special handling for effects
@@ -640,7 +682,7 @@ export class Attack extends Test {
      * @param {SagaMachineActor} actor
      * @return {boolean}
      */
-    static strength_met(dataset, actor=null) {
+    static strength_met(dataset, actor = null) {
         // Get a reference to the actor if one has not been provided
         if (!actor) actor = token_actor({
             scene_id: dataset.sceneId,
@@ -655,8 +697,8 @@ export class Attack extends Test {
         const hands = Attack.property_value(properties, 'Hands');  // Get the Hands X property
 
         // Check to see if the strength requirement is met
-        if (hands >= 2) return strength >= (light || (damage/2))
-        else            return strength >= (light || damage)
+        if (hands >= 2) return strength >= (light || (damage / 2))
+        else return strength >= (light || damage)
     }
 
     /**
@@ -737,7 +779,7 @@ export async function test_dialog(dataset) {
     });
 
     const dialog_content = await renderTemplate("systems/saga-machine/templates/test-dialog.html",
-        { actor: { ...actor.sheet.getData().data }, ...dataset });
+        {actor: { ...actor.sheet.getData().data }, STAT_OPTIONS: STAT_OPTIONS, SCORE_OPTIONS: SCORE_OPTIONS, ...dataset});
 
     new Dialog({
         title: "Make Test",
@@ -781,7 +823,7 @@ export async function test_dialog(dataset) {
                         let stat = html.find('select[name=stat] > option:selected').val();
                         let score = html.find('select[name=score] > option:selected').val();
                         let skill = html.find('select[name=skill] > option:selected').val();
-                        const { boons, banes, modifier, tags } = ModifierSet.total_modifiers(
+                        const {boons, banes, modifier, tags} = ModifierSet.total_modifiers(
                             ModifierSet.list_from_string(html.find('input[name=modifiers]').val())
                         );
                         const tn = html.find('input[name=tn]').val();
@@ -813,5 +855,5 @@ export async function test_dialog(dataset) {
             }
         },
         default: "roll"
-    }).render(true, { width: 450 });
+    }).render(true, {width: 450});
 }

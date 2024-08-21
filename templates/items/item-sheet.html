@@ -45,13 +45,8 @@
                 <label class="item-label">TL</label>
                 <input class="item-input" type="number" name="system.tl" value="{{ data.system.tl }}" step="1" />
                 <label class="item-label">Availability</label>
-                <select class="item-input" data-name="system.availability">
-                    {{#select data.system.availability}}
-                        <option value="common">Common</option>
-                        <option value="uncommon">Uncommon</option>
-                        <option value="rare">Rare</option>
-                        <option value="exotic">Exotic</option>
-                    {{/select}}
+                <select class="item-input" name="system.availability">
+                    {{ selectOptions data.system.ITEM_AVAILABILITY selected=data.system.availability }}
                 </select>
                 <label class="item-label">Cost</label>
                 <input class="item-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />

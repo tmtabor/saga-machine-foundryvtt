@@ -35,7 +35,7 @@ Hooks.once("init", async () => {
 	Handlebars.registerHelper("is_GM", () => game.user.isGM);
 	Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapons');
 	Handlebars.registerHelper("is_wearable",
-			item => item.system.group.toLowerCase() === 'armors' || item.system.group.toLowerCase() === 'apparel');
+		item => item.system.group.toLowerCase() === 'armors' || item.system.group.toLowerCase() === 'apparel');
 
 	// Register handlebars partials
 	await loadTemplates([
@@ -46,14 +46,61 @@ Hooks.once("init", async () => {
 });
 
 /**
+ * The following constants were moved from the templates to code due to deprecations in Foundry 12
+ */
+
+/**
+ * Used to build the lifestyle dropdown in the character inventory
+ */
+export const LIFESTYLES = {
+	'Broke': 'Broke',
+	'Poor': 'Poor',
+	'Struggling': 'Struggling',
+	'Average': 'Average',
+	'Comfortable': 'Comfortable',
+	'Wealthy': 'Wealthy',
+	'Very Wealthy': 'Very Wealthy',
+	'Filthy Rich': 'Filthy Rich'
+};
+
+/**
+ * Used to build the type dropdown on the Stash sheet
+ */
+export const STASH_TYPES = {
+	'Stash': 'Stash',
+	'Merchant': 'Merchant',
+};
+
+/**
+ * Used to build the availability dropdown on the Vehicle sheet
+ */
+export const VEHICLE_AVAILABILITY = {
+	'common': 'Common',
+	'uncommon': 'Uncommon',
+	'rare': 'Rare',
+	'exotic': 'Exotic'
+};
+
+/**
+ * Used to build the handling dropdown on the Vehicle sheet
+ */
+export const VEHICLE_HANDLING = {
+	'++': '⊕⊕',
+	'+': '⊕',
+	'': '—',
+	'-': '⊖',
+	'--': '⊖⊖'
+};
+
+/**
  * Extend Foundry's ActorSheet with modifications to support the Saga Machine system.
  * This is a base class that's meant to be extended for specific actor types.
  */
 export class SagaMachineActorSheet extends ActorSheet {
 
-    /**********************************
-     * METHODS THAT SET BASIC OPTIONS *
-     **********************************/
+	/**********************************
+	 * METHODS THAT SET BASIC OPTIONS *
+	 **********************************/
 
 	/**
 	 * The default options for actor sheets
@@ -72,16 +119,18 @@ export class SagaMachineActorSheet extends ActorSheet {
 		});
 	}
 
-    /**
-     * Dynamically set the HTML template for the actor based on type
+	/**
+	 * Dynamically set the HTML template for the actor based on type
 	 *
-     * @returns {string}
-     */
-	get template() { return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`; }
+	 * @returns {string}
+	 */
+	get template() {
+		return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`;
+	}
 
-    /**********************************
-     * METHODS THAT HANDLE SHEET DATA *
-     **********************************/
+	/**********************************
+	 * METHODS THAT HANDLE SHEET DATA *
+	 **********************************/
 
 	/**
 	 * @inheritdoc
@@ -91,9 +140,17 @@ export class SagaMachineActorSheet extends ActorSheet {
 	getData() {
 		const context = super.getData();
 
+		// Add constants by type
+		if (this.actor.type === 'character') context.data.system.LIFESTYLES = LIFESTYLES;
+		if (this.actor.type === 'stash') context.data.system.STASH_TYPES = STASH_TYPES;
+		if (this.actor.type === 'vehicle') {
+			context.data.system.VEHICLE_AVAILABILITY = VEHICLE_AVAILABILITY;
+			context.data.system.VEHICLE_HANDLING = VEHICLE_HANDLING;
+		}
+
 		// Filter and sort all item lists for the character
 		context.data.system.ambitions = this.items(context, 'ambition', null,
-			(a, b) =>  a.system.type > b.system.type ? 1 : -1);
+			(a, b) => a.system.type > b.system.type ? 1 : -1);
 		context.data.system.paths = this.items(context, 'path');
 		context.data.system.origins = this.items(context, 'origin');
 		context.data.system.all_skills = this.items(context, 'skill');
@@ -118,8 +175,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	items(context, type, filter, sort) {
 		if (!filter) filter = () => true;
-		if (!sort) sort = (a, b) =>  a.name > b.name ? 1 : -1;
-		return context.actor.items.filter( item => item.type === type && filter(item)).sort(sort);
+		if (!sort) sort = (a, b) => a.name > b.name ? 1 : -1;
+		return context.actor.items.filter(item => item.type === type && filter(item)).sort(sort);
 	}
 
 	/**
@@ -131,7 +188,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 * @return {{name: string, contents: SagaMachineItem[]}[]}
 	 * @private
 	 */
-	skills_and_traits(all_items, default_group, display_if_empty=null) {
+	skills_and_traits(all_items, default_group, display_if_empty = null) {
 		const raw_groups = this.group_items(all_items, i => i.system.group, null, null, default_group);
 		const final_groups = []; // { name: String, contents: Skill[] }
 
@@ -139,11 +196,11 @@ export class SagaMachineActorSheet extends ActorSheet {
 		if (display_if_empty)
 			for (const c of display_if_empty)
 				if (!(c in raw_groups))
-					final_groups.push({ name: c, contents: [] });
+					final_groups.push({name: c, contents: []});
 
 		// Add groups
 		for (const g of Object.keys(raw_groups))
-			final_groups.push({ name: g, contents: raw_groups[g] });
+			final_groups.push({name: g, contents: raw_groups[g]});
 
 		// Sort groups by name
 		final_groups.sort((a, b) => {
@@ -168,7 +225,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	groups_and_containers({context, top_groups = ['Weapons', 'Armors'], blank = 'Miscellanea'}) {
 		const raw_groups = this.group_items(context.data.system.equipment,
-				i => i.system.parent || i.system.group, i => !i.system.container);
+			i => i.system.parent || i.system.group, i => !i.system.container);
 		if (!context.data.system.equipment.filter(i => !i.system.parent && !i.system.container).length)
 			raw_groups[blank] = []; // Add blank group if no non-container groups
 
@@ -228,7 +285,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	group_items(items, group_path, filter, sort, blank_name) {
 		if (!filter) filter = () => true;
-		if (!sort) sort = (a, b) =>  a.name > b.name ? 1 : -1;
+		if (!sort) sort = (a, b) => a.name > b.name ? 1 : -1;
 		if (!blank_name) blank_name = 'Miscellanea';
 		const access = (object, path) => path.split('.').reduce((o, i) => o[i], object);
 		const groups = {};
@@ -258,9 +315,9 @@ export class SagaMachineActorSheet extends ActorSheet {
 			Math.round((context.data.system.scores.health.value / context.data.system.scores.health.max) * 100);
 	}
 
-    /****************************************
-     * METHODS THAT SET SHEET INTERACTIVITY *
-     ****************************************/
+	/****************************************
+	 * METHODS THAT SET SHEET INTERACTIVITY *
+	 ****************************************/
 
 	/**
 	 * @inheritdoc
@@ -271,7 +328,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		super.activateListeners(html);
 
 		// Everything below here is only needed if the sheet is editable
-		if ( !this.isEditable ) return;
+		if (!this.isEditable) return;
 
 		html.find('.item-create').on("click", this.on_item_create.bind(this));		// Item creation
 		html.find('.item-edit').on("click", this.on_item_edit.bind(this));			// Item editing
@@ -298,7 +355,12 @@ export class SagaMachineActorSheet extends ActorSheet {
 
 		// Attach IDs to the dataset
 		this.attach_ids(event.currentTarget.dataset);
-		const mod_keys = {'key-alt': event.altKey, 'key-ctrl': event.ctrlKey, 'key-shift': event.shiftKey, 'key-meta': event.metaKey};
+		const mod_keys = {
+			'key-alt': event.altKey,
+			'key-ctrl': event.ctrlKey,
+			'key-shift': event.shiftKey,
+			'key-meta': event.metaKey
+		};
 		event.dataTransfer.setData("text/plain", JSON.stringify({...event.currentTarget.dataset, ...mod_keys}));
 
 		super._onDragStart(event);
@@ -327,6 +389,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		// Finally, create the item!
 		return await Item.create(itemData, {parent: this.actor});
 	}
+
 	/**
 	 * Open the item sheet for an actor's item
 	 *
@@ -350,7 +413,10 @@ export class SagaMachineActorSheet extends ActorSheet {
 		const item = this.actor.items.get(box.data("id"));
 		if (!!item.system.container) {
 			const contained = this.actor.items.filter(i => i.type === 'item' && i.system.parent === item.id);
-			await this.actor.updateEmbeddedDocuments("Item", contained.map(i => new Object({ '_id': i.id, 'system.parent': null })));
+			await this.actor.updateEmbeddedDocuments("Item", contained.map(i => new Object({
+				'_id': i.id,
+				'system.parent': null
+			})));
 		}
 		item.delete();
 		box.slideUp(200, () => this.render(false));
@@ -365,16 +431,16 @@ export class SagaMachineActorSheet extends ActorSheet {
 	async on_item_remove(event) {
 		const box = $(event.currentTarget).parents(".item");
 		const item = this.actor.items.get(box.data("id"));
-		const update = { _id: item.id, 'system.parent': null };
-		this.actor.updateEmbeddedDocuments("Item", [update] );
+		const update = {_id: item.id, 'system.parent': null};
+		this.actor.updateEmbeddedDocuments("Item", [update]);
 	}
 
 	async on_item_update(event) {
 		const box = $(event.currentTarget).parents(".item");
 		const attribute = event.currentTarget.getAttribute('data-name');
-		const update = { _id: box.data("id") };
+		const update = {_id: box.data("id")};
 		update[attribute] = Number(event.currentTarget.value);
-		this.actor.updateEmbeddedDocuments("Item", [update] );
+		this.actor.updateEmbeddedDocuments("Item", [update]);
 	}
 
 	/**
@@ -424,14 +490,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 		});
 
 		// Disable drag events for inputs
-		html.find('.items-list .item input, .items-list .item select').on('mousedown', function(e) {
+		html.find('.items-list .item input, .items-list .item select').on('mousedown', function (e) {
 			e.stopPropagation();
 			$(e.target).closest('.item').attr('draggable', false);
 		});
-		html.find('.items-list .item').on('mousedown', function(e) {
+		html.find('.items-list .item').on('mousedown', function (e) {
 			$(e.target).attr('draggable', true);
 		}).on({
-			'dragstart': function(e) {
+			'dragstart': function (e) {
 				e.stopPropagation();
 				let dt = e.originalEvent.dataTransfer;
 				if (dt) {
@@ -452,7 +518,10 @@ export class SagaMachineActorSheet extends ActorSheet {
 		html.find('.item-group').on('drop', async event => {
 			// Get the drag event data
 			let data = null;
-			try { data = JSON.parse(event.originalEvent.dataTransfer.getData("text")); } catch(error) {}
+			try {
+				data = JSON.parse(event.originalEvent.dataTransfer.getData("text"));
+			} catch (error) {
+			}
 			if (!data || !data.uuid || data.type !== 'Item') return;
 
 			// Get the item being dropped
@@ -463,10 +532,10 @@ export class SagaMachineActorSheet extends ActorSheet {
 			const container_id = $(event.currentTarget).data('id');
 			if (container_id)
 				if (drop_item.system.container_encumbrance + $(event.currentTarget).data('encumbrance') <= $(event.currentTarget).data('max'))
-					await drop_item.update({ 'system.parent': container_id });
+					await drop_item.update({'system.parent': container_id});
 
-			// Otherwise, remove the item from the container
-			else await drop_item.update({ 'system.parent': null });
+				// Otherwise, remove the item from the container
+				else await drop_item.update({'system.parent': null});
 		});
 	}
 
@@ -587,7 +656,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		ChatMessage.create({
 			flavor: `<header class="item-header"><img src="${item.img}" alt="${item.name}" /><h2>${item.name}</h2></header>`,
 			content: item.system.description,
-			speaker: ChatMessage.getSpeaker({ actor: this.actor })
+			speaker: ChatMessage.getSpeaker({actor: this.actor})
 		});
 	}
 
@@ -608,17 +677,17 @@ export class SagaMachineActorSheet extends ActorSheet {
  * Character sheet functionality for PCs and NPCs
  */
 export class CharacterSheet extends SagaMachineActorSheet {
-    /**
+	/**
 	 * Dynamically set the HTML template for the actor based on permissions and PC/NPC
 	 *
 	 * @returns {string}
 	 * @override
-     */
-    get template() {
-		if (!game.user.isGM && this.actor.limited) 	return "systems/saga-machine/templates/actors/limited-sheet.html";
-		if (this.actor.is_pc()) 					return `systems/saga-machine/templates/actors/pc-sheet.html`;
-		else 										return `systems/saga-machine/templates/actors/npc-sheet.html`;
-    }
+	 */
+	get template() {
+		if (!game.user.isGM && this.actor.limited) return "systems/saga-machine/templates/actors/limited-sheet.html";
+		if (this.actor.is_pc()) return `systems/saga-machine/templates/actors/pc-sheet.html`;
+		else return `systems/saga-machine/templates/actors/npc-sheet.html`;
+	}
 
 	/**
 	 * @inheritdoc
@@ -664,8 +733,8 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	async on_item_equip(event) {
 		const box = $(event.currentTarget).parents(".item");
 		const item = this.actor.items.get(box.data("id"));
-		const update = { _id: item.id, 'system.equipped': !item.system.equipped };
-		this.actor.updateEmbeddedDocuments("Item", [update] );
+		const update = {_id: item.id, 'system.equipped': !item.system.equipped};
+		this.actor.updateEmbeddedDocuments("Item", [update]);
 	}
 
 	/**
@@ -677,8 +746,8 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	async on_item_carry(event) {
 		const box = $(event.currentTarget).parents(".item");
 		const item = this.actor.items.get(box.data("id"));
-		const update = { _id: item.id, 'system.carried': !item.system.carried };
-		this.actor.updateEmbeddedDocuments("Item", [update] );
+		const update = {_id: item.id, 'system.carried': !item.system.carried};
+		this.actor.updateEmbeddedDocuments("Item", [update]);
 	}
 
 	/**
@@ -829,31 +898,31 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	/**
 	 * Add a position to the vehicle positions form
 	 */
-    add_position() {
-        if ( !this.isEditable ) return;
+	add_position() {
+		if (!this.isEditable) return;
 
-        // Get the prototype position node and parent node, return if it wasn't found
-        const prototype = this.element.find('.position.prototype');
-        const parent = this.element.find('ol.position-list');
-        if (!prototype || !prototype.length || !parent || !parent.length) return;
+		// Get the prototype position node and parent node, return if it wasn't found
+		const prototype = this.element.find('.position.prototype');
+		const parent = this.element.find('ol.position-list');
+		if (!prototype || !prototype.length || !parent || !parent.length) return;
 
-        const clone = prototype.clone();
-        clone.removeClass('prototype');
-        clone.find('input, select').change(this.update_positions.bind(this));
-        parent.append(clone);
-    }
+		const clone = prototype.clone();
+		clone.removeClass('prototype');
+		clone.find('input, select').change(this.update_positions.bind(this));
+		parent.append(clone);
+	}
 
 	/**
 	 * Delete a position in the vehicle position form
 	 *
 	 * @param {Event} event
 	 */
-    delete_position(event) {
-        const box = $(event.currentTarget).closest(".position");
-        const position_list = box.closest('.position-list');
-        box.remove();
-        this.update_positions(event, position_list);
-    }
+	delete_position(event) {
+		const box = $(event.currentTarget).closest(".position");
+		const position_list = box.closest('.position-list');
+		box.remove();
+		this.update_positions(event, position_list);
+	}
 
 	/**
 	 * Draw the vehicle positions form
@@ -861,56 +930,56 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	 * @param {JQuery} html
 	 */
 	draw_positions(html) {
-        // Don't draw positions if there are no positions
-        if (!this.actor.system.scores.crew.positions || !this.actor.system.scores.crew.positions.length) return;
+		// Don't draw positions if there are no positions
+		if (!this.actor.system.scores.crew.positions || !this.actor.system.scores.crew.positions.length) return;
 
-        // Get the prototype attack position and parent node, return if it wasn't found
-        const prototype = html.find('.position.prototype');
-        const parent = html.find('ol.position-list');
-        if (!prototype || !prototype.length || !parent || !parent.length) return;
+		// Get the prototype attack position and parent node, return if it wasn't found
+		const prototype = html.find('.position.prototype');
+		const parent = html.find('ol.position-list');
+		if (!prototype || !prototype.length || !parent || !parent.length) return;
 
-        // For each position, clone the prototype and set up the form
-        for (let position of this.actor.system.scores.crew.positions) {
-            const clone = prototype.clone();
-            clone.removeClass('prototype');
-            clone.find("[name=position]").val(position.position);
-            clone.find("[name=character]").val(position.character);
-            parent.append(clone);
+		// For each position, clone the prototype and set up the form
+		for (let position of this.actor.system.scores.crew.positions) {
+			const clone = prototype.clone();
+			clone.removeClass('prototype');
+			clone.find("[name=position]").val(position.position);
+			clone.find("[name=character]").val(position.character);
+			parent.append(clone);
 
-            // Set up the data handlers for the form, if this sheet is editable
-		    if ( !this.isEditable ) continue;
-            clone.find('input, select').change(this.update_positions.bind(this));
-        }
-    }
+			// Set up the data handlers for the form, if this sheet is editable
+			if (!this.isEditable) continue;
+			clone.find('input, select').change(this.update_positions.bind(this));
+		}
+	}
 
-    /**
-     * Handle changes to the vehicle position form
-     *
-     * @param {Event} event
+	/**
+	 * Handle changes to the vehicle position form
+	 *
+	 * @param {Event} event
 	 * @param {JQuery|null} position_list
-     */
-    update_positions(event, position_list=null) {
-        event.preventDefault();
-        event.stopPropagation();
+	 */
+	update_positions(event, position_list = null) {
+		event.preventDefault();
+		event.stopPropagation();
 
-        // Get all positions
-        const position_nodes = position_list ? position_list.find('.position:not(.prototype)') :
-            $(event.currentTarget).closest('ol.position-list').find('.position:not(.prototype)');
+		// Get all positions
+		const position_nodes = position_list ? position_list.find('.position:not(.prototype)') :
+			$(event.currentTarget).closest('ol.position-list').find('.position:not(.prototype)');
 
-        // Iterate over each node and add to the list
-        const positions = [];
-        position_nodes.each((i, node) => {
-            let position = $(node).find("[name=position]").val().trim();
-            let character = $(node).find("[name=character]").val().trim();
+		// Iterate over each node and add to the list
+		const positions = [];
+		position_nodes.each((i, node) => {
+			let position = $(node).find("[name=position]").val().trim();
+			let character = $(node).find("[name=character]").val().trim();
 
-            // Create position, add name and properties if set, add to list
-            const position_object = {
-                position: position,
-                character: character
-            };
-            positions.push(position_object);
+			// Create position, add name and properties if set, add to list
+			const position_object = {
+				position: position,
+				character: character
+			};
+			positions.push(position_object);
 
-            this.actor.update({'system.scores.crew.positions': positions});
-        });
-    }
+			this.actor.update({'system.scores.crew.positions': positions});
+		});
+	}
 }

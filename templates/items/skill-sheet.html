@@ -42,17 +42,7 @@
 
                 <label class="item-label">Default Stat</label>
                 <select class="grid-span-2 item-input" name="system.default">
-                    {{#select data.system.default}}
-                        <option value="" data-val="0">--</option>
-                        <option value="strength">Strength</option>
-                        <option value="dexterity">Dexterity</option>
-                        <option value="speed">Speed</option>
-                        <option value="endurance">Endurance</option>
-                        <option value="intelligence">Intelligence</option>
-                        <option value="perception">Perception</option>
-                        <option value="charisma">Charisma</option>
-                        <option value="determination">Determination</option>
-                    {{/select}}
+                    {{ selectOptions data.system.SKILL_DEFAULTS selected=data.system.default}}
                 </select>
             </div>
             <div class="grid grid-5col item-box">

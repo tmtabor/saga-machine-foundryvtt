@@ -5,39 +5,24 @@
         <div class="grid grid-6col dialog-box">
             <label>Stat</label>
             <select class="grid-start-2 grid-span-2 dialog-select" name="stat">
-                {{#select stat}}
-                    <option value="" data-val="0">--</option>
-                    <option value="strength" data-val="{{ actor.system.stats.strength.value }}">Strength</option>
-                    <option value="dexterity" data-val="{{ actor.system.stats.dexterity.value }}">Dexterity</option>
-                    <option value="speed" data-val="{{ actor.system.stats.speed.value }}">Speed</option>
-                    <option value="endurance" data-val="{{ actor.system.stats.endurance.value }}">Endurance</option>
-                    <option value="intelligence" data-val="{{ actor.system.stats.intelligence.value }}">Intelligence</option>
-                    <option value="perception" data-val="{{ actor.system.stats.perception.value }}">Perception</option>
-                    <option value="charisma" data-val="{{ actor.system.stats.charisma.value }}">Charisma</option>
-                    <option value="determination" data-val="{{ actor.system.stats.determination.value }}">Determination</option>
-                {{/select}}
+                {{ selectOptions STAT_OPTIONS selected=stat }}
             </select>
             <label>or Score</label>
             <select class="grid-start-5 grid-span-2 dialog-select" name="score">
-                {{#select score}}
-                    <option value="" data-val="0">--</option>
-                    <option value="1d10" data-val="0">1d10</option>
-                    <option value="defense" data-val="{{ actor.system.scores.defense.value }}">Defense</option>
-                    <option value="willpower" data-val="{{ actor.system.scores.willpower.value }}">Willpower</option>
-                {{/select}}
+                {{ selectOptions SCORE_OPTIONS selected=score }}
             </select>
         </div>
 
         <div class="grid grid-6col dialog-box">
             <label>Skill</label>
             <select class="grid-start-2 grid-span-5 dialog-select" name="skill">
-                {{#select skill}}
+                {{#skillSelect skill}}
                     <option value="Unskilled" data-val="0">Unskilled</option>
                     <option value="" data-val="null">--</option>
-                    {{#each actor.system.all_skills as |sk|}}
+                    {{#each ../actor.system.all_skills as |sk|}}
                         <option data-id="{{ sk._id }}" value="{{ sk.system.full_name }}" data-val="{{ sk.system.rank }}">{{ sk.system.full_name }}</option>
                     {{/each}}
-                {{/select}}
+                {{/skillSelect}}
             </select>
         </div>
 

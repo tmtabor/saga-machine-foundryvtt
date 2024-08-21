@@ -7,13 +7,7 @@
                 <div class="stat flex-group-center">
                     <label class="score-label" title="Cost">Handling</label>
                     <select class="score-input" name="system.scores.handling.label" title="Handling" data-dtype="String">
-                        {{#select data.system.scores.handling.label}}
-                            <option value="++">⊕⊕</option>
-                            <option value="+">⊕</option>
-                            <option value="">—</option>
-                            <option value="-">⊖</option>
-                            <option value="--">⊖⊖</option>
-                        {{/select}}
+                        {{ selectOptions data.system.VEHICLE_HANDLING selected=data.system.scores.handling.label }}
                     </select>
                 </div>
                 <div class="score flex-group-center">
@@ -195,13 +189,8 @@
                 <label class="item-label right" for="system.cost">Cost</label>
                 <input class="money-input" type="number" name="system.cost" value="{{ data.system.cost }}" step="1" />
                 <label class="item-label right" for="system.availability">Availability</label>
-                <select class="money-input" data-name="system.availability">
-                    {{#select data.system.availability}}
-                        <option value="common">Common</option>
-                        <option value="uncommon">Uncommon</option>
-                        <option value="rare">Rare</option>
-                        <option value="exotic">Exotic</option>
-                    {{/select}}
+                <select class="money-input" name="system.availability">
+                    {{ selectOptions data.system.VEHICLE_AVAILABILITY selected=data.system.availability }}
                 </select>
             </div>
             <h3>Notes</h3>

@@ -165,7 +165,7 @@ export class ModifierSet {
     static list_from_string(input_str) {
         let json_list = null;
         try {
-            json_list = JSON.parse(input_str);
+            if (input_str) json_list = JSON.parse(input_str);
         } catch (e) {
             console.error("Error parsing list from tagify");
         }

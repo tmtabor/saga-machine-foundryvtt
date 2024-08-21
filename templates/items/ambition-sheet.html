@@ -10,12 +10,7 @@
         <div class="grid grid-4col item-box">
             <label class="item-label">Type</label>
             <select class="grid-start-2 grid-span-3 item-input" name="system.type">
-                {{#select data.system.type}}
-                    <option value="Long-term">Long-term</option>
-                    <option value="Short-term">Short-term</option>
-                    <option value="Party">Party</option>
-                    <option value="Quest">Quest</option>
-                {{/select}}
+                {{ selectOptions data.system.AMBITION_TYPES selected=data.system.type}}
             </select>
         </div>
     </header>

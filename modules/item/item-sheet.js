@@ -1,4 +1,43 @@
 /**
+ * The following constants were moved from the templates to code due to deprecations in Foundry 12
+ */
+
+/**
+ * Used to build the type dropdown on the Ambitions sheet
+ */
+export const AMBITION_TYPES = {
+    'Long-term': 'Long-term',
+    'Short-term': 'Short-term',
+    'Party': 'Party',
+    'Quest': 'Quest'
+};
+
+/**
+ * Used to build the default stat dropdown on the Skill sheet
+ */
+export const SKILL_DEFAULTS = {
+    '': '--',
+    'strength': 'Strength',
+    'dexterity': 'Dexterity',
+    'speed': 'Speed',
+    'endurance': 'Endurance',
+    'intelligence': 'Intelligence',
+    'perception': 'Perception',
+    'charisma': 'Charisma',
+    'determination': 'Determination'
+};
+
+/**
+ * Used to build the availability dropdown on the Item sheet
+ */
+export const ITEM_AVAILABILITY = {
+    'common': 'Common',
+    'uncommon': 'Uncommon',
+    'rare': 'Rare',
+    'exotic': 'Exotic'
+};
+
+/**
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SagaMachineItemSheet extends ItemSheet {
@@ -6,12 +45,12 @@ export class SagaMachineItemSheet extends ItemSheet {
      * METHODS THAT SET BASIC OPTIONS *
      **********************************/
 
-	/**
-	 * The default options for item sheets
-	 *
-	 * @override
-	 * @returns {DocumentSheetOptions}
-	 * */
+    /**
+     * The default options for item sheets
+     *
+     * @override
+     * @returns {DocumentSheetOptions}
+     * */
     static get defaultOptions() {
         return foundry.utils.mergeObject(super.defaultOptions, {
             classes: ["saga-machine", "sheet", "item"],
@@ -35,13 +74,18 @@ export class SagaMachineItemSheet extends ItemSheet {
      * METHODS THAT HANDLE SHEET DATA *
      **********************************/
 
-	/**
-	 * @inheritdoc
-	 * @override
-	 * @return Context
-	 * */
-	getData() {
+    /**
+     * @inheritdoc
+     * @override
+     * @return Context
+     * */
+    getData() {
         const context = super.getData();
+
+        // Add constants by type
+        if (this.item.type === 'ambition') context.data.system.AMBITION_TYPES = AMBITION_TYPES;
+        if (this.item.type === 'skill') context.data.system.SKILL_DEFAULTS = SKILL_DEFAULTS;
+        if (this.item.type === 'item') context.data.system.ITEM_AVAILABILITY = ITEM_AVAILABILITY;
 
         if (this.item.type === 'origin' || this.item.type === 'path') {
             context.data.system.skills_provided = this.items_provided('skill', context.data.system.skills);
@@ -56,16 +100,16 @@ export class SagaMachineItemSheet extends ItemSheet {
      * METHODS THAT SET SHEET INTERACTIVITY *
      ****************************************/
 
-	/**
-	 * @inheritdoc
-	 * @override
-	 * @param {JQuery} html
-	 * */
-	activateListeners(html) {
+    /**
+     * @inheritdoc
+     * @override
+     * @param {JQuery} html
+     * */
+    activateListeners(html) {
         super.activateListeners(html);
 
         // Everything below here is only needed if the sheet is editable
-		if ( !this.isEditable ) return;
+        if (!this.isEditable) return;
 
         // Toggle edit/display of provided fields in origins/paths
         html.find('.items-provided').on("contextmenu", this.toggle_items_provided.bind(this));
@@ -186,7 +230,7 @@ export class SagaMachineItemSheet extends ItemSheet {
             parent.append(clone);
 
             // Set up the data handlers for the form, if this sheet is editable
-		    if ( !this.isEditable ) continue;
+            if (!this.isEditable) continue;
             clone.find('input, select').change(this.update_attacks.bind(this));
         }
     }
@@ -195,7 +239,7 @@ export class SagaMachineItemSheet extends ItemSheet {
      * Add a new attack to the list
      */
     add_attack() {
-        if ( !this.isEditable ) return;
+        if (!this.isEditable) return;
 
         // Get the prototype attack node and parent node, return if it wasn't found
         const prototype = this.element.find('.attack.prototype');
@@ -226,7 +270,7 @@ export class SagaMachineItemSheet extends ItemSheet {
      * @param {Event} event
      * @param {JQuery} attack_list
      */
-    update_attacks(event, attack_list=null) {
+    update_attacks(event, attack_list = null) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -301,7 +345,7 @@ export class SagaMachineItemSheet extends ItemSheet {
      * @param {boolean} find_all - Whether to return all instances of the matching type or only the first
      * @return {string}
      */
-    search_effects(attack, type, property, find_all=false) {
+    search_effects(attack, type, property, find_all = false) {
         // Ensure that effects are in the right format
         if (!attack.effects || !attack.effects.length) return '';
         let parsed_effects = typeof attack.effects === 'string' ?
@@ -390,23 +434,23 @@ export class SagaMachineItemSheet extends ItemSheet {
     matching_item(type, raw_name) {
         // Extract rank
         let parts = raw_name.split(' ');
-        let rank = parts[parts.length-1];
+        let rank = parts[parts.length - 1];
         if (isNaN(Number(rank))) rank = '';
 
         // Extract specialization, if any
         let specialization = raw_name.match(/\(([^\)]+)\)/);
-        if (specialization) specialization = specialization[specialization.length-1];
+        if (specialization) specialization = specialization[specialization.length - 1];
         else specialization = '';
 
         // Extract name
-        let name = raw_name.slice(0, raw_name.length-rank.length);
+        let name = raw_name.slice(0, raw_name.length - rank.length);
         parts = name.split('(');
         if (parts.length > 1) name = parts[0];
         name = name.trim()
 
         // Query for matching items, return null if not found
         const matches = game.items.filter(i => i.type === type && i.name === name);
-        if (matches.length) return { item: matches[0], name: name, specialization: specialization, rank: rank }
-        else return { item: null, name: name, specialization: specialization, rank: rank };
+        if (matches.length) return {item: matches[0], name: name, specialization: specialization, rank: rank}
+        else return {item: null, name: name, specialization: specialization, rank: rank};
     }
 }

@@ -5,16 +5,7 @@
         <div class="grid grid-4col">
             <label class="item-label" for="system.wealth.lifestyle">Lifestyle</label>
             <select class="score-select" name="system.wealth.lifestyle">
-                {{#select data.system.wealth.lifestyle}}
-                    <option value="Broke">Broke</option>
-                    <option value="Poor">Poor</option>
-                    <option value="Struggling">Struggling</option>
-                    <option value="Average">Average</option>
-                    <option value="Comfortable">Comfortable</option>
-                    <option value="Wealthy">Wealthy</option>
-                    <option value="Very Wealthy">Very Wealthy</option>
-                    <option value="Filthy Rich">Filthy Rich</option>
-                {{/select}}
+                {{ selectOptions data.system.LIFESTYLES selected=data.system.wealth.lifestyle }}
             </select>
             <label class="item-label" for="system.wealth.money">Money</label>
             <input class="money-input" type="number" name="system.wealth.money" value="{{ data.system.wealth.money }}" step="1" data-dtype="Number" />
