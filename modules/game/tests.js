@@ -609,7 +609,7 @@ export class Test {
                 dataset[key]._evaluated = value._evaluated;
                 dataset[key]._formula = value._formula;
                 dataset[key]._total = value._total;
-                dataset[key].terms = [new Die({faces: 10})];
+                dataset[key].terms = [new foundry.dice.terms.Die({faces: 10})];
                 dataset[key].terms[0].results = value._terms;
             }
         }

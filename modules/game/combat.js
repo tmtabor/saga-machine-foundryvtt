@@ -134,7 +134,6 @@ export class SagaMachineCombat extends Combat {
         content += '</table>';
         await ChatMessage.create({
             content: content,
-            type: CONST.CHAT_MESSAGE_TYPES.WHISPER,
             whisper: game.users.filter(u => u.isGM).map(u => u.id)
         });
 

@@ -4,7 +4,7 @@
 
         <div class="top-right">
             <h1 class="stash-name"><input name="name" type="text" value="{{ data.name }}" placeholder="Name"/></h1>
-            <select class="item-input" name="system.type">
+            <select name="system.type">
                 {{ selectOptions data.system.STASH_TYPES selected=data.system.type }}
             </select>
             <div class="right">
