@@ -104,73 +104,97 @@ export class SagaMachineCombat extends Combat {
      * @return {Promise<void>}
      */
     async start_of_round(){
-        // Ensure that all combatants have a fast / slow turn marked in the order
-        await this.rollAll();
+        /** Perform new round actions */
+        const new_round = async (html) => {
+            // Ensure that all combatants have a fast / slow turn marked in the order
+            await this.rollAll();
 
-        // Cycle through all combatants
-        for (let c of this.combatants) {
+            // Cycle through all combatants
+            for (let c of this.combatants) {
 
-            // Make a defense test for everyone
-            await c.actor.test({
-                stat: 'defense', effects: [{"type": "defense"}], whisper: true, chat: true,
-                ...c.actor.total_modifiers({score: 'defense'})
-            });
-        }
-
-        // New Round Card - prompt players to choose fast / slow turn and display statuses
-        let content = `<h3>Round ${this.round+1}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table>`;
-        for (let c of this.combatants) {
-            if (c.hidden) continue; // Don't show hidden combatants
-            const statuses = Array.from(c.actor.statuses.map(s => s.split(/\s|-/).map(w => w.capitalize()).join(' '))).sort().join(', ');
-            content += `<tr><td><strong>${c.name}</strong></td><td>${statuses ? statuses : '&mdash;'}</td></tr>`;
-        }
-        content += '</table>';
-        await ChatMessage.create({content: content});
-
-        // Whisper all defenses to GM
-        content = '<h4><strong>Defenses This Round</strong></h4><table>';
-        for (let c of this.combatants)
-            content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn}</td></tr>`;
-        content += '</table>';
-        await ChatMessage.create({
-            content: content,
-            whisper: game.users.filter(u => u.isGM).map(u => u.id)
-        });
-
-        // Chat messages for Bleeding and Dying consequences
-        for (let c of this.combatants) {
-
-            // Test Endurance when dying, prompt to add or remove Dying conditions
-            if (c.actor.statuses.has('dying') && !c.actor.statuses.has('defeated')) {
-                await ChatMessage.create({ speaker: ChatMessage.getSpeaker({ actor: c.actor }), content:
-                        `<p><strong>${c.name} is Dying!</strong></p><ul><li>Limited to 1 AP.</li><li>Making an Endurance test.` +
-                        `<ul><li><em>Crit Success:</em> Lose a Dying.</li><li><em>Failure:</em> Gain a Dying.</li><li><em>3 Dying:</em> ${c.name} dies.</li></ul></li></ul>` });
+                // Make a defense test for everyone
                 await c.actor.test({
-                    stat: 'endurance', tn: c.actor.dying_tn(), chat: true,
-                    effects: [{"type": "consequence", "name": "Dying", "when": "failure", "target": "self"}],
+                    stat: 'defense', effects: [{"type": "defense"}], whisper: true, chat: true,
                     ...c.actor.total_modifiers({score: 'defense'})
                 });
             }
 
-            // Note Bleeding and prompt for damage
-            if (c.actor.statuses.has('bleeding') && !c.actor.statuses.has('defeated')) {
-                c.actor.items.filter(c => c.type === "consequence" && c.name === "Bleeding").forEach(b => {
-                    if (b.system.rank > 0) {
-                        const damage = new Effect({
-                            "type": "damage",
-                            "value": b.system.rank,
-                            "damage_type": b.system.specialization,
-                            "properties": "Ignores",
-                            "when": "always",
-                            "target": "self" }).apply();
-                        ChatMessage.create({
-                            speaker: ChatMessage.getSpeaker({ actor: c.actor }),
-                            content: `<p><strong>${c.name} is Bleeding!</strong></p><ul><li>Right-click and select Apply Damage.</li><li>${damage.message}</li></ul>`
-                        });
-                    }
-                });
+            // New Round Card - prompt players to choose fast / slow turn and display statuses
+            let content = `<h3>Round ${this.round + 1}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table>`;
+            for (let c of this.combatants) {
+                if (c.hidden) continue; // Don't show hidden combatants
+                const statuses = Array.from(c.actor.statuses.map(s => s.split(/\s|-/).map(w => w.capitalize()).join(' '))).sort().join(', ');
+                content += `<tr><td><strong>${c.name}</strong></td><td>${statuses ? statuses : '&mdash;'}</td></tr>`;
             }
-        }
+            content += '</table>';
+            await ChatMessage.create({content: content});
+
+            // Whisper all defenses to GM
+            content = '<h4><strong>Defenses This Round</strong></h4><table>';
+            for (let c of this.combatants)
+                content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn}</td></tr>`;
+            content += '</table>';
+            await ChatMessage.create({
+                content: content,
+                whisper: game.users.filter(u => u.isGM).map(u => u.id)
+            });
+
+            // Chat messages for Bleeding and Dying consequences
+            for (let c of this.combatants) {
+
+                // Test Endurance when dying, prompt to add or remove Dying conditions
+                if (c.actor.statuses.has('dying') && !c.actor.statuses.has('defeated')) {
+                    await ChatMessage.create({
+                        speaker: ChatMessage.getSpeaker({actor: c.actor}), content:
+                            `<p><strong>${c.name} is Dying!</strong></p><ul><li>Limited to 1 AP.</li><li>Making an Endurance test.` +
+                            `<ul><li><em>Crit Success:</em> Lose a Dying.</li><li><em>Failure:</em> Gain a Dying.</li><li><em>3 Dying:</em> ${c.name} dies.</li></ul></li></ul>`
+                    });
+                    await c.actor.test({
+                        stat: 'endurance', tn: c.actor.dying_tn(), chat: true,
+                        effects: [{"type": "consequence", "name": "Dying", "when": "failure", "target": "self"}],
+                        ...c.actor.total_modifiers({score: 'defense'})
+                    });
+                }
+
+                // Note Bleeding and prompt for damage
+                if (c.actor.statuses.has('bleeding') && !c.actor.statuses.has('defeated')) {
+                    c.actor.items.filter(c => c.type === "consequence" && c.name === "Bleeding").forEach(b => {
+                        if (b.system.rank > 0) {
+                            const damage = new Effect({
+                                "type": "damage",
+                                "value": b.system.rank,
+                                "damage_type": b.system.specialization,
+                                "properties": "Ignores",
+                                "when": "always",
+                                "target": "self"
+                            }).apply();
+                            ChatMessage.create({
+                                speaker: ChatMessage.getSpeaker({actor: c.actor}),
+                                content: `<p><strong>${c.name} is Bleeding!</strong></p><ul><li>Right-click and select Apply Damage.</li><li>${damage.message}</li></ul>`
+                            });
+                        }
+                    });
+                }
+            }
+        };
+
+        new Dialog({
+            title: `Begin New Round?`,
+            content: `<p>Do you want to begin a new round?</p>`,
+            buttons: {
+                Yes: {
+                    icon: "<i class='fas fa-check'></i>",
+                    label: 'Yes',
+                    callback: new_round
+                },
+                No: {
+                    icon: "<i class='fas fa-times'></i>",
+                    label: 'No',
+                    callback: () => {}
+                }
+            },
+            default: 'Yes'
+        }).render(true);
     }
 }
 

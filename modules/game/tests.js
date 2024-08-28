@@ -513,23 +513,14 @@ export class Test {
      * @return {Promise<void>}
      */
     async to_chat({whisper = false, rolls = null}) {
-        // Create the chat message
-        const message = await this.results.toMessage({}, {create: false});
-        message.flavor = this.flavor();
-        message.content = this.content();
-        message.speaker = ChatMessage.getSpeaker({actor: this.actor});
-
-        // Set the roll, if a custom one was provided
-        if (rolls) {
-            if (!Array.isArray(rolls)) rolls = [rolls];                     // Ensure this is an array
-            message.rolls = rolls.map(r => JSON.stringify(r.toJSON()));     // Convert to what ChatMessage expects
-        }
-
-        // Set as a whisper, if requested
-        const operation = whisper ? {rollMode: CONST.DICE_ROLL_MODES.PRIVATE, create: true} : {create: true};
-
         // Send the message to chat
-        await ChatMessage.create(message, operation);
+        await ChatMessage.create({
+            content: this.content(),
+            flavor: this.flavor(),
+            rolls: rolls ? rolls : [],  // Foundry 12: Setting rolls may interfere with whisper functionality
+            speaker: ChatMessage.getSpeaker({actor: this.actor}),
+            whisper: whisper ? game.users.filter(u => u.isGM || u.character?.id === this.actor?.id ).map(u => u.id) : []
+        });
     }
 
     /**
