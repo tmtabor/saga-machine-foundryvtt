@@ -23,8 +23,8 @@
     <nav class="sheet-tabs tabs" data-group="primary">
         <a class="item" data-tab="basics">Basics</a>
         <a class="item" data-tab="attacks">Attacks</a>
-        <a class="item" data-tab="description">Description</a>
         <a class="item" data-tab="effects">Effects</a>
+        <a class="item" data-tab="description">Description</a>
     </nav>
 
     {{!-- Sheet Body --}}
@@ -105,9 +105,6 @@
             </ol>
         </div>
 
-        <div class="tab description" data-group="primary" data-tab="description">
-            {{editor data.system.description target="system.description" engine="prosemirror" button=true owner=owner editable=editable}}
-        </div>
         <div class="tab effects" data-group="primary" data-tab="effects">
             <ol class="items-list effects-list">
                 <li class="items-header flexrow">
@@ -133,6 +130,10 @@
                     </div>
                 </li>
             {{/each}}
+        </div>
+
+        <div class="tab description" data-group="primary" data-tab="description">
+            {{editor data.system.description target="system.description" engine="prosemirror" button=true owner=owner editable=editable}}
         </div>
     </section>
 </form>
