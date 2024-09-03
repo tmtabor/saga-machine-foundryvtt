@@ -769,7 +769,7 @@ export async function test_dialog(dataset) {
         actor_id: dataset.actorId
     });
 
-    const dialog_content = await renderTemplate("systems/saga-machine/templates/test-dialog.html",
+    const dialog_content = await renderTemplate("systems/saga-machine/templates/apps/test-dialog.html",
         {actor: { ...actor.sheet.getData().data }, STAT_OPTIONS: STAT_OPTIONS, SCORE_OPTIONS: SCORE_OPTIONS, ...dataset});
 
     new Dialog({
@@ -846,5 +846,5 @@ export async function test_dialog(dataset) {
             }
         },
         default: "roll"
-    }).render(true, {width: 450});
+    }).render(true, { width: 450 });
 }
