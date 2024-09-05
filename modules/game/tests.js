@@ -513,12 +513,17 @@ export class Test {
      * @return {Promise<void>}
      */
     async to_chat({whisper = false, rolls = null}) {
+        if (rolls) {
+            if (!Array.isArray(rolls)) rolls = [rolls];             // Ensure this is an array
+            rolls = rolls.map(r => JSON.stringify(r.toJSON()));     // Convert to what ChatMessage expects
+        }
+
         // Send the message to chat
         await ChatMessage.create({
             content: this.content(),
             flavor: this.flavor(),
-            rolls: rolls ? rolls : [],  // Foundry 12: Setting rolls may interfere with whisper functionality
-            speaker: ChatMessage.getSpeaker({actor: this.actor}),
+            rolls: rolls ? rolls : (whisper ? [] : [this.results]),  // Foundry 12: Setting rolls may interfere with whisper functionality
+            speaker: ChatMessage.getSpeaker({ actor: this.actor }),
             whisper: whisper ? game.users.filter(u => u.isGM || u.character?.id === this.actor?.id ).map(u => u.id) : []
         });
     }
