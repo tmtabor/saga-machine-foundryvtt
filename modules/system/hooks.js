@@ -193,7 +193,7 @@ export async function delete_active_effect(effect, options, id) {
  */
 export async function pre_update_combat(combat, update, options, id){
     // Perform start of combat and start of round tasks
-    if (game.user.id === id && update.round !== combat.round) {
+    if (game.user.id === id && update.round && update.round !== combat.round) {
         await combat.start_of_round();
     }
 }
