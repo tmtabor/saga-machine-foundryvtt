@@ -77,7 +77,7 @@ export class Effect {
         // Get the consequence, if it exists as an item
         let consequence = game.items.filter(item => item.type === 'consequence' && item.name === name);
         if (!consequence || !consequence.length) return name;
-        return `<a class="content-link" draggable="true" data-uuid="Item.${consequence[0].id}" data-id="${consequence[0].id}" data-type="Item" data-tooltip="Item"><i class="fas fa-suitcase"></i>${name}</a>`;
+        return `<a class="content-link" draggable="true" data-link="" data-uuid="${consequence[0].uuid}" data-id="${consequence[0].id}" data-type="Item" data-tooltip="Item"><i class="fas fa-suitcase"></i>${name}</a>`;
     }
 
     /**
