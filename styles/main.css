@@ -508,10 +508,6 @@ img.system-logo {
   display: none !important;
 }
 
-.saga-machine fieldset legend {
-  font-size: 1.25em;
-}
-
 .saga-machine .sheet-body ol.ambitions-list {
   margin: 0;
   padding: 0;
@@ -530,7 +526,7 @@ img.system-logo {
 }
 
 .saga-machine .hidden {
-  display: none;
+  display: none !important;
 }
 
 .saga-machine .toggle-check:checked~.toggle-visible {
@@ -1060,6 +1056,10 @@ img.system-logo {
     overflow: hidden;
 }
 
+.saga-machine.sheet.item > .window-content > form {
+    height: 100px;
+}
+
 .saga-machine.sheet.item header.item-top > img.profile-img {
     height: 100px;
     width: 100px;
@@ -1100,6 +1100,14 @@ img.system-logo {
   width: calc(100% - 120px);
 }
 
+.saga-machine.sheet.item section.sheet-body {
+  height: calc(100% - 115px);
+}
+
+.saga-machine.sheet.item .description > .editor {
+  height: 100%;
+}
+
 .saga-machine.sheet.item .attack-row {
   display: grid;
   grid-template-columns: 100px 110px 100px 90px 1fr 50px;
@@ -1117,6 +1125,34 @@ img.system-logo {
   border-left: 1px solid #c9c7b8;
   border-right: 1px solid #c9c7b8;
   font-size: 0.85em;
+}
+
+.saga-machine.sheet.item .action-list {
+    margin-bottom: 0;
+}
+
+.saga-machine.sheet.item .action-row {
+    display: grid;
+    grid-template-columns: 105px 1fr 75px 65px 50px;
+    gap: 1px;
+}
+
+.saga-machine.sheet.item .action-effect.prototype {
+  display: none !important;
+}
+
+.saga-machine.sheet.item .action-row .action-damage,
+.saga-machine.sheet.item .action-row .action-consequence,
+.saga-machine.sheet.item .action-row .action-message {
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    gap: 1px;
+}
+
+.saga-machine.sheet.item .action-row .action-consequence > input::placeholder,
+.saga-machine.sheet.item .action-row .action-message > input::placeholder {
+    font-size: 0.8em;
+    opacity: 0.75;
 }
 
 .saga-machine.sheet.item .item-effect {

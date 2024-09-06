@@ -1,0 +1,154 @@
+<form class="{{cssClass}} action-sheet" autocomplete="off">
+    <header class="item-top">
+        <img class="profile-img" src="{{ data.img }}" data-edit="img" title="{{ data.name }}" height="100" width="100"/>
+
+        <div class="item-topright">
+            <div class="grid grid-5col item-box">
+                <label class="item-label">Name</label>
+                <input class="grid-start-2 grid-span-4 item-input" type="text" name="name" value="{{ data.name }}" />
+            </div>
+
+            <div class="grid grid-5col item-box">
+                <label class="item-label">Group</label>
+                <input class="item-input grid-span-4" type="text" name="system.group" value="{{ data.system.group }}" list="action-groups"/>
+                    <datalist id="action-groups">
+                        <option>Attacks</option>
+                        <option>Powers</option>
+                        <option>Actions</option>
+                        <option>Reactions</option>
+                    </datalist>
+            </div>
+        </div>
+    </header>
+
+    {{!-- Sheet Tab Navigation --}}
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="basics">Basics</a>
+        <a class="item" data-tab="description">Description</a>
+    </nav>
+
+    {{!-- Sheet Body --}}
+    <section class="sheet-body">
+        <div class="tab basics" data-group="primary" data-tab="basics">
+            <fieldset>
+                <legend>Test Basics</legend>
+
+                <div class="grid grid-6col dialog-box">
+                    <label>Stat</label>
+                    <select class="grid-start-2 grid-span-2 dialog-select stat" name="system.stat">
+                        {{ selectOptions data.system.STAT_OPTIONS selected=data.system.stat }}
+                    </select>
+                    <label>or Score</label>
+                    <select class="grid-start-5 grid-span-2 dialog-select score" name="system.stat">
+                        {{ selectOptions data.system.SCORE_OPTIONS selected=data.system.stat }}
+                    </select>
+                </div>
+
+                <div class="grid grid-6col dialog-box">
+                    <label>Skill</label>
+                    <input class="grid-start-2 grid-span-5 dialog-input" type="text" name="system.skill" value="{{ data.system.skill }}" list="skill-targets" />
+                    <datalist id="skill-targets">
+                        <option value="Unskilled" data-val="0">Unskilled</option>
+                        <option value="" data-val="null">--</option>
+                        {{#each actor.system.all_skills as |sk|}}
+                            <option value="{{ sk.system.full_name }}">{{ sk.system.full_name }}</option>
+                        {{/each}}
+                    </datalist>
+                </div>
+
+                <div class="grid grid-6col dialog-box">
+                    <label>TN</label>
+                    <input class="grid-start-2 grid-span-5 dialog-input" type="text" name="system.tn" value="{{ data.system.tn }}" list="tn-targets" />
+                    <datalist id="tn-targets">
+                        <option value="Defense">vs. Defense</option>
+                        <option value="Willpower">vs. Willpower</option>
+                        <option value="6">Trivial (TN 6)</option>
+                        <option value="8">Easy (TN 8)</option>
+                        <option value="10">Average (TN 10)</option>
+                        <option value="12">Difficult (TN 12)</option>
+                        <option value="14">Daunting (TN 14)</option>
+                        <option value="16">Desperate (TN 16)</option>
+                        <option value="18">Absurd (TN 18)</option>
+                        <option value="20">Impossible (TN 20)</option>
+                    </datalist>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Modifiers & Properties</legend>
+                <div class="grid grid-6col dialog-box">
+                    <label>Modifiers</label>
+                    <input class="grid-start-2 grid-span-5 modifier-tags tag-input" type="text" name="system.modifiers" value="{{ data.system.modifiers }}" />
+                    <p class="grid-span-6 hint">To add a boon or bane, type <strong>+</strong> or <strong>-</strong>, separated
+                        by a comma. For a modifier, type the value. You may optionally prepend a descriptor; for example: "Aim +".</p>
+                    <label>Properties</label>
+                    <input class="grid-start-2 grid-span-5 modifier-tags tag-input" type="text" name="system.properties" value="{{ data.system.properties }}" />
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Damage & Effects</legend>
+                <ol class="items-list action-list">
+                    <li class="item flexrow items-header action-row">
+                        <div class="item-name">Effect</div>
+                        <div class="item-name">Parameters</div>
+                        <div class="item-name">Apply on</div>
+                        <div class="item-name">To</div>
+                        <div class="item-controls">
+                            <a class="item-control item-create" title="Create action" data-type="item"><i class="fas fa-plus"></i> Add</a>
+                        </div>
+                    </li>
+
+                    <li class="item flexrow action-effect action-row prototype">
+                        <select class="item-input item-name" name="effect_type">
+                            <option value="damage">Damage</option>
+                            <option value="consequence">Consequence</option>
+                            <option value="defense">Set Defense</option>
+                            <option value="message">Message</option>
+                        </select>
+                        <div class="action-props">
+                            <div class="action-damage">
+                                <input class="item-input item-name" type="number" name="damage_value" value="0" />
+                                <select class="item-input item-name" name="damage_type">
+                                    <option value="burn">burn</option>
+                                    <option value="cor">cor</option>
+                                    <option value="cut">cut</option>
+                                    <option value="fat">fat</option>
+                                    <option value="fr">fr</option>
+                                    <option value="pi">pi</option>
+                                    <option value="sm">sm</option>
+                                    <option value="tox">tox</option>
+                                </select>
+                            </div>
+                            <div class="action-consequence hidden">
+                                <input class="item-input item-name" type="text" name="consequence_name" placeholder="Consequence" value="" />
+                                <input class="item-input item-name" type="text" name="consequence_subject" placeholder="Subject (optional)" value="" />
+                            </div>
+                            <div class="action-defense hidden"></div>
+                            <div class="action-message hidden">
+                                <input class="item-input item-name" type="text" name="message_key" placeholder="Label (optional)" value="" />
+                                <input class="item-input item-name" type="text" name="message_value" placeholder="Message" value="" />
+                            </div>
+                        </div>
+                        <select class="item-input item-name" name="effect_when">
+                            <option value="success">Success</option>
+                            <option value="failure">Failure</option>
+                            <option value="always">Always</option>
+                        </select>
+                        <select class="item-input item-name" name="effect_target">
+                            <option value="target">Target</option>
+                            <option value="self">Self</option>
+                        </select>
+                        <div class="item-controls">
+                            <a class="item-control item-delete" title="Delete action"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </li>
+                </ol>
+            </fieldset>
+        </div>
+
+        <div class="tab description" data-group="primary" data-tab="description">
+            {{editor data.system.description target="system.description" engine="prosemirror" button=true owner=owner editable=editable}}
+        </div>
+    </section>
+</form>

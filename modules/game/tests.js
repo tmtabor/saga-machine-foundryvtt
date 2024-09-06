@@ -1,5 +1,5 @@
 import Tagify from "../libraries/tagify.min.js";
-import { capitalize, token_actor } from "../system/utils.js";
+import { capitalize, test_label, token_actor } from "../system/utils.js";
 import { ModifierSet } from "./modifiers.js";
 import { Effect } from "./damage.js";
 
@@ -149,10 +149,7 @@ export class Test {
         if (this._label) return this._label;
 
         // Lazily generate the label
-        const stat_label = this.stat ? capitalize(this.stat) : '1d10';
-        const skill_label = this.skill ? `/${this.skill}` : '';
-        const tn_label = this.tn ? (isNaN(this.tn) ? ` vs. ${this.tn}` : `-${this.tn}`) : '';
-        this._label = stat_label + skill_label + tn_label;
+        this._label = test_label(this.stat, this.skill, this.tn);
         return this._label;
     }
 
@@ -514,7 +511,7 @@ export class Test {
      */
     async to_chat({whisper = false, rolls = null}) {
         if (rolls) {
-            if (!Array.isArray(rolls)) rolls = [rolls];             // Ensure this is an array
+            if (!Array.isArray(rolls)) rolls = [rolls];                 // Ensure this is an array
             rolls = rolls.map(r => JSON.stringify(r.toJSON()));     // Convert to what ChatMessage expects
         }
 

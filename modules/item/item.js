@@ -38,6 +38,7 @@ export class SagaMachineItem extends Item {
             if (this.type === 'path') this.update({'img': 'systems/saga-machine/images/defaults/path.svg'});
             if (this.type === 'ambition') this.update({'img': 'systems/saga-machine/images/defaults/ambition.svg'});
             if (this.type === 'consequence') this.update({'img': 'systems/saga-machine/images/defaults/consequence.svg'});
+            if (this.type === 'action') this.update({'img': 'systems/saga-machine/images/defaults/action.svg'});
         }
     }
 
@@ -67,11 +68,11 @@ export class SagaMachineItem extends Item {
         this.system.bulky = this.property_value('Bulky');
         this.system.powered = this.property_value('Powered');
         this.system.hands = this.property_value('Hands') || 1;
-        this.system.unit_encumbrance = this.calc_unit_encumbrance();
-        this.system.container_encumbrance = this.calc_container_encumbrance();
-        this.system.encumbrance = this.calc_encumbrance();
-        this.system.unit_loads = this.calc_unit_loads();
-        this.system.loads = this.calc_loads();
+        this.system.unit_encumbrance = ItemHelper.calc_unit_encumbrance(this);
+        this.system.container_encumbrance = ItemHelper.calc_container_encumbrance(this);
+        this.system.encumbrance = ItemHelper.calc_encumbrance(this);
+        this.system.unit_loads = ItemHelper.calc_unit_loads(this);
+        this.system.loads = ItemHelper.calc_loads(this);
     }
 
     /**
@@ -98,21 +99,20 @@ export class SagaMachineItem extends Item {
     async remove_from_container() {
         if (this.type === 'item') this.update({ 'system.parent': null });
     }
+}
 
-    /**************************************
-     * METHODS THAT DEAL WITH ENCUMBRANCE *
-     **************************************/
-
+export class ItemHelper {
     /**
      * Calculate the encumbrance per item, taking all item properties into account
      *
+     * @param {SagaMachineItem} item
      * @return {number}
      */
-    calc_unit_encumbrance() {
-        if (this.system.load) return 100;
-        else if (this.system.properties.includes('Neg')) return 0;
+    static calc_unit_encumbrance(item) {
+        if (item.system.load) return 100;
+        else if (item.system.properties.includes('Neg')) return 0;
         else {
-            for (const prop of this.system.properties) {
+            for (const prop of item.system.properties) {
                 if (prop.startsWith('Implant ')) return 0;
                 if (prop.startsWith('Software ')) return 0;
 
@@ -129,41 +129,45 @@ export class SagaMachineItem extends Item {
      * Calculates the loads per unit.
      * Loads are Encumbrance 100 and are used in the trading and vehicles sub-systems.
      *
+     * @param {SagaMachineItem} item
      * @return {number}
      */
-    calc_unit_loads() {
-        return this.system.unit_encumbrance / 100;
+    static calc_unit_loads(item) {
+        return item.system.unit_encumbrance / 100;
     }
 
     /**
      * Calculate the encumbrance value of the stack in regards to how much container space it takes.
      *
+     * @param {SagaMachineItem} item
      * @return {number}
      */
-    calc_container_encumbrance() {
-        return this.system.unit_encumbrance * this.system.quantity;
+    static calc_container_encumbrance(item) {
+        return item.system.unit_encumbrance * item.system.quantity;
     }
 
     /**
      * Calculate the encumbrance value of the stack, taking into account item properties,
      * quantity and whether the item is equipped.
      *
+     * @param {SagaMachineItem} item
      * @return {number}
      */
-    calc_encumbrance() {
-        if (!this.system.carried) return 0;
-        if (this.system.parent) return 0;
-        if (this.system.equipped && this.system.properties.includes('Worn')) return 0;
-        return this.system.unit_encumbrance * this.system.quantity;
+    static calc_encumbrance(item) {
+        if (!item.system.carried) return 0;
+        if (item.system.parent) return 0;
+        if (item.system.equipped && item.system.properties.includes('Worn')) return 0;
+        return item.system.unit_encumbrance * item.system.quantity;
     }
 
     /**
      * Calculate the number of loads in the stack.
      * Loads are Encumbrance 100 and are used in the trading and vehicles sub-systems.
      *
+     * @param {SagaMachineItem} item
      * @return {number}
      */
-    calc_loads() {
-        return Math.floor(this.system.unit_loads * this.system.quantity);
+    static calc_loads(item) {
+        return Math.floor(item.system.unit_loads * item.system.quantity);
     }
 }

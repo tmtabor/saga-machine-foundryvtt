@@ -1,4 +1,5 @@
 import { Attack, test_dialog } from "../game/tests.js";
+import {SagaMachineItem} from "../item/item";
 
 /**
  * ActorSheet context used in getData() and dependent methods.
@@ -139,14 +140,6 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 * */
 	getData() {
 		const context = super.getData();
-
-		// Add constants by type
-		if (this.actor.type === 'character') context.data.system.LIFESTYLES = LIFESTYLES;
-		if (this.actor.type === 'stash') context.data.system.STASH_TYPES = STASH_TYPES;
-		if (this.actor.type === 'vehicle') {
-			context.data.system.VEHICLE_AVAILABILITY = VEHICLE_AVAILABILITY;
-			context.data.system.VEHICLE_HANDLING = VEHICLE_HANDLING;
-		}
 
 		// Filter and sort all item lists for the character
 		context.data.system.ambitions = this.items(context, 'ambition', null,
@@ -696,6 +689,9 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	getData() {
 		const context = super.getData();
 
+		// Add constant for Lifestyles dropdown
+		context.data.system.LIFESTYLES = LIFESTYLES;
+
 		// Organize inventory
 		context.data.system.equipment_groups = this.groups_and_containers({
 			context: context,
@@ -704,6 +700,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		});
 
 		context.data.system.attacks = this.gather_attacks(context);	// Gather the list of attacks
+		context.data.system.actions = this.gather_actions(context);	// Gather the list of actions
 		this.calc_health_progress_bar(context);						// Calculate health progress bar percentages
 
 		return context;
@@ -788,6 +785,25 @@ export class CharacterSheet extends SagaMachineActorSheet {
 
 		return attacks;
 	}
+
+	/**
+	 * Return list of all actions provided by items or owned by the actor directly
+	 *
+	 * @param {Context} context
+	 * @returns {SagaMachineItem[]}
+
+	 */
+	gather_actions(context) {
+		const actions = [];
+		const action_items = context.actor.items.filter(item => item.system.actions?.length &&
+			(item.system.equipped || item.system.equipped === undefined));
+
+		for (let item of action_items)
+			for (let action of item.system.actions)
+				actions.push(new SagaMachineItem(action));
+
+		return actions;
+	}
 }
 
 /**
@@ -800,6 +816,9 @@ export class StashSheet extends SagaMachineActorSheet {
 	 * */
 	getData() {
 		const context = super.getData();
+
+		// Add constant for type dropdown
+		context.data.system.STASH_TYPES = STASH_TYPES;
 
 		// Organize inventory
 		context.data.system.equipment_groups = this.groups_and_containers({
@@ -854,6 +873,10 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	 * */
 	getData() {
 		const context = super.getData();
+
+		// Add constants for availability and handling dropdowns
+		context.data.system.VEHICLE_AVAILABILITY = VEHICLE_AVAILABILITY;
+		context.data.system.VEHICLE_HANDLING = VEHICLE_HANDLING;
 
 		// Organize inventory
 		context.data.system.equipment_groups = this.groups_and_containers({

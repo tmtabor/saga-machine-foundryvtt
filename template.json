@@ -193,7 +193,7 @@
     }
   },
   "Item": {
-    "types": ["skill", "trait", "origin", "path","consequence", "item", "ambition"],
+    "types": ["skill", "trait", "origin", "path", "consequence", "item", "ambition", "action"],
     "templates": {
       "basics": {
         "full_name": "",
@@ -205,28 +205,40 @@
       },
       "ranked":  {
         "ranked": false,
-        "rank": 0
+        "rank": 0,
+        "free_ranks": 0
+      },
+      "actions":  {
+        "attacks": [],
+        "actions": []
       }
+    },
+    "action": {
+      "group": "Actions",
+      "stat": "strength",
+      "skill": "",
+      "tn": 10,
+      "modifiers": [],
+      "properties":  [],
+      "action_effects": [],
+      "description": ""
     },
     "ambition": {
       "type": "",
       "description": ""
     },
     "skill": {
-      "templates": ["basics", "specialized", "ranked"],
-      "group": "General",
+      "templates": ["basics", "specialized", "ranked", "actions"],
+      "group": "General Skills",
       "default": "",
-      "ranked": true,
-      "free_ranks": 0,
-      "attacks": []
+      "ranked": true
     },
     "trait": {
-      "templates": ["basics", "specialized", "ranked"],
-      "group": "General",
+      "templates": ["basics", "specialized", "ranked", "actions"],
+      "group": "General Traits",
       "rank": 1,
       "requirements": [],
-      "cost": 0,
-      "attacks": []
+      "cost": 0
     },
     "origin": {
       "templates": ["basics"],
@@ -251,12 +263,11 @@
       "rank": 1
     },
     "item": {
-      "templates": ["basics"],
+      "templates": ["basics", "actions"],
       "parent": null,
       "quantity": 1,
       "properties": [],
       "group": "",
-      "attacks": [],
       "carried": true,
       "equipped": false,
       "load": false,

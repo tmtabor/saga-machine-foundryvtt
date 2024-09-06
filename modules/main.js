@@ -3,7 +3,8 @@ import { CharacterSheet, StashSheet, VehicleSheet } from "./actor/actor-sheet.js
 import { SagaMachineCombat, SagaMachineCombatant, SagaMachineCombatTracker } from "./game/combat.js";
 import { generate_conditions } from "./game/consequences.js";
 import { SagaMachineItem } from "./item/item.js";
-import { SagaMachineItemSheet } from "./item/item-sheet.js";
+import { SkillSheet, TraitSheet, OriginSheet, PathSheet, ConsequenceSheet, PhysicalItemSheet, AmbitionSheet,
+    ActionSheet } from "./item/item-sheet.js";
 import { create_active_effect, create_item, delete_active_effect, delete_item, drop_actor_sheet_data,
     get_chat_log_entry_context, hotbar_drop, pre_create_active_effect, pre_delete_active_effect, pre_update_combat,
     render_chat_message, update_active_effect, update_actor, update_item } from "./system/hooks.js";
@@ -40,7 +41,14 @@ Hooks.once("init", async () => {
     Actors.registerSheet("saga-machine", CharacterSheet, { types: ["character"], makeDefault: true });
     Actors.registerSheet("saga-machine", StashSheet, { types: ["stash"], makeDefault: true });
     Actors.registerSheet("saga-machine", VehicleSheet, { types: ["vehicle"], makeDefault: true });
-    Items.registerSheet("saga-machine", SagaMachineItemSheet, { makeDefault: true });
+    Items.registerSheet("saga-machine", SkillSheet, { types: ["skill"], makeDefault: true });
+    Items.registerSheet("saga-machine", TraitSheet, { types: ["trait"], makeDefault: true });
+    Items.registerSheet("saga-machine", OriginSheet, { types: ["origin"], makeDefault: true });
+    Items.registerSheet("saga-machine", PathSheet, { types: ["path"], makeDefault: true });
+    Items.registerSheet("saga-machine", ConsequenceSheet, { types: ["consequence"], makeDefault: true });
+    Items.registerSheet("saga-machine", PhysicalItemSheet, { types: ["item"], makeDefault: true });
+    Items.registerSheet("saga-machine", AmbitionSheet, { types: ["ambition"], makeDefault: true });
+    Items.registerSheet("saga-machine", ActionSheet, { types: ["action"], makeDefault: true });
 
     // Register custom status effects
     CONFIG.statusEffects = generate_conditions();
