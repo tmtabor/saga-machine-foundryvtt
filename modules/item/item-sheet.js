@@ -395,6 +395,7 @@ export class SagaMachineItemSheet extends ItemSheet {
 
         // Assemble the default action spec, based on item type and properties
         const spec = { name: this.item.name, type: "action", _id: mock_id(), img: this.item.img, system: {} };
+        if (this.item.system.description) spec.system.description = this.item.system.description;
         if (this.item.type === 'item') {
             spec.system.properties = this.item.system.properties;
             if (this.item.system.group === 'Weapons') spec.system.group = 'Attacks';
