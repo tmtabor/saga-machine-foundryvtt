@@ -177,17 +177,22 @@ export class ModifierSet {
     }
 
     /**
-     * Parse a json object representing a single Tagify tag and return a ModifierSet object
+     * Parse a json object or string representing a single Tagify tag and return a ModifierSet object.
      *
-     * @param {{value: string, title: string|undefined, color: string|undefined}} tag_json
+     * Accepts JSON in the format:
+     *     [{"value":"Dazed ⊖","title":"Dazed","color":"red"},{"value":"Confused ⊕"},{"value":"Skilled +2"}]
+     * Or a string in the format:
+     *     "Dazed ⊖"
+     *
+     * @param {{value: string, title: string|undefined, color: string|undefined}|string} tag
      * @return {ModifierSet}
      */
-    static from_tag(tag_json) {
-        // '[{"value":"Dazed ⊖","title":"Dazed","color":"red"},{"value":"Confused ⊕"},{"value":"Skilled +2"}]'
-        if (!tag_json.value) return {};
+    static from_tag(tag) {
+        const value = (typeof tag === 'string' || tag instanceof String) ? tag : tag.value;
+        if (!value) return {};
 
         // Parse the tag name
-        const parts = tag_json.value.split(" ");
+        const parts = value.split(" ");
         const all_mods = parts.pop();
         const name = parts.join(" ");
 

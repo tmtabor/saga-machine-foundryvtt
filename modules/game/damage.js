@@ -205,12 +205,12 @@ export class Effect {
     /**
      * Return a json representation of the effect
      *
-     * @param test
+     * @param effect
      * @return {{}}
      */
-    static to_json(test) {
+    static to_json(effect) {
         const json = {};
-        for (let [key, value] of Object.entries(test)) {
+        for (let [key, value] of Object.entries(effect)) {
             // For basic data, copy it over to the JSON
             if (typeof value === 'string' || typeof value === 'number' ||
                 typeof value === 'boolean' || value === null || key === 'properties')

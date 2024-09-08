@@ -101,6 +101,26 @@ export class SagaMachineItem extends Item {
     }
 }
 
+export class ActionHelper {
+    /**
+     * Get the index of this action in the parent's list
+     *
+     * @param {SagaMachineItem} parent - Parent item of action
+     * @param id - ID of action
+     * @return {number}
+     */
+    static parent_action_index(parent, id) {
+        const parent_actions = parent?.system?.actions;
+        if (!parent_actions) return -1;
+
+        for (let i = 0; i < parent_actions.length; i++)
+            if (parent_actions[i]._id === id)
+                return i;
+
+        return -1;
+    }
+}
+
 export class ItemHelper {
     /**
      * Calculate the encumbrance per item, taking all item properties into account

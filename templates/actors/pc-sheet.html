@@ -177,6 +177,35 @@
 				{{/each}}
 			</ol>
 
+            <h3>Actions</h3>
+			<ol class="items-list">
+				<li class="item flexrow items-header">
+					<div class="item-name">Name</div>
+                    <div class="item-name">Source</div>
+                    <div class="item-controls">
+						<a class="item-control item-create" title="Create action" data-type="action"><i class="fas fa-plus"></i> Add</a>
+					</div>
+				</li>
+
+				{{#each data.system.actions as |action|}}
+					<li class="item flexrow" data-id="{{ action._id }}" data-type="Item" data-direct="{{ action.isEmbedded }}" data-parent-id="{{ action.parent.id }}" data-uuid="{{ action.uuid }}">
+                        <div class="item-name action-name">
+                            <span class="item-img rollable" data-type="Test" data-stat="{{ action.system.stat }}" data-skill="{{ action.system.skill }}" data-tn="{{ action.system.tn }}" data-modifiers="{{ action.system.modifiers }}" data-properties="{{ action.system.properties }}" data-effects='{{ action.sheet.effects_str }}'>
+                                <img class="item-img" src="{{ action.img }}" title="Test {{ action.name }}" />
+                                <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ action.name }} Test" />
+                            </span>
+                            <span class="expandable">{{ action.name }}</span>
+                        </div>
+                        <div class="item-name">{{ action.parent.name }}</div>
+						<div class="item-controls">
+							<a class="item-control action-edit" title="Edit Action"><i class="fas fa-edit"></i></a>
+							<a class="item-control action-delete" title="Delete Action"><i class="fas fa-trash"></i></a>
+						</div>
+                        <div class="item-description">{{{ action.system.description }}}</div>
+					</li>
+				{{/each}}
+			</ol>
+
 			<h3>Consequences</h3>
 			<ol class="items-list">
 				<li class="item flexrow items-header">

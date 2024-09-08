@@ -1,5 +1,5 @@
 import { Attack, test_dialog } from "../game/tests.js";
-import {SagaMachineItem} from "../item/item";
+import { ActionHelper, SagaMachineItem } from "../item/item.js";
 
 /**
  * ActorSheet context used in getData() and dependent methods.
@@ -719,6 +719,33 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		html.find('.item-equip').click(this.on_item_equip.bind(this));				// Item equipping
 		html.find('.item-carry').click(this.on_item_carry.bind(this));				// Item carrying
 		html.find('.items-inline > .item').on("contextmenu", this.on_npc_edit.bind(this));	// Open item on NPC sheet
+
+		html.find('.action-edit').on("click", this.on_action_edit.bind(this));			// Action editing
+		html.find('.action-delete').on("click", this.on_action_delete.bind(this));		// Action deletion
+	}
+
+	async on_action_edit(event) {
+		const box = $(event.currentTarget).parents(".item");
+		if (box.data('direct')) await this.on_item_edit(event);
+		else {
+			const parent = this.actor.items.get(box.data("parentId"));
+			const index = ActionHelper.parent_action_index(parent, box.data('id'));
+			if (index > parent.system.actions.length || index < 0) return;
+			const action = new SagaMachineItem(parent.system.actions[index], { parent: parent });
+			action.sheet.render(true);
+		}
+	}
+
+	async on_action_delete(event) {
+		const box = $(event.currentTarget).parents(".item");
+		if (box.data('direct')) await this.on_item_delete(event);
+		else {
+			const parent = this.actor.items.get(box.data("parentId"));
+			const index = ActionHelper.parent_action_index(parent, box.data('id'));
+			parent.system.actions.splice(index, 1);
+			parent.update({ 'system.actions': parent.system.actions });
+			box.remove();
+		}
 	}
 
 	/**
@@ -794,13 +821,13 @@ export class CharacterSheet extends SagaMachineActorSheet {
 
 	 */
 	gather_actions(context) {
-		const actions = [];
+		const actions = this.items(context, 'action');
 		const action_items = context.actor.items.filter(item => item.system.actions?.length &&
 			(item.system.equipped || item.system.equipped === undefined));
 
 		for (let item of action_items)
 			for (let action of item.system.actions)
-				actions.push(new SagaMachineItem(action));
+				actions.push(new SagaMachineItem(action, { parent: item }));
 
 		return actions;
 	}

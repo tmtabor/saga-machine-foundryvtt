@@ -1,9 +1,9 @@
 import Tagify from "../libraries/tagify.min.js";
-import { SCORE_OPTIONS, STAT_OPTIONS } from "../game/tests";
-import { SagaMachineItem } from "./item";
-import { ModifierSet } from "../game/modifiers";
-import { mock_id } from "../system/utils";
-import { Effect } from "../game/damage";
+import { SCORE_OPTIONS, STAT_OPTIONS } from "../game/tests.js";
+import { ActionHelper, SagaMachineItem } from "./item.js";
+import { ModifierSet } from "../game/modifiers.js";
+import { mock_id } from "../system/utils.js";
+import { Effect } from "../game/damage.js";
 
 /**
  * The following constants were moved from the templates to code due to deprecations in Foundry 12
@@ -816,7 +816,7 @@ export class ActionSheet extends SagaMachineItemSheet {
             foundry.utils.mergeObject(this.item, form_data);
 
             // Get the index in the list, replace and save
-            const index = this.parent_action_index();
+            const index = ActionHelper.parent_action_index(this?.item?.parent, this.item.id);
             if (index >= 0) {
                 this.item.parent.system.actions[index] = this.item.toObject(false);
                 return await this.item.parent.update({'system.actions': this.item.parent.system.actions});
@@ -826,22 +826,6 @@ export class ActionSheet extends SagaMachineItemSheet {
         // Otherwise, do things the usual way
         else return super._onSubmit(event,
             { updateData: updateData, preventClose: preventClose, preventRender: preventRender });
-    }
-
-    /**
-     * Get the index of this action in the parent's list
-     *
-     * @return {number}
-     */
-    parent_action_index() {
-        const parent_actions = this.item?.parent?.system?.actions;
-        if (!parent_actions) return -1;
-
-        for (let i = 0; i < parent_actions.length; i++)
-            if (parent_actions[i]._id === this.item.id)
-                return i;
-
-        return -1;
     }
 
     /*******************************
@@ -972,5 +956,14 @@ export class ActionSheet extends SagaMachineItemSheet {
             await this.render();
         }
         else this.item.update({ 'system.action_effects': effects });
+    }
+
+    /**
+     * Return a JSON string representation of this action's effects - used in templates
+     *
+     * @return {string}
+     */
+    get effects_str() {
+        return  JSON.stringify(this.item.system.action_effects.map(c => Effect.to_json(c)));
     }
 }

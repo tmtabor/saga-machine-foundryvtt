@@ -782,7 +782,6 @@ export async function test_dialog(dataset) {
             const modifiers = actor.modifiers(dataset);         // Get the list of modifiers from consequences
             const input = html.find('input[name=modifiers]');   // Get the modifiers input DOM element
             if (!input) return;
-            input.val(JSON.stringify(modifiers.map(m => m.tag())));
             const tagify = new Tagify(input[0], {
                 duplicates: true,
                 transformTag: tag_data => {
@@ -791,6 +790,7 @@ export async function test_dialog(dataset) {
                         tag_data.value = tag_data.value.replaceAll('+', '⊕').replaceAll('-', '⊖');
                 }
             });
+            tagify.addTags(modifiers.map(m => m.tag())); // Add modifiers from consequences
 
             // Redo modifiers when the stat, score or TN is changed
             const inputs = html.find('select[name=stat], select[name=score], input[name=tn]');
