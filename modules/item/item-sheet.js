@@ -393,7 +393,22 @@ export class SagaMachineItemSheet extends ItemSheet {
     add_action() {
         if (!this.isEditable) return;
 
-        const action = new SagaMachineItem({ name: "New action", type: "action", _id: mock_id() }, { parent: this.item });
+        // Assemble the default action spec, based on item type and properties
+        const spec = { name: this.item.name, type: "action", _id: mock_id(), img: this.item.img, system: {} };
+        if (this.item.type === 'item') {
+            spec.system.properties = this.item.system.properties;
+            if (this.item.system.group === 'Weapons') spec.system.group = 'Attacks';
+        }
+        if (this.item.type === 'skill') {
+            spec.system.skill = this.item.system.full_name;
+            spec.system.stat = this.item.system.default;
+            if (this.item.system.group === 'Powers') spec.system.group = 'Powers';
+            if (this.item.system.group === 'Maneuvers') spec.system.group = 'Attacks';
+            if (this.item.system.group === 'Opening Moves') spec.system.group = 'Attacks';
+            if (this.item.system.group === 'Stances') spec.system.group = 'Attacks';
+        }
+
+        const action = new SagaMachineItem(spec, { parent: this.item });
         this.item.system.actions.push(action.toJSON());
         this.item.update({'system.actions': this.item.system.actions});
     }
