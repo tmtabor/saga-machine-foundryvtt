@@ -4,6 +4,7 @@ import { standard_consequence } from "../game/consequences.js";
 import { median } from "../system/utils.js";
 import { Effect, WoundFactory } from "../game/damage.js";
 import { ModifierSet } from "../game/modifiers.js";
+import {ActionHelper} from "../item/item";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
@@ -427,7 +428,7 @@ export class SagaMachineActor extends Actor {
      *
      * @param {{base_score: string, stat: string|null, score: string|null, tn: string|number, boons: number,
      *     banes: number, modifier: number, divide: number, percent: number}} dataset
-     * @returns {string[]}
+     * @returns {ModifierSet[]}
      * @see ModifierSet
      */
     modifiers(dataset) {
@@ -454,7 +455,8 @@ export class SagaMachineActor extends Actor {
         if (dataset.divide) mods_object.push(`divide=${dataset.divide}`);
 
         // Add possible bane from the strength requirement
-        if (Attack.is_attack(dataset) && !Attack.strength_met(dataset, this)) mods_object.push(`name=Low Str&banes=1`);
+        if (Attack.is_attack(dataset) && !ActionHelper.is_power(dataset) && !Attack.strength_met(dataset, this))
+            mods_object.push(`name=Low Str&banes=1`);
 
         // Add possible bane from Fatigue
         if ((dataset.stat === 'strength' || dataset.stat === 'dexterity' || dataset.stat === 'speed' || dataset.stat === 'endurance') &&

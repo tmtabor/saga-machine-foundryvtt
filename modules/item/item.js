@@ -1,3 +1,5 @@
+import { Attack } from "../game/tests.js";
+
 /**
  * Extend the base Item class to support the Saga Machine system
  */
@@ -101,6 +103,9 @@ export class SagaMachineItem extends Item {
     }
 }
 
+/**
+ * Helper class for operations on actions
+ */
 export class ActionHelper {
     /**
      * Get the index of this action in the parent's list
@@ -119,8 +124,16 @@ export class ActionHelper {
 
         return -1;
     }
+
+    static is_power(dataset) {
+        if (!dataset.properties) return false;
+        return Attack.has_property(dataset.properties, 'Power');
+    }
 }
 
+/**
+ * Helper class for operations on inventory items
+ */
 export class ItemHelper {
     /**
      * Calculate the encumbrance per item, taking all item properties into account
