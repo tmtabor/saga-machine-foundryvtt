@@ -1,4 +1,4 @@
-import { Attack, test_dialog } from "../game/tests.js";
+import { test_dialog } from "../game/tests.js";
 import { ActionHelper, SagaMachineItem } from "../item/item.js";
 
 /**
@@ -699,7 +699,6 @@ export class CharacterSheet extends SagaMachineActorSheet {
 			blank: 'Miscellanea'
 		});
 
-		context.data.system.attacks = this.gather_attacks(context);	// Gather the list of attacks
 		context.data.system.actions = this.gather_actions(context);	// Gather the list of actions
 		this.calc_health_progress_bar(context);						// Calculate health progress bar percentages
 
@@ -785,32 +784,6 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		const box = $(event.currentTarget).closest(".item");
 		const item = this.actor.items.get(box.data("id"));
 		item.sheet.render(true);
-	}
-
-	/**
-	 * Return list of all attacks provided by items
-	 *
-	 * @param {Context} context
-	 * @returns {Attack[]}
-	 * @private
-	 */
-	gather_attacks(context) {
-		const attacks = [];
-		const attack_items = context.actor.items.filter(item => item.system.attacks && item.system.attacks.length &&
-			(item.system.equipped || item.system.equipped === undefined));
-
-		for (let item of attack_items)
-			for (let attack of item.system.attacks)
-				attacks.push(new Attack({
-					actor: this.actor,
-					item: item,
-					name: item.system.full_name,
-					type: item.type,
-					properties: item.system.properties || '',
-					...attack
-				}));
-
-		return attacks;
 	}
 
 	/**

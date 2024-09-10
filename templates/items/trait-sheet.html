@@ -22,7 +22,6 @@
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
         <a class="item" data-tab="basics">Basics</a>
-        <a class="item" data-tab="attacks">Attacks</a>
         <a class="item" data-tab="actions">Actions</a>
         <a class="item" data-tab="effects">Effects</a>
         <a class="item" data-tab="description">Description</a>
@@ -47,63 +46,6 @@
                 <input class="toggle-check item-input" type="checkbox" name="system.ranked" {{checked data.system.ranked}} />
                 <input class="toggle-visible grid-start-3 grid-span-3 item-input" type="number" name="system.rank" placeholder="Rank" value="{{ data.system.rank }}" step="1" />
             </div>
-        </div>
-
-        <div class="tab attacks" data-group="primary" data-tab="attacks">
-            <ol class="items-list attack-list">
-                <li class="item flexrow items-header attack-row">
-                    <div class="item-name">Name</div>
-                    <div class="item-name">Stat</div>
-                    <div class="item-name">Skill</div>
-                    <div class="item-name">Targets</div>
-                    <div class="item-name">Properties</div>
-                    <div class="item-controls">
-                        <a class="item-control item-create" title="Create attack" data-type="item"><i class="fas fa-plus"></i> Add</a>
-                    </div>
-                </li>
-
-                <li class="item flexrow attack attack-row prototype">
-                    <input class="item-input item-name" type="text" name="attack_name" value="" placeholder="{{ data.system.full_name }}" />
-                    <select class="item-input item-name" name="stat">
-                        <option value="">--</option>
-                        <option value="strength">Strength</option>
-                        <option value="dexterity">Dexterity</option>
-                        <option value="speed">Speed</option>
-                        <option value="endurance">Endurance</option>
-                        <option value="intelligence">Intelligence</option>
-                        <option value="perception">Perception</option>
-                        <option value="charisma">Charisma</option>
-                        <option value="determination">Determination</option>
-                    </select>
-                    <input class="item-input item-name" type="text" name="skill" value="" />
-                    <select class="item-input item-name" name="targets">
-                        <option value="">--</option>
-                        <option value="Defense">Defense</option>
-                        <option value="Willpower">Willpower</option>
-                    </select>
-                    <input class="item-input item-name" type="text" name="properties" value="" placeholder="{{ data.system.properties }}" />
-
-                    <div class="item-controls">
-                        <a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
-                    </div>
-
-                    <label class="item-effect">Damage</label>
-                    <input class="item-input item-name" type="text" name="damage" value="0" />
-                    <select class="item-input item-name" name="damage_type">
-                        <option value="">--</option>
-                        <option value="burn">Burning (burn)</option>
-                        <option value="cor">Corrosive (cor)</option>
-                        <option value="cut">Cutting (cut)</option>
-                        <option value="fat">Fatigue (fat)</option>
-                        <option value="fr">Freezing (fr)</option>
-                        <option value="pi">Piercing (pi)</option>
-                        <option value="sm">Smashing (sm)</option>
-                        <option value="tox">Toxic (tox)</option>
-                    </select>
-                    <label class="item-effect">Consequences</label>
-                    <input class="item-input item-name" type="text" name="consequences" value="" />
-                </li>
-            </ol>
         </div>
 
         <div class="tab actions" data-group="primary" data-tab="actions">

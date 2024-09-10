@@ -19,29 +19,6 @@
             <div class="initiative float-right">
                 <label class="score-label combat-top rollable" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-effects='{"type": "defense"}'>Defense <i class="fas fa-shield-alt"></i></label>
             </div>
-            <h3>Attacks</h3>
-			<ol class="items-list">
-				<li class="item attack-row items-header">
-					<div class="item-name">Name</div>
-                    <div class="item-name">Test / Effect</div>
-                    <div class="item-name">Properties</div>
-				</li>
-
-				{{#each data.system.attacks as |attack|}}
-					<li class="item attack-row" data-type="Item" data-uuid="{{ attack.item.uuid }}">
-                        <div class="item-name attack-name">
-                            <span class="item-img rollable" data-type="Test" data-stat="{{ attack.stat }}" data-skill="{{ attack.skill }}" data-tn="{{ attack.tn }}" data-properties="{{ attack.properties }}" data-effects='{{ effects_string }}'>
-                                <img class="item-img" src="{{ attack.item.img }}" title="Test {{ attack.full_name }}" />
-                                <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ attack.full_name }} Test" />
-                            </span>
-                            <span class="expandable">{{ attack.full_name }}</span>
-                        </div>
-                        <div class="item-name attack-effect">{{ attack.label }} {{#if attack.effect }}({{{ attack.effect }}}){{/if}}</div>
-                        <div class="item-name attack-properties">{{ attack.properties }}</div>
-                        <div class="item-description">{{{ attack.item.system.description }}}</div>
-					</li>
-				{{/each}}
-			</ol>
 
             <h3>Actions</h3>
 			<ol class="items-list">

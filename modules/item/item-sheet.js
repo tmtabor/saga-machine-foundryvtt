@@ -64,7 +64,7 @@ export class SagaMachineItemSheet extends ItemSheet {
             width: 600,
             height: 360,
             tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "basics"}],
-            scrollY: [".basics", ".attacks", ".actions", "effects", ".description"]
+            scrollY: [".basics", ".actions", "effects", ".description"]
         });
     }
 
@@ -181,206 +181,6 @@ export class SagaMachineItemSheet extends ItemSheet {
         const name = box.data("name");
         const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
         effect.update({'disabled': !effect.disabled});
-    }
-
-    /*******************************
-     * METHODS THAT HANDLE ATTACKS *
-     *******************************/
-
-    /**
-     * Render the list of attacks
-     *
-     * @param {JQuery} html
-     */
-    draw_attacks(html) {
-        // Don't draw attacks if there are no attacks
-        if (!this.item.system.attacks || !this.item.system.attacks.length) return;
-
-        // Get the prototype attack node and parent node, return if it wasn't found
-        const prototype = html.find('.attack.prototype');
-        const parent = html.find('ol.attack-list');
-        if (!prototype || !prototype.length || !parent || !parent.length) return;
-
-        // For each attack, clone the prototype and set up the form
-        for (let attack of this.item.system.attacks) {
-            const clone = prototype.clone();
-            clone.removeClass('prototype');
-            clone.find("[name=attack_name]").val(attack.name);
-            clone.find("[name=stat]").val(attack.stat);
-            clone.find("[name=skill]").val(attack.skill);
-            clone.find("[name=damage]").val(this.find_damage(attack));
-            clone.find("[name=damage_type]").val(this.find_damage_type(attack));
-            clone.find("[name=targets]").val(attack.tn);
-            clone.find("[name=properties]").val(attack.properties);
-            clone.find("[name=consequences]").val(this.find_consequences(attack));
-            parent.append(clone);
-
-            // Set up the data handlers for the form, if this sheet is editable
-            if (!this.isEditable) continue;
-            clone.find('input, select').change(this.update_attacks.bind(this));
-        }
-    }
-
-    /**
-     * Add a new attack to the list
-     */
-    add_attack() {
-        if (!this.isEditable) return;
-
-        // Get the prototype attack node and parent node, return if it wasn't found
-        const prototype = this.element.find('.attack.prototype');
-        const parent = this.element.find('ol.attack-list');
-        if (!prototype || !prototype.length || !parent || !parent.length) return;
-
-        const clone = prototype.clone();
-        clone.removeClass('prototype');
-        clone.find('input, select').change(this.update_attacks.bind(this));
-        parent.append(clone);
-    }
-
-    /**
-     * Delete an attack from the list
-     *
-     * @param {Event} event
-     */
-    delete_attack(event) {
-        const box = $(event.currentTarget).closest(".attack");
-        const attack_list = box.closest('.attack-list');
-        box.remove();
-        this.update_attacks(event, attack_list);
-    }
-
-    /**
-     * Handle changes to the attack form
-     *
-     * @param {Event} event
-     * @param {JQuery} attack_list
-     */
-    update_attacks(event, attack_list = null) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        // Get all attacks
-        const attack_nodes = attack_list ? attack_list.find('.attack:not(.prototype)') :
-            $(event.currentTarget).closest('ol.attack-list').find('.attack:not(.prototype)');
-
-        // Iterate over each node and add to the list
-        const attacks = [];
-        attack_nodes.each((i, node) => {
-            let name = $(node).find("[name=attack_name]").val().trim();
-            let stat = $(node).find("[name=stat]").val().trim();
-            let skill = $(node).find("[name=skill]").val().trim();
-            let properties = $(node).find("[name=properties]").val().trim();
-            let damage = $(node).find("[name=damage]").val().trim();
-            let damage_type = $(node).find("[name=damage_type]").val().trim();
-            let targets = $(node).find("[name=targets]").val().trim();
-            let consequences = $(node).find("[name=consequences]").val().trim();
-
-            if (!stat) return; // Don't add if no stat is specified
-
-            // Create attack, add name and properties if set, add to list
-            const attack = {
-                stat: stat,
-                skill: skill,
-                tn: targets,
-                effects: this.create_effects(damage, damage_type, consequences)
-            };
-            if (name) attack['name'] = name;
-            if (properties) attack['properties'] = properties;
-            attacks.push(attack);
-
-            this.item.update({'system.attacks': attacks});
-        });
-    }
-
-    /**
-     * Get the attack's damage
-     *
-     * @param {Attack} attack
-     * @return {string}
-     */
-    find_damage(attack) {
-        return this.search_effects(attack, 'damage', 'value');
-    }
-
-    /**
-     * Get the attack's damage type
-     * @param {Attack} attack
-     * @return {string}
-     */
-    find_damage_type(attack) {
-        return this.search_effects(attack, 'damage', 'damage_type');
-    }
-
-    /**
-     * Get any consequences imposed with a successful attack
-     *
-     * @param {Attack} attack
-     * @return {string}
-     */
-    find_consequences(attack) {
-        return this.search_effects(attack, 'consequence', 'name', true);
-    }
-
-    /**
-     * Search those all effects imposed by the attack and return those matching the specified type
-     *
-     * @param {Attack} attack - The Attack object to search
-     * @param {string} type - The type of the Effect object
-     * @param {string} property - The property of the object containing the desired value
-     * @param {boolean} find_all - Whether to return all instances of the matching type or only the first
-     * @return {string}
-     */
-    search_effects(attack, type, property, find_all = false) {
-        // Ensure that effects are in the right format
-        if (!attack.effects || !attack.effects.length) return '';
-        let parsed_effects = typeof attack.effects === 'string' ?
-            JSON.parse(attack.effects) : attack.effects;
-        parsed_effects = Array.isArray(parsed_effects) ? parsed_effects : [parsed_effects];
-
-        const all_found = [];
-        for (let con of parsed_effects) {
-            if (con.type === type) {
-                let found = con[property];
-                if (found === undefined || found === null) found = '';
-                if (!find_all) return found
-                else all_found.push(found)
-            }
-        }
-        return all_found.join(', ');
-    }
-
-    /**
-     * Create new Effect objects for the entered damage and consequences
-     *
-     * @param {string} damage - The damage to apply
-     * @param {string} damage_type - The damage type in abbreviated format (e.g. cut, pi, sm)
-     * @param {string} consequences - The names of any consequences to impose
-     * @return {Effect[]}
-     */
-    create_effects(damage, damage_type, consequences) {
-        const effects_list = [];
-
-        if (damage !== '') {
-            effects_list.push({
-                type: "damage",
-                value: damage,
-                damage_type: damage_type,
-                when: "success"
-            });
-        }
-
-        if (consequences !== '') {
-            const all_consequences = consequences.split(',').map(c => c.trim());
-            for (let con of all_consequences)
-                effects_list.push({
-                    type: "consequence",
-                    name: con,
-                    when: "success"
-                });
-        }
-
-        return effects_list;
     }
 
     /*******************************
@@ -525,11 +325,6 @@ export class SkillSheet extends SagaMachineItemSheet {
 
         // Everything below here is only needed if the sheet is editable
         if (!this.isEditable) return;
-
-        // Handle attacks
-        this.draw_attacks(html);
-        html.find('.attacks .item-create').click(this.add_attack.bind(this));
-        html.find('.attacks .item-delete').click(this.delete_attack.bind(this));
 	}
 }
 
@@ -551,11 +346,6 @@ export class TraitSheet extends SagaMachineItemSheet {
         html.find('.effect-edit').on('click', this.on_edit_effect.bind(this));      // Open active effect sheet
         html.find('.effect-delete').on('click', this.on_delete_effect.bind(this));  // Delete active effect
         html.find('.effect-toggle').on('click', this.on_toggle_effect.bind(this));  // Toggle effect on/off
-
-        // Handle attacks
-        this.draw_attacks(html);
-        html.find('.attacks .item-create').click(this.add_attack.bind(this));
-        html.find('.attacks .item-delete').click(this.delete_attack.bind(this));
 	}
 }
 
@@ -672,11 +462,6 @@ export class PhysicalItemSheet extends SagaMachineItemSheet {
 
         // Everything below here is only needed if the sheet is editable
         if (!this.isEditable) return;
-
-        // Handle attacks
-        this.draw_attacks(html);
-        html.find('.attacks .item-create').click(this.add_attack.bind(this));
-        html.find('.attacks .item-delete').click(this.delete_attack.bind(this));
 	}
 }
 

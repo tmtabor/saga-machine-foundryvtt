@@ -1,4 +1,5 @@
-import { Attack } from "../game/tests.js";
+import { token_actor } from "../system/utils.js";
+import { Effect } from "../game/damage.js";
 
 /**
  * Extend the base Item class to support the Saga Machine system
@@ -127,7 +128,105 @@ export class ActionHelper {
 
     static is_power(dataset) {
         if (!dataset.properties) return false;
-        return Attack.has_property(dataset.properties, 'Power');
+        return ActionHelper.has_property(dataset.properties, 'Power');
+    }
+
+    /**
+     * Returns whether this action is an attack (shorthand: targets Defense or Willpower)
+     *
+     * @param dataset
+     * @return {boolean}
+     */
+    static is_attack(dataset) {
+        return dataset.tn === 'Defense' || dataset.tn === 'Willpower';
+    }
+
+    /**
+     * Returns whether the character meets the strength requirements for the attack
+     *
+     * @param dataset
+     * @param {SagaMachineActor} actor
+     * @return {boolean}
+     */
+    static strength_met(dataset, actor = null) {
+        // Get a reference to the actor if one has not been provided
+        if (!actor) actor = token_actor({
+            scene_id: dataset.sceneId,
+            token_id: dataset.tokenId,
+            actor_id: dataset.actorId
+        });
+
+        const strength = actor.system.stats.strength.value;                     // Get the actor's strength
+        const damage = ActionHelper.damage(dataset);                                  // Get the attack's damage
+        const properties = ActionHelper.parse_properties(dataset.properties);
+        const light = ActionHelper.property_value(properties, 'Light');       // Get the Light X property, if any
+        const hands = ActionHelper.property_value(properties, 'Hands');  // Get the Hands X property
+
+        // Check to see if the strength requirement is met
+        if (hands >= 2) return strength >= (light || (damage / 2))
+        else return strength >= (light || damage)
+    }
+
+    /**
+     * Returns the base damage value of an attack
+     *
+     * @param dataset
+     * @return {number}
+     */
+    static damage(dataset) {
+        if (!dataset.effects) return 0;
+
+        // Parse effects into a list
+        let effects_list = JSON.parse(dataset.effects);
+        if (!Array.isArray(effects_list)) effects_list = [effects_list];
+
+        // Get the damage
+        for (let i = 0; i < effects_list.length; i++) {
+            const effect = new Effect(effects_list[i]);
+            if (effect.type === 'damage') return effect.base_damage();
+        }
+
+        return 0;
+    }
+
+    /**
+     * Parses the action properties, if necessary, from string to list
+     *
+     * @param properties
+     * @return {string[]}
+     */
+    static parse_properties(properties) {
+        if (typeof properties === 'string') return properties.split(',').map(t => t.trim());
+        else if (Array.isArray(properties)) return properties;
+        else return [];
+    }
+
+    /**
+     * Returns the value of the specified property, returning 0 if not specified or no match
+     *
+     * @param {string|string[]} properties
+     * @param {string} property
+     * @return {number}
+     */
+    static property_value(properties, property) {
+        for (const prop of ActionHelper.parse_properties(properties)) {
+            if (prop.toLowerCase().startsWith(`${property.toLowerCase()} `)) {
+                const [, val] = prop.split(' ');
+                return Number(val);
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Returns whether the action has the specified property
+     *
+     * @param {string|string[]} properties
+     * @param {string} property
+     * @return {boolean}
+     */
+    static has_property(properties, property) {
+        return ActionHelper.parse_properties(properties).map(p => p.split(' ')[0]).includes(property);
     }
 }
 

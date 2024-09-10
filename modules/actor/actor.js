@@ -1,10 +1,10 @@
 import { INITIATIVE } from "../game/combat.js";
-import { Attack, Test } from "../game/tests.js";
+import { Test } from "../game/tests.js";
 import { standard_consequence } from "../game/consequences.js";
 import { median } from "../system/utils.js";
 import { Effect, WoundFactory } from "../game/damage.js";
 import { ModifierSet } from "../game/modifiers.js";
-import {ActionHelper} from "../item/item";
+import { ActionHelper } from "../item/item";
 
 /**
  * Extends the base Actor class to support the Saga Machine system
@@ -455,7 +455,7 @@ export class SagaMachineActor extends Actor {
         if (dataset.divide) mods_object.push(`divide=${dataset.divide}`);
 
         // Add possible bane from the strength requirement
-        if (Attack.is_attack(dataset) && !ActionHelper.is_power(dataset) && !Attack.strength_met(dataset, this))
+        if (ActionHelper.is_attack(dataset) && !ActionHelper.is_power(dataset) && !ActionHelper.strength_met(dataset, this))
             mods_object.push(`name=Low Str&banes=1`);
 
         // Add possible bane from Fatigue
@@ -472,7 +472,7 @@ export class SagaMachineActor extends Actor {
             mods_object.push(`name=Powered&boons=2`);
 
         // Add boon from the Auto property
-        if (Attack.is_attack(dataset) && Attack.has_property(dataset.properties, 'Auto')) mods_object.push(`name=Auto&boons=1`);
+        if (ActionHelper.is_attack(dataset) && ActionHelper.has_property(dataset.properties, 'Auto')) mods_object.push(`name=Auto&boons=1`);
 
         // Parse the mods object into a list of mods
         return ModifierSet.parse(mods_object);

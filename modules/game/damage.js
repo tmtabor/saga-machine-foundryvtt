@@ -1,5 +1,5 @@
 import { random_member } from "../system/utils.js";
-import { Attack } from "./tests.js";
+import { ActionHelper } from "../item/item.js";
 
 /**
  * Object representing the effects of a test
@@ -159,13 +159,13 @@ export class Effect {
             (this.test && this.test.margin ? Number(this.test.margin) : 0);
 
         // Handle the Feeble property
-        this.properties = Attack.parse_properties(dataset.properties);
-        if (Attack.has_property(this.properties, 'Feeble'))
+        this.properties = ActionHelper.parse_properties(dataset.properties);
+        if (ActionHelper.has_property(this.properties, 'Feeble'))
             margin = Math.min(base_damage, margin);
 
         // Handle the Ignores and Pierce properties
-        const ignores = Attack.has_property(this.properties, 'Ignores');
-        const pierce = ignores ? Effect.IGNORES_ALL_ARMOR : Attack.property_value(this.properties, 'Pierce');
+        const ignores = ActionHelper.has_property(this.properties, 'Ignores');
+        const pierce = ignores ? Effect.IGNORES_ALL_ARMOR : ActionHelper.property_value(this.properties, 'Pierce');
 
         let damage = base_damage + margin;                              // Add base damage and margin
         if (damage < 0) damage = 0;                                     // Minimum 0

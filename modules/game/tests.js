@@ -2,6 +2,7 @@ import Tagify from "../libraries/tagify.min.js";
 import { capitalize, test_label, token_actor } from "../system/utils.js";
 import { ModifierSet } from "./modifiers.js";
 import { Effect } from "./damage.js";
+import { ActionHelper } from "../item/item";
 
 /**
  * Register Handlebars helpers for test dialog
@@ -359,7 +360,7 @@ export class Test {
         const properties = dataset?.properties || this.properties || [];
         if (!this.effects_evaluated) {
             // Handle extra hits and shots from the Auto property
-            if (Attack.has_property(properties, 'Auto')) {
+            if (ActionHelper.has_property(properties, 'Auto')) {
                 const base_attack = this.basic_attack_damage() || {value: 0, damage_type: 'sm'};
                 for (let m_count = this.margin - 5; m_count > 0; m_count -= 5)
                     this.effects.push(new Effect({
@@ -374,12 +375,12 @@ export class Test {
                 this.effects.push(new Effect({
                     type: 'message',
                     key: 'Ammo',
-                    value: `Automatic fire consumes ${Attack.property_value(properties, 'Auto')} shots.`
+                    value: `Automatic fire consumes ${ActionHelper.property_value(properties, 'Auto')} shots.`
                 }, this));
             }
 
             // Handle the Stun property
-            if (Attack.has_property(properties, 'Stun'))
+            if (ActionHelper.has_property(properties, 'Stun'))
                 this.effects.push(new Effect({
                     type: 'consequence',
                     name: 'Stun',
@@ -608,152 +609,6 @@ export class Test {
         }
 
         return new Test(dataset);
-    }
-}
-
-/**
- * Object representing an Attack test
- *
- * @extends Test
- */
-export class Attack extends Test {
-    _effects_string = null;
-    _effect = null;
-
-    /**
-     * Get the name of the attack, defaulting to "Unnamed Attack"
-     *
-     * @return {string}
-     */
-    get full_name() {
-        return this.name || "Unnamed Attack";
-    }
-
-    /**
-     * Return a json string containing all the attack's effects - used in HTML templates
-     *
-     * @return {string}
-     */
-    get effects_string() {
-        // Return cached version
-        if (this._effects_string) return this._effects_string;
-
-        // Or lazily generate the string and return
-        this._effects_string = this.effects ?
-            JSON.stringify(this.effects.map(c => Effect.to_json(c))) : "[]";
-        return this.effects_string;
-    }
-
-    /**
-     * Returns a list containing all the attack's Effect objects
-     *
-     * @return {Effect[]}
-     */
-    get effect() {
-        // Return cached version
-        if (this._effect) return this._effect;
-
-        // If there are no effects specified, return empty string, otherwise, compile the list of effects
-        this._effect = this.effects ? this.effects.map(c => c.effect()).join(', ') : '';
-        return this._effect
-    }
-
-    /**
-     * Returns whether this test is an attack (shorthand: targets Defense or Willpower)
-     *
-     * @param dataset
-     * @return {boolean}
-     */
-    static is_attack(dataset) {
-        return dataset.tn === 'Defense' || dataset.tn === 'Willpower';
-    }
-
-    /**
-     * Returns whether the character meets the strength requirements for the attack
-     *
-     * @param dataset
-     * @param {SagaMachineActor} actor
-     * @return {boolean}
-     */
-    static strength_met(dataset, actor = null) {
-        // Get a reference to the actor if one has not been provided
-        if (!actor) actor = token_actor({
-            scene_id: dataset.sceneId,
-            token_id: dataset.tokenId,
-            actor_id: dataset.actorId
-        });
-
-        const strength = actor.system.stats.strength.value;                     // Get the actor's strength
-        const damage = Attack.damage(dataset);                                  // Get the attack's damage
-        const properties = Attack.parse_properties(dataset.properties);
-        const light = Attack.property_value(properties, 'Light');       // Get the Light X property, if any
-        const hands = Attack.property_value(properties, 'Hands');  // Get the Hands X property
-
-        // Check to see if the strength requirement is met
-        if (hands >= 2) return strength >= (light || (damage / 2))
-        else return strength >= (light || damage)
-    }
-
-    /**
-     * Returns the base damage value of the attack
-     *
-     * @param dataset
-     * @return {number}
-     */
-    static damage(dataset) {
-        if (!dataset.effects) return 0;
-
-        // Parse effects into a list
-        let effects_list = JSON.parse(dataset.effects);
-        if (!Array.isArray(effects_list)) effects_list = [effects_list];
-
-        // Get the damage
-        for (let i = 0; i < effects_list.length; i++) {
-            const effect = new Effect(effects_list[i]);
-            if (effect.type === 'damage') return effect.base_damage();
-        }
-
-        return 0;
-    }
-
-    /**
-     * Parses the attacks properties, if necessary, from string to list
-     *
-     * @param properties
-     * @return {string[]}
-     */
-    static parse_properties(properties) {
-        if (typeof properties === 'string') return properties.split(',').map(t => t.trim());
-        else if (Array.isArray(properties)) return properties;
-        else return [];
-    }
-
-    /**
-     * Returns the value of the specified property, returning 0 if not specified or no match
-     *
-     * @param {string|string[]} properties
-     * @param {string} property
-     * @return {number}
-     */
-    static property_value(properties, property) {
-        for (const prop of Attack.parse_properties(properties)) {
-            if (prop.toLowerCase().startsWith(`${property.toLowerCase()} `)) {
-                const [, val] = prop.split(' ');
-                return Number(val);
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * Returns whether the attack has the specified property
-     *
-     * @param {string|string[]} properties
-     * @param {string} property
-     * @return {boolean}
-     */
-    static has_property(properties, property) {
-        return Attack.parse_properties(properties).map(p => p.split(' ')[0]).includes(property);
     }
 }
 
