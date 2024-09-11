@@ -635,9 +635,9 @@ export async function test_dialog(dataset) {
         render: html => {
             // Initialize the modifiers (tag) widget
             const modifiers = actor.modifiers(dataset);         // Get the list of modifiers from consequences
-            const input = html.find('input[name=modifiers]');   // Get the modifiers input DOM element
-            if (!input) return;
-            const tagify = new Tagify(input[0], {
+            const modifier_input = html.find('input[name=modifiers]');   // Get the modifiers input DOM element
+            if (!modifier_input) return;
+            const modifier_tagify = new Tagify(modifier_input[0], {
                 duplicates: true,
                 transformTag: tag_data => {
                     tag_data.style = ModifierSet.color(tag_data.value);
@@ -645,20 +645,38 @@ export async function test_dialog(dataset) {
                         tag_data.value = tag_data.value.replaceAll('+', '⊕').replaceAll('-', '⊖');
                 }
             });
-            tagify.addTags(modifiers.map(m => m.tag())); // Add modifiers from consequences
+            const initial_tags = foundry.utils.deepClone(modifier_tagify.value);
+            const generated_tags = modifiers.map(m => m.tag());
+            modifier_tagify.addTags(generated_tags); // Add modifiers from consequences
 
-            // Redo modifiers when the stat, score or TN is changed
-            const inputs = html.find('select[name=stat], select[name=score], input[name=tn]');
+            // Tagify the properties
+            const property_input = html.find('input[name=properties]');   // Get the properties input DOM element
+            const property_tagify = new Tagify(property_input[0], {
+                duplicates: true,
+                transformTag: tag_data => {
+                    tag_data.style = ModifierSet.GRAY;
+                }
+            });
+
+            // Redo modifiers when the stat, score, TN or properties is changed
+            const inputs = html.find('select[name=stat], select[name=score], select[name=skill], input[name=tn], input[name=properties]');
             inputs.on('change', event => {
                 // Get the new test parameters
-                const modified_dataset = foundry.utils.deepClone(dataset);
+                const modified_dataset = JSON.parse(JSON.stringify(dataset)); // Clone the dataset because deepCopy isn't working
                 modified_dataset.stat = html.find('select[name=stat]').val();
                 modified_dataset.score = html.find('select[name=score]').val();
+                modified_dataset.skill = html.find('select[name=skill]').val();
                 modified_dataset.tn = html.find('input[name=tn]').val();
+
+                // Parse Tagify JSON and put it in the expected format
+                const prop_json = html.find('input[name=properties]').val() || "[]";
+                modified_dataset.properties = JSON.parse(prop_json).map(p => p.value).join(',');
 
                 // Get the new modifiers and set the tag widget
                 const new_modifiers = actor.modifiers(modified_dataset);
-                input.val(JSON.stringify(new_modifiers.map(m => m.tag())));
+                modifier_tagify.removeAllTags();
+                modifier_tagify.addTags(initial_tags);
+                modifier_tagify.addTags(new_modifiers.map(m => m.tag()));
             });
         },
         buttons: {

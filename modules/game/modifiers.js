@@ -10,6 +10,10 @@ export class ModifierSet {
     divide = 0;
     percent = 0;
 
+    static GRAY = '--tag-bg:#a1a1a1;--tag-text-color:#2b2a2a;--tag-hover:#bababa;--tag-remove-bg:#a1a1a1;--tag-remove-btn-color:#2b2a2a';
+    static RED = '--tag-bg:#d19d9d;--tag-text-color:#530d0d;--tag-hover:#e1b4b4;--tag-remove-bg:#d19d9d;--tag-remove-btn-color:#530d0d';
+    static GREEN = '--tag-bg:#9dd1ab;--tag-text-color:#224939;--tag-hover:#b5e0c1;--tag-remove-bg:#9dd1ab;--tag-remove-btn-color:#224939';
+
     constructor({name = null, description = null, boons = 0, banes = 0, modifier = 0,
                  divide = 0, percent = 0}) {
         this._name = name;
@@ -119,14 +123,10 @@ export class ModifierSet {
         const includes_plus = name.includes('+') || name.includes('⊕');
         const includes_minus = name.includes('-') || name.includes('⊖');
 
-        const GRAY = '--tag-bg:#a1a1a1;--tag-text-color:#2b2a2a;--tag-hover:#bababa;--tag-remove-bg:#a1a1a1;--tag-remove-btn-color:#2b2a2a';
-        const RED = '--tag-bg:#d19d9d;--tag-text-color:#530d0d;--tag-hover:#e1b4b4;--tag-remove-bg:#d19d9d;--tag-remove-btn-color:#530d0d';
-        const GREEN = '--tag-bg:#9dd1ab;--tag-text-color:#224939;--tag-hover:#b5e0c1;--tag-remove-bg:#9dd1ab;--tag-remove-btn-color:#224939';
-
-        if (includes_plus && includes_minus) return GRAY;
-        else if (includes_plus) return GREEN;
-        else if (includes_minus) return RED;
-        else return GRAY;
+        if (includes_plus && includes_minus) return ModifierSet.GRAY;
+        else if (includes_plus) return ModifierSet.GREEN;
+        else if (includes_minus) return ModifierSet.RED;
+        else return ModifierSet.GRAY;
     }
 
     /**
