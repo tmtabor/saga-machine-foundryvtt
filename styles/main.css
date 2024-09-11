@@ -618,27 +618,76 @@ img.system-logo {
 }
 
 .saga-machine .initiative {
-  margin-bottom: 20px;
+  display: flex;
+  list-style: none;
+  margin: -10px -10px 10px -10px;
+  padding: 10px;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
+  flex: none;
   color: #191813;
 }
 
-.saga-machine .initiative > .toggle-switch {
+.saga-machine .initiative div.grouping {
+  margin-right: 20px;
+}
+
+.saga-machine .initiative div.grouping.turn {
+  position: relative;
+  top: 8px;
+}
+
+.saga-machine .initiative div.toggle-switch {
+  margin-left: 5px;
+}
+
+.saga-machine .initiative select {
+  background: rgba(255, 255, 255, 0.35);
+  width: 120px;
+  margin-left: 5px;
+}
+
+.saga-machine .initiative a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  line-height: 24px;
+  border-radius: 4px;
+  text-align: left;
+  padding: 0 5px;
+}
+
+.saga-machine .initiative a:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.saga-machine .initiative .toggle-switch {
   top: 1px;
   margin-left: 3px;
 }
 
-.saga-machine .combat-top {
-  margin-left: 10px;
-}
-
-.saga-machine .combat-top i {
+.saga-machine .initiative .rollable {
+  display: inline-block;
   position: relative;
-  top: 2px;
-  font-size: 1.2em;
+  top: 3px;
+  padding: 0 5px 0 0;
+  border: 1px solid var(--color-border-light-tertiary);
+  background: rgba(255, 255, 255, 0.35);
 }
 
-.saga-machine .combat-top.rollable:hover {
-  color: black;
+.saga-machine .initiative .rollable > img {
+  filter: invert(1);
+  height: 20px;
+  width: 20px;
+  min-height: 20px;
+  min-width: 20px;
+  margin-left: 5px;
+  position: relative;
+  top: 3px;
+  background: none;
+  border: solid 1px transparent;
 }
 
 /*

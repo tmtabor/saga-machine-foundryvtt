@@ -141,18 +141,28 @@
 		</div>
 
 		<div class="tab combat" data-group="primary" data-tab="combat">
-            <div class="initiative">
-                <label class="score-label">Turn</label>
-                <div class="toggle-switch">
-                    <input type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
-                    <div class="slider">
-                        <span class="on">FAST&nbsp;</span>
-                        <span class="off">&nbsp;&nbsp;SLOW</span>
+            <nav class="initiative">
+                <div class="grouping turn">
+                    <label>Turn</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
+                        <div class="slider">
+                            <span class="on">FAST&nbsp;</span>
+                            <span class="off">&nbsp;&nbsp;SLOW</span>
+                        </div>
                     </div>
                 </div>
-                <label class="score-label combat-top rollable" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-effects='{"type": "defense"}'>Defense <i class="fas fa-shield-alt"></i></label>
-            </div>
 
+                <div class="grouping defense">
+                    <label>Defense</label>
+                    <select>
+                        <option value="">Standard</option>
+                    </select>
+                    <a class="rollable" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-effects='{"type": "defense"}'><img class="item-img" src="systems/saga-machine/images/combat/defense.svg" title="Set Defense TN for the Round" /></a>
+                </div>
+
+
+            </nav>
             <h3>Actions</h3>
 			<ol class="items-list">
 				<li class="item flexrow items-header">
