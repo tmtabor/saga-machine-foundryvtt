@@ -40,7 +40,8 @@
           "defense": {
             "value": 0,
             "tn": 0,
-            "custom": false
+            "custom": false,
+            "test": ""
           },
           "encumbrance": {
             "value": 0,

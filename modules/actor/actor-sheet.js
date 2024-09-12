@@ -699,8 +699,14 @@ export class CharacterSheet extends SagaMachineActorSheet {
 			blank: 'Miscellanea'
 		});
 
-		context.data.system.actions = this.gather_actions(context);	// Gather the list of actions
-		this.calc_health_progress_bar(context);						// Calculate health progress bar percentages
+		// Gather the list of actions
+		context.data.system.actions = this.gather_actions(context);
+
+		// Calculate health progress bar percentages
+		this.calc_health_progress_bar(context);
+
+		// Gather defense test options
+		context.data.system.defenses = this.gather_defenses(context);
 
 		return context;
 	}
@@ -719,10 +725,61 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		html.find('.item-carry').click(this.on_item_carry.bind(this));				// Item carrying
 		html.find('.items-inline > .item').on("contextmenu", this.on_npc_edit.bind(this));	// Open item on NPC sheet
 
+		html.find('.defense-test').on("click", this.on_defense_test.bind(this));
+
 		html.find('.action-edit').on("click", this.on_action_edit.bind(this));			// Action editing
 		html.find('.action-delete').on("click", this.on_action_delete.bind(this));		// Action deletion
 	}
 
+	/**
+	 * Look up the set defense option and make a defense test for the round
+	 *
+	 * @param event
+	 */
+	async on_defense_test(event) {
+		const defense_id = this.actor.system.scores.defense.test;
+
+		// If the standard defense is set, test Defense score
+		if (!defense_id) await this.on_test(event);
+		else
+			for (let action of this.gather_actions(this))
+				if (action.id === defense_id) {
+					const dataset = {
+						type: 'Test',
+						stat: action.system.stat,
+						skill: action.system.skill,
+						tn: action.system.tn,
+						modifiers: action.system.modifiers,
+						properties: action.system.properties,
+						effects: action.sheet.effects_str
+					};
+					this.attach_ids(dataset);
+					return await test_dialog(dataset);
+				}
+	}
+
+	/**
+	 * Gather a list of all actions the actor has which set defense
+	 *
+	 * @param context
+	 * @return {SagaMachineItem[]}
+	 */
+	gather_defenses(context) {
+		const defenses = [];
+
+		for (const action of context.data.system.actions)
+			if (ActionHelper.is_defense(action.system.action_effects))
+				defenses.push(action);
+
+		return defenses;
+	}
+
+	/**
+	 * Handle clicking the edit button on an action
+	 *
+	 * @param {Event} event
+	 * @return {Promise<void>}
+	 */
 	async on_action_edit(event) {
 		const box = $(event.currentTarget).parents(".item");
 		if (box.data('direct')) await this.on_item_edit(event);
@@ -735,6 +792,12 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		}
 	}
 
+	/**
+	 * Handle clicking the delete button on an action
+	 *
+	 * @param {Event} event
+	 * @return {Promise<void>}
+	 */
 	async on_action_delete(event) {
 		const box = $(event.currentTarget).parents(".item");
 		if (box.data('direct')) await this.on_item_delete(event);

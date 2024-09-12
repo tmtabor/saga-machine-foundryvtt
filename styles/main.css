@@ -621,7 +621,7 @@ img.system-logo {
   display: flex;
   list-style: none;
   margin: -10px -10px 10px -10px;
-  padding: 10px;
+  padding: 0 10px 3px 10px;
   gap: 5px;
   background: rgba(0, 0, 0, 0.15);
   flex-wrap: wrap;
@@ -644,7 +644,7 @@ img.system-logo {
 
 .saga-machine .initiative select {
   background: rgba(255, 255, 255, 0.35);
-  width: 120px;
+  width: 150px;
   margin-left: 5px;
 }
 
@@ -668,7 +668,7 @@ img.system-logo {
   margin-left: 3px;
 }
 
-.saga-machine .initiative .rollable {
+.saga-machine .initiative .init-button {
   display: inline-block;
   position: relative;
   top: 3px;
@@ -677,7 +677,11 @@ img.system-logo {
   background: rgba(255, 255, 255, 0.35);
 }
 
-.saga-machine .initiative .rollable > img {
+.saga-machine .initiative .init-button:hover {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.saga-machine .initiative .init-button > img {
   filter: invert(1);
   height: 20px;
   width: 20px;

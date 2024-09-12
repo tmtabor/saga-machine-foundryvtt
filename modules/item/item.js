@@ -190,6 +190,21 @@ export class ActionHelper {
     }
 
     /**
+     * Returns whether the action serves as a Defense test
+     *
+     * @param {*[]} effects_list - Array of JSON representations of effects
+     * @return {boolean}
+     */
+    static is_defense(effects_list) {
+        if (!effects_list || !effects_list.length) return false;
+
+        for (let i = 0; i < effects_list.length; i++)
+            if (effects_list[i].type === 'defense') return true;
+
+        return false;
+    }
+
+    /**
      * Parses the action properties, if necessary, from string to list
      *
      * @param properties

@@ -180,7 +180,7 @@ export class SagaMachineCombat extends Combat {
 
         new Dialog({
             title: `Begin New Round?`,
-            content: `<p>Do you want to begin a new round?</p>`,
+            content: `<p>Do you want to begin a new round? Make sure to prompt your players to set their defenses first, if necessary.</p>`,
             buttons: {
                 Yes: {
                     icon: "<i class='fas fa-check'></i>",

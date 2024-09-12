@@ -155,10 +155,17 @@
 
                 <div class="grouping defense">
                     <label>Defense</label>
-                    <select>
+                    <select name="system.scores.defense.test">
                         <option value="">Standard</option>
+                        {{ selectOptions data.system.defenses selected=data.system.scores.defense.test nameAttr="_id" labelAttr="name" }}
                     </select>
-                    <a class="rollable" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-effects='{"type": "defense"}'><img class="item-img" src="systems/saga-machine/images/combat/defense.svg" title="Set Defense TN for the Round" /></a>
+                    <a class="init-button defense-test" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-effects='{"type": "defense"}'><img class="item-img" src="systems/saga-machine/images/combat/defense.svg" title="Set Defense TN for the Round" /></a>
+                </div>
+
+                <div class="grouping reactions">
+                    <a class="rollable init-button" title="Dodge" data-type="Test" data-score="defense"><img class="item-img" src="systems/saga-machine/images/combat/dodge.svg" title="Dodge" /></a>
+                    <a class="rollable init-button" title="Parry" data-type="Test" data-score="defense"><img class="item-img" src="systems/saga-machine/images/combat/parry.svg" title="Parry" /></a>
+                    <a class="rollable init-button" title="Resist" data-type="Test" data-score="willpower"><img class="item-img" src="systems/saga-machine/images/combat/resist.svg" title="Resist" /></a>
                 </div>
 
 
