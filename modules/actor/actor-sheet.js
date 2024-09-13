@@ -1,5 +1,6 @@
 import { test_dialog } from "../game/tests.js";
 import { ActionHelper, SagaMachineItem } from "../item/item.js";
+import { CharacterHelper } from "./actor.js";
 
 /**
  * ActorSheet context used in getData() and dependent methods.
@@ -726,9 +727,40 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		html.find('.items-inline > .item').on("contextmenu", this.on_npc_edit.bind(this));	// Open item on NPC sheet
 
 		html.find('.defense-test').on("click", this.on_defense_test.bind(this));
+		html.find('.parry-toggle').on("click", this.on_parry.bind(this));
 
 		html.find('.action-edit').on("click", this.on_action_edit.bind(this));			// Action editing
 		html.find('.action-delete').on("click", this.on_action_delete.bind(this));		// Action deletion
+	}
+
+	/**
+	 * Toggle the character's parry bonus on or off
+	 *
+	 * @param event
+	 * @return {Promise<void>}
+	 */
+	async on_parry(event) {
+		const add_bonus = !this.actor.system.scores.defense.parry_on;
+		const bonus = CharacterHelper.parry_bonus(this.actor);
+		const new_tn = add_bonus ? this.actor.system.scores.defense.tn + bonus :
+			this.actor.system.scores.defense.tn - bonus;
+
+		if (add_bonus)
+			await ChatMessage.create({
+				flavor: `<div>${this.actor.name} Parries!</div><div><strong>Defense TN:</strong> ${new_tn}</div>`,
+				speaker: ChatMessage.getSpeaker({ actor: this.actor })
+			});
+		else
+			await ChatMessage.create({
+				flavor: `<div>Removing Parry bonus.</div><div><strong>Defense TN:</strong> ${new_tn}</div>`,
+				whisper: game.users.filter(u => u.character?.id === this.actor?.id ).map(u => u.id),
+				speaker: ChatMessage.getSpeaker({ actor: this.actor })
+			});
+
+		await this.actor.update({
+            'system.scores.defense.tn': new_tn,
+            'system.scores.defense.parry_on': add_bonus
+        });
 	}
 
 	/**

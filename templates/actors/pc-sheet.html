@@ -164,7 +164,8 @@
 
                 <div class="grouping reactions">
                     <a class="rollable init-button" title="Dodge" data-type="Test" data-score="defense"><img class="item-img" src="systems/saga-machine/images/combat/dodge.svg" title="Dodge" /></a>
-                    <a class="rollable init-button" title="Parry" data-type="Test" data-score="defense"><img class="item-img" src="systems/saga-machine/images/combat/parry.svg" title="Parry" /></a>
+                    <input id="{{ data.id }}-parry" class="button-checkbox" type="checkbox" name="system.scores.defense.parry_on" data-dtype="Boolean" {{checked data.system.scores.defense.parry_on}} />
+                    <label class="init-button parry-toggle" title="Parry" for="{{ data.id }}-parry"><img class="item-img" src="systems/saga-machine/images/combat/parry.svg" title="Parry" /></label>
                     <a class="rollable init-button" title="Resist" data-type="Test" data-score="willpower"><img class="item-img" src="systems/saga-machine/images/combat/resist.svg" title="Resist" /></a>
                 </div>
 

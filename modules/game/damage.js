@@ -194,8 +194,11 @@ export class Effect {
         const willpower_tn = target.system.scores.willpower.value + this.test.randomizer;
 
         // Update defense and willpower
-        target.update({'system.scores.defense.tn': defense_tn});
-        target.update({'system.scores.willpower.tn': willpower_tn});
+        target.update({
+            'system.scores.defense.tn': defense_tn,
+            'system.scores.defense.parry_on': false,
+            'system.scores.willpower.tn': willpower_tn
+        });
 
         // Set the message
         this.message = this.format_message('Defense', `TN ${defense_tn}`) +

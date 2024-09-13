@@ -641,6 +641,24 @@ export class CharacterHelper {
         else if (total_spent < 350)   return "Renowned";
         else                          return "Legendary";
     }
+
+    /**
+     * Get the actor's current Parry bonus
+     *
+     * @param {SagaMachineActor} actor
+     * @returns {number}
+     */
+    static parry_bonus(actor) {
+        const equipped_weapons = actor.items.filter(item => item.type === 'item' &&
+            item.system.group === 'Weapons' && item.system.equipped);
+
+        let highest = 0;
+        for (const weapon of equipped_weapons) {
+            const val = weapon.system.parry;
+            if (val > highest) highest = val;
+        }
+        return highest;
+    }
 }
 
 /**

@@ -69,6 +69,7 @@ export class SagaMachineItem extends Item {
         this.system.container = this.property_value('Container');
         this.system.armor = this.property_value('Armor');
         this.system.bulky = this.property_value('Bulky');
+        this.system.parry = this.property_value('Parry');
         this.system.powered = this.property_value('Powered');
         this.system.hands = this.property_value('Hands') || 1;
         this.system.unit_encumbrance = ItemHelper.calc_unit_encumbrance(this);
