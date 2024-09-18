@@ -1,6 +1,6 @@
 import { Test } from "../game/tests.js";
 import { Effect } from "../game/damage.js";
-import { ItemHelper } from "../item/item.js";
+import { ActionHelper } from "../item/item.js";
 
 /**
  * Attach test data to the chat card
@@ -251,7 +251,7 @@ export async function add_edit_test(options) {
                                     const parts = value.split(' ');
                                     params.value = Number(parts?.[0]) - test.margin;
                                     params.damage_type = parts?.[1];
-                                    if (parts.length >= 3) params.properties = ItemHelper.parse_properties(parts.slice(2).join(' '));
+                                    if (parts.length >= 3) params.properties = ActionHelper.parse_properties(parts.slice(2).join(' '));
                                 }
 
                                 const effect = new Effect({type: type, ...params}, test);

@@ -727,10 +727,89 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		html.find('.items-inline > .item').on("contextmenu", this.on_npc_edit.bind(this));	// Open item on NPC sheet
 
 		html.find('.defense-test').on("click", this.on_defense_test.bind(this));
+		html.find('.dodge-toggle').on("click", this.on_dodge.bind(this));
 		html.find('.parry-toggle').on("click", this.on_parry.bind(this));
+		html.find('.resist-toggle').on("click", this.on_resist.bind(this));
 
 		html.find('.action-edit').on("click", this.on_action_edit.bind(this));			// Action editing
 		html.find('.action-delete').on("click", this.on_action_delete.bind(this));		// Action deletion
+	}
+
+	/**
+	 * Roll for a dodge and set the Defense TN if appropriate, or toggle it off
+	 *
+	 * @param event
+	 * @return {Promise<void>}
+	 */
+	async on_dodge(event) {
+		event.preventDefault();
+		const add_dodge = !this.actor.system.scores.defense.dodge_on;
+
+		// Toggle off parry, if needed
+		if (this.actor.system.scores.defense.parry_on) await this.on_parry(event);
+
+		// Handle setting the Defense score upon making the test
+		const set_dodge = async test => {
+			const dodge_higher = test.total > this.actor.system.scores.defense.tn;
+			if (dodge_higher)
+				await this.actor.update({
+					'system.scores.defense.tn': test.total,
+					'system.scores.defense.dodge_on': true,
+					'system.scores.defense.round_tn': this.actor.system.scores.defense.tn,
+				});
+		}
+
+		// Prompt the user with the test dialog
+		if (add_dodge) {
+			let dataset = { type: "Test", score: "defense" };
+			this.attach_ids(dataset);
+			await test_dialog(dataset, set_dodge);
+		}
+		else {
+			await ChatMessage.create({
+				flavor: `<div>Removing Dodge.</div><div><strong>Defense TN:</strong> ${this.actor.system.scores.defense.round_tn}</div>`,
+				whisper: game.users.filter(u => u.character?.id === this.actor?.id).map(u => u.id),
+				speaker: ChatMessage.getSpeaker({actor: this.actor})
+			});
+			await this.actor.update({
+				'system.scores.defense.tn': this.actor.system.scores.defense.round_tn,
+				'system.scores.defense.dodge_on': false
+			});
+		}
+	}
+
+	async on_resist(event) {
+		event.preventDefault();
+		const add_resist = !this.actor.system.scores.willpower.resist_on;
+
+		// Handle setting the Willpower score upon making the test
+		const set_willpower = async test => {
+			const willpower_higher = test.total > this.actor.system.scores.willpower.tn;
+			if (willpower_higher)
+				await this.actor.update({
+					'system.scores.willpower.tn': test.total,
+					'system.scores.willpower.resist_on': true,
+					'system.scores.willpower.round_tn': this.actor.system.scores.willpower.tn,
+				});
+		}
+
+		// Prompt the user with the test dialog
+		if (add_resist) {
+			let dataset = { type: "Test", score: "willpower" };
+			this.attach_ids(dataset);
+			await test_dialog(dataset, set_willpower);
+		}
+		else {
+			await ChatMessage.create({
+				flavor: `<div>Removing Resist.</div><div><strong>Willpower TN:</strong> ${this.actor.system.scores.willpower.round_tn}</div>`,
+				whisper: game.users.filter(u => u.character?.id === this.actor?.id).map(u => u.id),
+				speaker: ChatMessage.getSpeaker({actor: this.actor})
+			});
+			await this.actor.update({
+				'system.scores.willpower.tn': this.actor.system.scores.willpower.round_tn,
+				'system.scores.willpower.resist_on': false
+			});
+		}
 	}
 
 	/**
@@ -740,6 +819,9 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	 * @return {Promise<void>}
 	 */
 	async on_parry(event) {
+		// Toggle off dodge, if needed
+		if (this.actor.system.scores.defense.dodge_on) await this.on_dodge(event);
+
 		const add_bonus = !this.actor.system.scores.defense.parry_on;
 		const bonus = CharacterHelper.parry_bonus(this.actor);
 		const new_tn = add_bonus ? this.actor.system.scores.defense.tn + bonus :
@@ -814,12 +896,13 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	 */
 	async on_action_edit(event) {
 		const box = $(event.currentTarget).parents(".item");
-		if (box.data('direct')) await this.on_item_edit(event);
+		if (box.data('parent-type') === 'Actor') await this.on_item_edit(event);
 		else {
 			const parent = this.actor.items.get(box.data("parentId"));
 			const index = ActionHelper.parent_action_index(parent, box.data('id'));
 			if (index > parent.system.actions.length || index < 0) return;
-			const action = new SagaMachineItem(parent.system.actions[index], { parent: parent });
+			const action = new SagaMachineItem(parent.system.actions[index],
+				{ parent: parent, parentCollection: parent.collection });
 			action.sheet.render(true);
 		}
 	}
@@ -832,7 +915,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	 */
 	async on_action_delete(event) {
 		const box = $(event.currentTarget).parents(".item");
-		if (box.data('direct')) await this.on_item_delete(event);
+		if (box.data('parent-type') === 'Actor') await this.on_item_delete(event);
 		else {
 			const parent = this.actor.items.get(box.data("parentId"));
 			const index = ActionHelper.parent_action_index(parent, box.data('id'));
@@ -895,7 +978,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 
 		for (let item of action_items)
 			for (let action of item.system.actions)
-				actions.push(new SagaMachineItem(action, { parent: item }));
+				actions.push(new SagaMachineItem(action, { parent: item, parentCollection: item.collection }));
 
 		return actions;
 	}

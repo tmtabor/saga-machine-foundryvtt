@@ -209,7 +209,7 @@ export class SagaMachineItemSheet extends ItemSheet {
             if (this.item.system.group === 'Stances') spec.system.group = 'Attacks';
         }
 
-        const action = new SagaMachineItem(spec, { parent: this.item });
+        const action = new SagaMachineItem(spec, { parent: this.item, parentCollection: this.item.collection });
         this.item.system.actions.push(action.toJSON());
         this.item.update({'system.actions': this.item.system.actions});
     }
@@ -224,7 +224,8 @@ export class SagaMachineItemSheet extends ItemSheet {
         const index = box.data("id");
 
         if (index > this.item.system.actions.length) return;
-        const action = new SagaMachineItem(this.item.system.actions[index], { parent: this.item });
+        const action = new SagaMachineItem(this.item.system.actions[index],
+            { parent: this.item, parentCollection: this.item.collection });
         action.sheet.render(true);
     }
 

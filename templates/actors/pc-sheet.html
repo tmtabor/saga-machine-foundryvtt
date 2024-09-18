@@ -157,19 +157,19 @@
                     <label>Defense</label>
                     <select name="system.scores.defense.test">
                         <option value="">Standard</option>
-                        {{ selectOptions data.system.defenses selected=data.system.scores.defense.test nameAttr="_id" labelAttr="name" }}
+                        {{ selectOptions data.system.defenses selected=data.system.scores.defense.test valueAttr="_id" labelAttr="name" }}
                     </select>
                     <a class="init-button defense-test" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-effects='{"type": "defense"}'><img class="item-img" src="systems/saga-machine/images/combat/defense.svg" title="Set Defense TN for the Round" /></a>
                 </div>
 
                 <div class="grouping reactions">
-                    <a class="rollable init-button" title="Dodge" data-type="Test" data-score="defense"><img class="item-img" src="systems/saga-machine/images/combat/dodge.svg" title="Dodge" /></a>
-                    <input id="{{ data.id }}-parry" class="button-checkbox" type="checkbox" name="system.scores.defense.parry_on" data-dtype="Boolean" {{checked data.system.scores.defense.parry_on}} />
-                    <label class="init-button parry-toggle" title="Parry" for="{{ data.id }}-parry"><img class="item-img" src="systems/saga-machine/images/combat/parry.svg" title="Parry" /></label>
-                    <a class="rollable init-button" title="Resist" data-type="Test" data-score="willpower"><img class="item-img" src="systems/saga-machine/images/combat/resist.svg" title="Resist" /></a>
+                    <input id="{{ data._id }}-dodge" class="button-checkbox" type="checkbox" name="system.scores.defense.dodge_on" data-dtype="Boolean" {{checked data.system.scores.defense.dodge_on}} />
+                    <label class="init-button dodge-toggle" title="Dodge" for="{{ data._id }}-dodge"><img class="item-img" src="systems/saga-machine/images/combat/dodge.svg" title="Dodge" /></label>
+                    <input id="{{ data._id }}-parry" class="button-checkbox" type="checkbox" name="system.scores.defense.parry_on" data-dtype="Boolean" {{checked data.system.scores.defense.parry_on}} />
+                    <label class="init-button parry-toggle" title="Parry" for="{{ data._id }}-parry"><img class="item-img" src="systems/saga-machine/images/combat/parry.svg" title="Parry" /></label>
+                    <input id="{{ data._id }}-resist" class="button-checkbox" type="checkbox" name="system.scores.willpower.resist_on" data-dtype="Boolean" {{checked data.system.scores.willpower.resist_on}} />
+                    <label class="init-button resist-toggle" title="Resist" for="{{ data._id }}-resist"><img class="item-img" src="systems/saga-machine/images/combat/resist.svg" title="Resist" /></label>
                 </div>
-
-
             </nav>
             <h3>Actions</h3>
 			<ol class="items-list">
@@ -182,7 +182,7 @@
 				</li>
 
 				{{#each data.system.actions as |action|}}
-					<li class="item flexrow" data-id="{{ action._id }}" data-type="Item" data-direct="{{ action.isEmbedded }}" data-parent-id="{{ action.parent.id }}" data-uuid="{{ action.uuid }}">
+					<li class="item flexrow" data-id="{{ action._id }}" data-type="Item" data-parent-type="{{ action.parent.documentName }}" data-parent-id="{{ action.parent.id }}" data-uuid="{{ action.uuid }}">
                         <div class="item-name action-name">
                             <span class="item-img rollable" data-type="Test" data-stat="{{ action.system.stat }}" data-skill="{{ action.system.skill }}" data-tn="{{ action.system.tn }}" data-modifiers="{{ action.system.modifiers }}" data-properties="{{ action.system.properties }}" data-effects='{{ action.sheet.effects_str }}'>
                                 <img class="item-img" src="{{ action.img }}" title="Test {{ action.name }}" />

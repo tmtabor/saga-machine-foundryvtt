@@ -247,18 +247,19 @@ export class SagaMachineActor extends Actor {
         // If no damage is applied, there is nothing more to do
         if (applied_damage <= 0) return;
 
-        // If this reduces the character to <=0 HP, upgrade to a grave wound
+        // If this increases the character's wounds to >= Health, upgrade to a grave wound
         if (this.system.scores.health.value + applied_damage >= this.system.scores.health.max) {
             critical = true;
-            if (type === 'fat') ChatMessage.create({ content: `Wound Total exceeds Health . ${this.name} falls unconscious for [[1d10]] hours.` });
+            if (type === 'fat') ChatMessage.create({ content: `Wound Total exceeds Health. ${this.name} must succeed at an <strong>End-${this.system.scores.health.fatigue + applied_damage}</strong> test or fall unconscious for [[1d10]] hours.` });
             else                ChatMessage.create({ content: `Wound Total exceeds Health. ${this.name} takes a Grave Wound.` });
         }
 
         // Determine whether and how many Dying consequences to apply
         const current_increment = Math.floor(this.system.scores.health.value / this.system.scores.health.max);
         const new_increment = Math.floor((this.system.scores.health.value + applied_damage) / this.system.scores.health.max);
-        const dying_to_apply = Math.max(new_increment - current_increment,
-            (this.system.scores.health.value > this.system.scores.health.max ? 1 : 0));  // If Wound Total > Health, always add a dying when taking damage
+        let dying_to_apply = Math.max(new_increment - current_increment,
+            (this.system.scores.health.value > this.system.scores.health.max && type !== 'fat' ? 1 : 0));  // If Wound Total > Health, always add a dying when taking damage
+        if (type === 'fat' && current_increment === 0) dying_to_apply--;
 
         // If there is a Dying to apply
         if (dying_to_apply > 0) {

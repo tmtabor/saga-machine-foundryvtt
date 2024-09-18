@@ -672,7 +672,7 @@ img.system-logo {
   display: none;
 }
 
-.saga-machine .initiative input[type=checkbox].button-checkbox:checked ~ label.init-button {
+.saga-machine .initiative input[type=checkbox].button-checkbox:checked + label.init-button {
   background: rgba(255, 255, 255, 0.75);
   box-shadow: inset 0 0 5px #000000;
 }
@@ -684,6 +684,7 @@ img.system-logo {
   padding: 0 5px 0 0;
   border: 1px solid var(--color-border-light-tertiary);
   background: rgba(255, 255, 255, 0.35);
+  border-radius: 4px;
 }
 
 .saga-machine .initiative .init-button:hover {

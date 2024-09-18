@@ -197,7 +197,9 @@ export class Effect {
         target.update({
             'system.scores.defense.tn': defense_tn,
             'system.scores.defense.parry_on': false,
-            'system.scores.willpower.tn': willpower_tn
+            'system.scores.defense.dodge_on': false,
+            'system.scores.willpower.tn': willpower_tn,
+            'system.scores.willpower.resist_on': false,
         });
 
         // Set the message
@@ -284,7 +286,7 @@ export class WoundFactory {
         const wound = new Wound();
 
         // Handle grave wounds
-        if (critical) {
+        if (critical && type !== 'fat') {
             const grave_wounds_table = game.tables.getName('Grave Wounds');
             if (grave_wounds_table) {
                 wound.description = (await grave_wounds_table.draw()).results[0].text;

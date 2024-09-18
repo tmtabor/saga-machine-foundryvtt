@@ -42,6 +42,8 @@
             "tn": 0,
             "custom": false,
             "test": "",
+            "round_tn": 0,
+            "dodge_on": false,
             "parry_on": false
           },
           "encumbrance": {
@@ -67,7 +69,9 @@
           "willpower": {
             "value": 0,
             "tn": 0,
-            "custom": false
+            "custom": false,
+            "round_tn": 0,
+            "resist_on": false
           }
         }
       }

@@ -615,11 +615,11 @@ export class Test {
 /**
  * Show a test dialog for the test provided in the dataset
  *
- * @param dataset
- * @returns {Promise<void>}
- * @private
+ * @param dataset - Dataset with test parameters
+ * @param callback - Optional callback to be executed when test is resolved, passes Test object as parameter
+ * @return {Promise<void>}
  */
-export async function test_dialog(dataset) {
+export async function test_dialog(dataset, callback=null) {
     const actor = token_actor({
         scene_id: dataset.sceneId,
         token_id: dataset.tokenId,
@@ -715,6 +715,9 @@ export async function test_dialog(dataset) {
                         // Send the message to chat
                         const whisper = !!dataset['whisper'];
                         await test.to_chat({whisper: whisper});
+
+                        // Make the callback, if provided
+                        if (callback) await callback(test);
                     }, 200);
                 },
                 icon: `<i class="fas fa-check"></i>`
