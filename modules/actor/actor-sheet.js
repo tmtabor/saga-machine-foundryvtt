@@ -180,7 +180,6 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 * @param {string} default_group - Default group for new items or those without a specified group
 	 * @param {string[]} display_if_empty - Groups to create even if they are empty
 	 * @return {{name: string, contents: SagaMachineItem[]}[]}
-	 * @private
 	 */
 	skills_and_traits(all_items, default_group, display_if_empty = null) {
 		const raw_groups = this.group_items(all_items, i => i.system.group, null, null, default_group);
@@ -702,6 +701,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 
 		// Gather the list of actions
 		context.data.system.actions = this.gather_actions(context);
+		context.data.system.action_groups = this.skills_and_traits(context.data.system.actions, 'Attacks');
 
 		// Calculate health progress bar percentages
 		this.calc_health_progress_bar(context);
