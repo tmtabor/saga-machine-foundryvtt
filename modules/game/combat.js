@@ -113,10 +113,11 @@ export class SagaMachineCombat extends Combat {
             for (let c of this.combatants) {
 
                 // Make a defense test for everyone
-                await c.actor.test({
-                    stat: 'defense', effects: [{"type": "defense"}], whisper: true, chat: true,
-                    ...c.actor.total_modifiers({score: 'defense'})
-                });
+                if (c.actor.type === "character")
+                    await c.actor.test({
+                        stat: 'defense', effects: [{"type": "defense"}], whisper: true, chat: true,
+                        ...c.actor.total_modifiers({score: 'defense'})
+                    });
             }
 
             // New Round Card - prompt players to choose fast / slow turn and display statuses
@@ -132,7 +133,7 @@ export class SagaMachineCombat extends Combat {
             // Whisper all defenses to GM
             content = '<h4><strong>Defenses This Round</strong></h4><table>';
             for (let c of this.combatants)
-                content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn}</td></tr>`;
+                content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn || '&mdash;'}</td></tr>`;
             content += '</table>';
             await ChatMessage.create({
                 content: content,

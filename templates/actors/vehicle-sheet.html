@@ -76,6 +76,7 @@
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
         <a class="item" data-tab="basics">Crew</a>
+        <a class="item" data-tab="combat">Combat</a>
         <a class="item" data-tab="inventory">Cargo</a>
         <a class="item" data-tab="description">Description</a>
     </nav>
@@ -94,15 +95,25 @@
             <h3>Positions</h3>
             <ol class="items-list position-list">
                 <li class="flexrow items-header position-row">
+                    <div class="item-name">Crewman</div>
                     <div class="item-name">Position</div>
-                    <div class="item-name">Character</div>
+                    <div class="item-name">Actions</div>
                     <div class="item-controls">
-                        <a class="item-control position-create" title="Create Position"><i class="fas fa-plus"></i> Add</a>
+                        <a class="item-control position-create hidden" title="Create Position"><i class="fas fa-plus"></i> Add</a>
+                        <a class="item-control lock-toggle locked" title="Unlock"><i class="fas fa-lock"></i></a>
                     </div>
                 </li>
 
                 <li class="flexrow position position-row prototype">
-                    <select class="item-input item-name" name="position">
+                    <h4 class="item-name character">
+                        <span class="item-img">
+                            <img class="item-img crewman" src="icons/svg/mystery-man.svg" title="Open Position" />
+                        </span>
+                        <div class="item-name character-label" title="Drag character to position">Open Position</div>
+                        <input name="character" type="hidden" value="">
+                        <a class="item-control crew-delete" title="Delete Position"><i class="fas fa-trash"></i></a>
+                    </h4>
+                    <select class="item-input item-name" name="position" disabled>
                         <option value="Captain">Captain</option>
                         <option value="Driver/Pilot">Driver / Pilot</option>
                         <option value="Engineer">Engineer</option>
@@ -111,15 +122,102 @@
                         <option value="Marine">Marine</option>
                         <option value="Mechanic">Mechanic</option>
                         <option value="Medic">Medic</option>
+                        <option value="Passenger">Passenger</option>
                     </select>
-                    <input class="item-input item-name" type="text" name="character" value="" />
-
+                    <div class="item-name"></div>
                     <div class="item-controls">
-                        <a class="item-control position-delete" title="Delete Position"><i class="fas fa-trash"></i></a>
+                        <a class="item-control position-delete hidden" title="Delete Position"><i class="fas fa-trash"></i></a>
                     </div>
                 </li>
             </ol>
         </div>
+
+		<div class="tab combat" data-group="primary" data-tab="combat">
+            <nav class="initiative">
+                <div class="grouping turn">
+                    <label>Turn</label>
+                    <div class="toggle-switch">
+                        <input type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
+                        <div class="slider">
+                            <span class="on">FAST&nbsp;</span>
+                            <span class="off">&nbsp;&nbsp;SLOW</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            {{#each data.system.action_groups as |actions|}}
+                <h3>{{ actions.name }}</h3>
+                <ol class="items-list">
+                    <li class="item flexrow items-header">
+                        <div class="item-name">Name</div>
+                        <div class="item-name">Source</div>
+                        <div class="item-controls">
+                            <a class="item-control item-create" title="Create action" data-type="action" data-system='{"group": "{{ actions.name }}"}'><i class="fas fa-plus"></i> Add</a>
+                        </div>
+                    </li>
+
+                    {{#each actions.contents as |action|}}
+                        <li class="item flexrow" data-id="{{ action._id }}" data-type="Item" data-parent-type="{{ action.parent.documentName }}" data-parent-id="{{ action.parent.id }}" data-uuid="{{ action.uuid }}">
+                            <div class="item-name action-name">
+                                <span class="item-img rollable" data-type="Test" data-stat="{{ action.system.stat }}" data-skill="{{ action.system.skill }}" data-tn="{{ action.system.tn }}" data-modifiers="{{ action.system.modifiers }}" data-properties="{{ action.system.properties }}" data-effects='{{ action.sheet.effects_str }}'>
+                                    <img class="item-img" src="{{ action.img }}" title="Test {{ action.name }}" />
+                                    <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ action.name }} Test" />
+                                </span>
+                                <span class="expandable">{{ action.name }}</span>
+                            </div>
+                            <div class="item-name">{{ action.parent.name }}</div>
+                            <div class="item-controls">
+                                <a class="item-control action-edit" title="Edit Action"><i class="fas fa-edit"></i></a>
+                                <a class="item-control action-delete" title="Delete Action"><i class="fas fa-trash"></i></a>
+                            </div>
+                            <div class="item-description">{{{ action.system.description }}}</div>
+                        </li>
+                    {{/each}}
+                </ol>
+            {{else}}
+                <h3>Attacks</h3>
+                <ol class="items-list">
+                    <li class="item flexrow items-header">
+                        <div class="item-name">Name</div>
+                        <div class="item-name">Source</div>
+                        <div class="item-controls">
+                            <a class="item-control item-create" title="Create action" data-type="action" data-system='{"group": "Attacks"}'><i class="fas fa-plus"></i> Add</a>
+                        </div>
+                    </li>
+                </ol>
+            {{/each}}
+
+			<h3>Consequences</h3>
+			<ol class="items-list">
+				<li class="item flexrow items-header">
+					<div class="item-name">Name</div>
+					<div class="item-prop">Value</div>
+					<div class="item-controls">
+						<a class="item-control item-create" title="Create item" data-type="consequence"><i class="fas fa-plus"></i> Add</a>
+					</div>
+				</li>
+
+				{{#each data.system.consequences as |consequence|}}
+					<li class="item flexrow" data-id="{{ consequence._id }}" data-type="Item" data-uuid="{{ consequence.uuid }}">
+                        <h4 class="item-name">
+                            <span class="chatable item-img">
+                                <img class="item-img" src="{{ consequence.img }}" title="Display {{ consequence.system.full_name }}" />
+                                <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ consequence.system.full_name }}" />
+                            </span>
+                            <span class="expandable">{{ consequence.system.full_name }}</span>
+                        </h4>
+						<input class="item-input item-prop" type="number" data-name="system.rank" value="{{ consequence.system.rank }}" step="1" data-dtype="Number" />
+						<div class="item-controls">
+							<a class="item-control item-edit" title="Edit Item"><i class="fas fa-edit"></i></a>
+							<a class="item-control item-delete" title="Delete Item"><i class="fas fa-trash"></i></a>
+						</div>
+                        <div class="item-description">{{{ consequence.system.description }}}</div>
+					</li>
+				{{/each}}
+			</ol>
+            <br/>
+		</div>
 
         <div class="tab inventory" data-group="primary" data-tab="inventory">
             {{#each data.system.equipment_groups as |items|}}

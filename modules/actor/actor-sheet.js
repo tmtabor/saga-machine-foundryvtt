@@ -173,6 +173,25 @@ export class SagaMachineActorSheet extends ActorSheet {
 		return context.actor.items.filter(item => item.type === type && filter(item)).sort(sort);
 	}
 
+		/**
+	 * Return list of all actions provided by items or owned by the actor directly
+	 *
+	 * @param {Context} context
+	 * @returns {SagaMachineItem[]}
+
+	 */
+	gather_actions(context) {
+		const actions = this.items(context, 'action');
+		const action_items = context.actor.items.filter(item => item.system.actions?.length &&
+			(item.system.equipped || item.system.equipped === undefined));
+
+		for (let item of action_items)
+			for (let action of item.system.actions)
+				actions.push(new SagaMachineItem(action, { parent: item, parentCollection: item.collection }));
+
+		return actions;
+	}
+
 	/**
 	 * Organize skill or trait items into groups
 	 *
@@ -434,6 +453,43 @@ export class SagaMachineActorSheet extends ActorSheet {
 		const update = {_id: box.data("id")};
 		update[attribute] = Number(event.currentTarget.value);
 		this.actor.updateEmbeddedDocuments("Item", [update]);
+	}
+
+	/**
+	 * Handle clicking the edit button on an action
+	 *
+	 * @param {Event} event
+	 * @return {Promise<void>}
+	 */
+	async on_action_edit(event) {
+		const box = $(event.currentTarget).parents(".item");
+		if (box.data('parent-type') === 'Actor') await this.on_item_edit(event);
+		else {
+			const parent = this.actor.items.get(box.data("parentId"));
+			const index = ActionHelper.parent_action_index(parent, box.data('id'));
+			if (index > parent.system.actions.length || index < 0) return;
+			const action = new SagaMachineItem(parent.system.actions[index],
+				{ parent: parent, parentCollection: parent.collection });
+			action.sheet.render(true);
+		}
+	}
+
+	/**
+	 * Handle clicking the delete button on an action
+	 *
+	 * @param {Event} event
+	 * @return {Promise<void>}
+	 */
+	async on_action_delete(event) {
+		const box = $(event.currentTarget).parents(".item");
+		if (box.data('parent-type') === 'Actor') await this.on_item_delete(event);
+		else {
+			const parent = this.actor.items.get(box.data("parentId"));
+			const index = ActionHelper.parent_action_index(parent, box.data('id'));
+			parent.system.actions.splice(index, 1);
+			parent.update({ 'system.actions': parent.system.actions });
+			box.remove();
+		}
 	}
 
 	/**
@@ -889,43 +945,6 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	}
 
 	/**
-	 * Handle clicking the edit button on an action
-	 *
-	 * @param {Event} event
-	 * @return {Promise<void>}
-	 */
-	async on_action_edit(event) {
-		const box = $(event.currentTarget).parents(".item");
-		if (box.data('parent-type') === 'Actor') await this.on_item_edit(event);
-		else {
-			const parent = this.actor.items.get(box.data("parentId"));
-			const index = ActionHelper.parent_action_index(parent, box.data('id'));
-			if (index > parent.system.actions.length || index < 0) return;
-			const action = new SagaMachineItem(parent.system.actions[index],
-				{ parent: parent, parentCollection: parent.collection });
-			action.sheet.render(true);
-		}
-	}
-
-	/**
-	 * Handle clicking the delete button on an action
-	 *
-	 * @param {Event} event
-	 * @return {Promise<void>}
-	 */
-	async on_action_delete(event) {
-		const box = $(event.currentTarget).parents(".item");
-		if (box.data('parent-type') === 'Actor') await this.on_item_delete(event);
-		else {
-			const parent = this.actor.items.get(box.data("parentId"));
-			const index = ActionHelper.parent_action_index(parent, box.data('id'));
-			parent.system.actions.splice(index, 1);
-			parent.update({ 'system.actions': parent.system.actions });
-			box.remove();
-		}
-	}
-
-	/**
 	 * Equip or un-equip an item
 	 *
 	 * @param {Event} event
@@ -962,25 +981,6 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		const box = $(event.currentTarget).closest(".item");
 		const item = this.actor.items.get(box.data("id"));
 		item.sheet.render(true);
-	}
-
-	/**
-	 * Return list of all actions provided by items or owned by the actor directly
-	 *
-	 * @param {Context} context
-	 * @returns {SagaMachineItem[]}
-
-	 */
-	gather_actions(context) {
-		const actions = this.items(context, 'action');
-		const action_items = context.actor.items.filter(item => item.system.actions?.length &&
-			(item.system.equipped || item.system.equipped === undefined));
-
-		for (let item of action_items)
-			for (let action of item.system.actions)
-				actions.push(new SagaMachineItem(action, { parent: item, parentCollection: item.collection }));
-
-		return actions;
 	}
 }
 
@@ -1063,6 +1063,10 @@ export class VehicleSheet extends SagaMachineActorSheet {
 			blank: 'Trade Goods'
 		});
 
+		// Gather the list of actions
+		context.data.system.actions = this.gather_actions(context);
+		context.data.system.action_groups = this.skills_and_traits(context.data.system.actions, 'Attacks');
+
 		this.calc_health_progress_bar(context);	// Calculate health progress bar percentages
 		this.calc_space_progress_bar(context);	// Calculate space progress bar percentages
 
@@ -1073,16 +1077,24 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	 * @inheritDoc
 	 * @override
 	 */
-	activateListeners(html) {
+	async activateListeners(html) {
 		super.activateListeners(html);
 
 		html.find('.score').on("contextmenu", this.on_score_toggle.bind(this));		// Toggle custom score mode on/off
 		html.find('.score').on("click", this.on_score_increment.bind(this));		// Increment secondary score
 
 		// Handle positions
-		this.draw_positions(html);
+		await this.draw_positions(html);
+		html.find('.position-list .lock-toggle').click(this.toggle_lock.bind(this));
+		html.find('.position-list .position-row').on("drop", this.drop_crewman.bind(this));
+		html.find('.position-list img.crewman').click(this.open_crewman.bind(this));
+		html.find('.position-list .crew-delete').click(this.delete_crewman.bind(this));
 		html.find('.position-list .position-create').click(this.add_position.bind(this));
 		html.find('.position-list .position-delete').click(this.delete_position.bind(this));
+
+		// Handle actions
+		html.find('.action-edit').on("click", this.on_action_edit.bind(this));			// Action editing
+		html.find('.action-delete').on("click", this.on_action_delete.bind(this));		// Action deletion
 	}
 
 	/**
@@ -1097,9 +1109,73 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	}
 
 	/**
-	 * Add a position to the vehicle positions form
+	 * Handle dropping an actor onto a crew position
+	 *
+	 * @param event
 	 */
-	add_position() {
+	async drop_crewman(event) {
+		// Get the drag event data
+		let data = null;
+		try { data = JSON.parse(event.originalEvent?.dataTransfer?.getData("text")); } catch (error) {}
+		if (!data || !data.uuid || data.type !== 'Actor') return;
+
+		// Get the actor being dropped
+		const drop_actor = await fromUuid(data.uuid);
+		if (drop_actor.type !== 'character') return;
+
+		// Set the crew position to the actor
+		$(event.currentTarget).closest(".position").find("input[name=character]").val(drop_actor.uuid);
+		this.update_positions(event);
+	}
+
+	async open_crewman(event) {
+		const uuid = $(event.currentTarget).data("uuid");
+		const crewman = await fromUuid(uuid);
+		crewman.sheet.render(true);
+	}
+
+	/**
+	 * Remove the crewman from the selected position
+	 *
+	 * @param event
+	 */
+	async delete_crewman(event) {
+		const box = $(event.currentTarget).closest(".character");
+		box.find("input[name=character]").val("");
+		this.update_positions(event);
+	}
+
+	/**
+	 * Toggle on or off position editing
+	 *
+	 * @param event
+	 */
+	toggle_lock(event) {
+		const target = $(event.currentTarget).closest(".lock-toggle");
+		const list = target.closest('.position-list');
+		const locked = target.hasClass('locked');
+
+		if (locked) {	// Unlock editing positions
+			target.removeClass('locked').find('i').removeClass('fa-lock').addClass('fa-unlock');
+			list.find('.position-create').removeClass('hidden');
+			list.find('.position-delete').removeClass('hidden');
+			list.find('select').removeAttr('disabled');
+		}
+		else {			// Lock editing positions
+			target.addClass('locked').find('i').removeClass('fa-unlock').addClass('fa-lock');
+			list.find('.position-create').addClass('hidden');
+			list.find('.position-delete').addClass('hidden');
+			list.find('select').attr('disabled', 'disabled');
+		}
+	}
+
+	/**
+	 * Add a position to the vehicle positions form
+	 *
+	 * @param event
+	 * @return {Promise<void>}
+	 */
+	async add_position(event) {
 		if (!this.isEditable) return;
 
 		// Get the prototype position node and parent node, return if it wasn't found
@@ -1111,6 +1187,7 @@ export class VehicleSheet extends SagaMachineActorSheet {
 		clone.removeClass('prototype');
 		clone.find('input, select').change(this.update_positions.bind(this));
 		parent.append(clone);
+		this.update_positions(event);
 	}
 
 	/**
@@ -1118,7 +1195,7 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	 *
 	 * @param {Event} event
 	 */
-	delete_position(event) {
+	async delete_position(event) {
 		const box = $(event.currentTarget).closest(".position");
 		const position_list = box.closest('.position-list');
 		box.remove();
@@ -1130,7 +1207,7 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	 *
 	 * @param {JQuery} html
 	 */
-	draw_positions(html) {
+	async draw_positions(html) {
 		// Don't draw positions if there are no positions
 		if (!this.actor.system.scores.crew.positions || !this.actor.system.scores.crew.positions.length) return;
 
@@ -1145,6 +1222,12 @@ export class VehicleSheet extends SagaMachineActorSheet {
 			clone.removeClass('prototype');
 			clone.find("[name=position]").val(position.position);
 			clone.find("[name=character]").val(position.character);
+			if (position.character) {
+				let crewman = await fromUuid(position.character);
+				clone.find(".character").addClass("filled");
+				clone.find("img.crewman").attr("src", crewman.img).data("uuid", crewman.uuid);
+				clone.find("div.character-label").text(crewman.name);
+			}
 			parent.append(clone);
 
 			// Set up the data handlers for the form, if this sheet is editable
@@ -1159,9 +1242,12 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	 * @param {Event} event
 	 * @param {JQuery|null} position_list
 	 */
-	update_positions(event, position_list = null) {
+	async update_positions(event, position_list = null) {
 		event.preventDefault();
 		event.stopPropagation();
+
+		// Get whether editing positions is locked or not
+		const locked = !!list.find('.lock-toggle').hasClass('locked');
 
 		// Get all positions
 		const position_nodes = position_list ? position_list.find('.position:not(.prototype)') :
@@ -1179,8 +1265,10 @@ export class VehicleSheet extends SagaMachineActorSheet {
 				character: character
 			};
 			positions.push(position_object);
-
-			this.actor.update({'system.scores.crew.positions': positions});
 		});
+		await this.actor.update({'system.scores.crew.positions': positions});
+
+		// Preserve locked/unlocked status
+		if (!locked) setTimeout(() => this.element.find('.lock-toggle').trigger('click'), 10);
 	}
 }

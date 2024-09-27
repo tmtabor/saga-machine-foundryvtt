@@ -627,6 +627,7 @@ img.system-logo {
   flex-wrap: wrap;
   flex: none;
   color: #191813;
+  min-height: 32px;
 }
 
 .saga-machine .initiative div.grouping {
@@ -960,6 +961,44 @@ img.system-logo {
   padding: 0 2px;
   border-bottom: 1px solid #c9c7b8;
   min-height: 27px;
+}
+
+.saga-machine .position-list .character span.item-img > img.item-img:last-child {
+  display: block;
+  visibility: hidden;
+}
+
+.saga-machine .position-list .character.filled span.item-img > img.item-img:last-child {
+  display: block;
+  visibility: visible;
+  cursor: pointer;
+}
+
+.saga-machine .sheet-body .position-list .character .item-name {
+  opacity: 0.8;
+}
+
+.saga-machine .sheet-body .position-list .character.filled .item-name {
+  opacity: inherit;
+}
+
+.saga-machine .sheet-body .position-list .character .crew-delete {
+  display: none;
+}
+
+.saga-machine .sheet-body .position-list .character.filled .crew-delete {
+  display: block;
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+.saga-machine .sheet-body .position-list select.item-name {
+  margin-right: 10px;
+  margin-left: 15px;
+}
+
+.saga-machine .sheet-body .position-list select.item-name:disabled {
+  color: rgba(0, 0, 0, 0.8);
 }
 
 .saga-machine .position.prototype {

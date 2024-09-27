@@ -151,7 +151,11 @@
         "defense": {
           "value": 0,
           "tn": 0,
-          "custom": false
+          "custom": false,
+          "test": "",
+          "round_tn": 0,
+          "dodge_on": false,
+          "parry_on": false
         },
         "handling": {
           "banes": 0,
@@ -179,6 +183,7 @@
           "custom": false
         }
       },
+      "fast_turn": false,
       "cost": 0,
       "availability": "",
       "equipment": [],
