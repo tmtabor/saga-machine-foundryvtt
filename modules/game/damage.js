@@ -158,17 +158,17 @@ export class Effect {
         let margin = this.margin ? Number(this.margin) :              // Get the margin
             (this.test && this.test.margin ? Number(this.test.margin) : 0);
 
-        // Handle the Feeble property
-        this.properties = ActionHelper.parse_properties(dataset.properties);
-        if (ActionHelper.has_property(this.properties, 'Feeble'))
-            margin = Math.min(base_damage, margin);
-
         // Handle the Ignores and Pierce properties
+        this.properties = ActionHelper.parse_properties(dataset.properties);
         const ignores = ActionHelper.has_property(this.properties, 'Ignores');
         const pierce = ignores ? Effect.IGNORES_ALL_ARMOR : ActionHelper.property_value(this.properties, 'Pierce');
 
         let damage = base_damage + margin;                              // Add base damage and margin
         if (damage < 0) damage = 0;                                     // Minimum 0
+
+        // Handle the Feeble property
+        if (ActionHelper.has_property(this.properties, 'Feeble'))
+            damage = Math.floor(damage / 2);
 
         // Get the damage type
         const damage_type = this.damage_type ? this.damage_type : '';
