@@ -12,13 +12,15 @@ export function capitalize(word) {
 /**
  * Get the actor from the specified IDs, return null if none found
  *
+ * @param {string} uuid
  * @param {string} scene_id
  * @param {string} token_id
  * @param {string} actor_id
  * @returns {SagaMachineActor|null}
  */
-export function token_actor({scene_id=null, token_id=null, actor_id=null}) {
-	if (scene_id && token_id) return game.scenes.get(scene_id)?.tokens.get(token_id)?.actor || null;
+export function token_actor({uuid=null, scene_id=null, token_id=null, actor_id=null}) {
+	if (uuid) return fromUuidSync(uuid) || null;
+	else if (scene_id && token_id) return game.scenes.get(scene_id)?.tokens.get(token_id)?.actor || null;
 	else if (actor_id) return game.actors.get(actor_id) || null;
 	else return null;
 }

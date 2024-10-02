@@ -143,7 +143,7 @@
           "custom": false
         },
         "crew": {
-          "rating": null,
+          "value": null,
           "crewmen": 0,
           "passengers": 0,
           "positions": []

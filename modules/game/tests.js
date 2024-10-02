@@ -42,6 +42,13 @@ export const SCORE_OPTIONS = {
     'willpower': 'Willpower'
 };
 
+
+export const VEHICLE_SCORE_OPTIONS = {
+    '': '--',
+    'defense': 'Defense',
+    'crew': 'Crew'
+};
+
 /**
  * Object representing a Saga Machine test
  */
@@ -79,7 +86,8 @@ export class Test {
     validate() {
         // Make sure the dataset has all the required components, throw an error if not
         let valid = (this.sceneId && this.tokenId || this.actorId || this.actor) && this.actor && this.actor.system &&
-            (this.actor.system.stats[this.stat] || this.actor.system.scores[this.stat] || !this.stat);
+            ((this.actor.system?.stats && this.actor.system?.stats[this.stat]) ||
+             (this.actor.system?.scores && this.actor.system?.scores[this.stat]) || !this.stat);
         if (!valid)
             throw `Test missing required data: scene=${this.sceneId}, token=${this.tokenId}, actor=${this.actorId}, stat=${this.stat}`;
 
@@ -246,8 +254,8 @@ export class Test {
      */
     calc_total() {
         // Look up the stat or score value
-        let stat = this.stat ? (this.stat in this.actor.system.stats ?
-            this.actor.system.stats[this.stat].value : this.actor.system.scores[this.stat].value) : 0;
+        let stat = this.stat ? (this.stat in (this.actor.system?.stats || []) ?
+            this.actor.system?.stats[this.stat].value : this.actor.system?.scores[this.stat].value) : 0;
 
         // Get the skill rank
         const relevant_skill = !!this.skill; // There is a skill for this test
@@ -587,11 +595,7 @@ export class Test {
             // Special handling for _actor and target
             else if (key === '_actor' || key === 'target') {
                 if (value instanceof game.sagamachine.SagaMachineActor) dataset[key] = value;
-                else dataset[key] = token_actor({
-                    scene_id: value.scene_id,
-                    token_id: value.token_id,
-                    actor_id: value.actor_id
-                });
+                else dataset[key] = token_actor(dataset);
             }
 
             // Special handling for effects
@@ -620,21 +624,18 @@ export class Test {
  * @return {Promise<void>}
  */
 export async function test_dialog(dataset, callback=null) {
-    const actor = token_actor({
-        scene_id: dataset.sceneId,
-        token_id: dataset.tokenId,
-        actor_id: dataset.actorId
-    });
+    const actor = token_actor(dataset);
+    const score_options = actor.type === 'vehicle' ? VEHICLE_SCORE_OPTIONS : SCORE_OPTIONS;
 
     const dialog_content = await renderTemplate("systems/saga-machine/templates/apps/test-dialog.html",
-        {actor: { ...actor.sheet.getData().data }, STAT_OPTIONS: STAT_OPTIONS, SCORE_OPTIONS: SCORE_OPTIONS, ...dataset});
+        {actor: { ...actor.sheet.getData().data }, STAT_OPTIONS: STAT_OPTIONS, SCORE_OPTIONS: score_options, ...dataset});
 
     new Dialog({
         title: "Make Test",
         content: dialog_content,
         render: html => {
             // Initialize the modifiers (tag) widget
-            const modifiers = actor.modifiers(dataset);         // Get the list of modifiers from consequences
+            const modifiers = actor.modifiers(dataset);     // Get the list of modifiers from consequences
             const modifier_input = html.find('input[name=modifiers]');   // Get the modifiers input DOM element
             if (!modifier_input) return;
             const modifier_tagify = new Tagify(modifier_input[0], {

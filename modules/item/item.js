@@ -12,11 +12,11 @@ export class SagaMachineItem extends Item {
     async prepareDerivedData() {
         super.prepareDerivedData();
 
-        // Don't derive properties for items you don't own or which haven't been saved to the db
-        if (!this.actor || !this.actor.isOwner || !this.id || !this.actor.items.get(this.id)) return;
-
         // Derive the full name from the base name and specialization
         this.full_name();
+
+        // Don't derive properties for items you don't own or which haven't been saved to the db
+        if (!this.actor || !this.actor.isOwner || !this.id || !this.actor.items.get(this.id)) return;
 
         // Parse the submitted property string into an array and set various derived values
         this.parse_properties();

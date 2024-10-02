@@ -89,8 +89,8 @@
                 <input class="money-input" type="number" name="system.scores.crew.crewmen" value="{{ data.system.scores.crew.crewmen }}" step="1" />
                 <label class="item-label right" for="system.scores.crew.passengers">Passengers</label>
                 <input class="money-input" type="number" name="system.scores.crew.passengers" value="{{ data.system.scores.crew.passengers }}" step="1" />
-                <label class="item-label right" for="system.scores.crew.rating">Crew Rating</label>
-                <input class="money-input" type="number" name="system.scores.crew.rating" value="{{ data.system.scores.crew.rating }}" step="1" />
+                <label class="item-label right" for="system.scores.crew.value">Crew Rating</label>
+                <input class="money-input" type="number" name="system.scores.crew.value" value="{{ data.system.scores.crew.value }}" step="1" />
             </div>
             <h3>Positions</h3>
             <ol class="items-list position-list">
@@ -133,24 +133,27 @@
         </div>
 
 		<div class="tab combat" data-group="primary" data-tab="combat">
-            <nav class="initiative">
-                <div class="grouping turn">
-                    <label>Turn</label>
-                    <div class="toggle-switch">
-                        <input type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
-                        <div class="slider">
-                            <span class="on">FAST&nbsp;</span>
-                            <span class="off">&nbsp;&nbsp;SLOW</span>
+            {{#if data.system.is_pc }}
+                <nav class="initiative">
+                    <div class="grouping turn">
+                        <label>Turn</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" name="system.fast_turn" data-dtype="Boolean" {{checked data.system.fast_turn}} />
+                            <div class="slider">
+                                <span class="on">FAST&nbsp;</span>
+                                <span class="off">&nbsp;&nbsp;SLOW</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </nav>
+                </nav>
+            {{/if}}
 
             {{#each data.system.action_groups as |actions|}}
                 <h3>{{ actions.name }}</h3>
                 <ol class="items-list">
                     <li class="item flexrow items-header">
                         <div class="item-name">Name</div>
+                        <div class="item-name">Crewman</div>
                         <div class="item-name">Source</div>
                         <div class="item-controls">
                             <a class="item-control item-create" title="Create action" data-type="action" data-system='{"group": "{{ actions.name }}"}'><i class="fas fa-plus"></i> Add</a>
@@ -165,6 +168,12 @@
                                     <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ action.name }} Test" />
                                 </span>
                                 <span class="expandable">{{ action.name }}</span>
+                            </div>
+                            <div class="item-name">
+                                <select class="action-crewman">
+                                    <option value="">General Crew</option>
+                                    {{ selectOptions ../../data.system.scores.crew.roster valueAttr="character" labelAttr="label" }}
+                                </select>
                             </div>
                             <div class="item-name">{{ action.parent.name }}</div>
                             <div class="item-controls">

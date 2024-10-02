@@ -127,7 +127,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 * @returns {string}
 	 */
 	get template() {
-		return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`;
+		if (!game.user.isGM && this.actor.limited) return "systems/saga-machine/templates/actors/limited-sheet.html";
+		else return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`;
 	}
 
 	/**********************************
@@ -366,7 +367,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		if (event.currentTarget.dataset['type'] === 'Test') event.stopPropagation();
 
 		// Attach IDs to the dataset
-		this.attach_ids(event.currentTarget.dataset);
+		this.attach_uuid(event.currentTarget.dataset);
 		const mod_keys = {
 			'key-alt': event.altKey,
 			'key-ctrl': event.ctrlKey,
@@ -618,17 +619,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 *
 	 * @param {{}} dataset
 	 */
-	attach_ids(dataset) {
-		// Attach token and scene ID, if available
-		if (this.token) {
-			dataset['tokenId'] = this.token.id;
-			dataset['sceneId'] = this.token.parent.id;
-		}
-
-		// Otherwise, attach the actor ID
-		else {
-			dataset['actorId'] = this.actor.id;
-		}
+	attach_uuid(dataset) {
+		if (!dataset.uuid) dataset.uuid = this.actor.uuid;
 	}
 
 	/**
@@ -717,7 +709,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	async on_test(event) {
 		event.preventDefault();
-		this.attach_ids(event.currentTarget.dataset);		// Attach IDs to the dataset
+		this.attach_uuid(event.currentTarget.dataset);		// Attach IDs to the dataset
 		await test_dialog(event.currentTarget.dataset);		// Show the dialog
 	}
 }
@@ -775,6 +767,9 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	activateListeners(html) {
 		super.activateListeners(html);
 
+		// Everything below here is only needed if the sheet is editable
+		if (!this.isEditable) return;
+
 		html.find('.rollable').click(this.on_test.bind(this));						// Open test dialog
 		html.find('.score').on("contextmenu", this.on_score_toggle.bind(this));		// Toggle custom score mode on/off
 		html.find('.score').on("click", this.on_score_increment.bind(this));		// Increment secondary score
@@ -818,7 +813,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		// Prompt the user with the test dialog
 		if (add_dodge) {
 			let dataset = { type: "Test", score: "defense" };
-			this.attach_ids(dataset);
+			this.attach_uuid(dataset);
 			await test_dialog(dataset, set_dodge);
 		}
 		else {
@@ -852,7 +847,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		// Prompt the user with the test dialog
 		if (add_resist) {
 			let dataset = { type: "Test", score: "willpower" };
-			this.attach_ids(dataset);
+			this.attach_uuid(dataset);
 			await test_dialog(dataset, set_willpower);
 		}
 		else {
@@ -923,7 +918,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 						properties: action.system.properties,
 						effects: action.sheet.effects_str
 					};
-					this.attach_ids(dataset);
+					this.attach_uuid(dataset);
 					return await test_dialog(dataset);
 				}
 	}
@@ -1015,6 +1010,9 @@ export class StashSheet extends SagaMachineActorSheet {
 	activateListeners(html) {
 		super.activateListeners(html);
 
+		// Everything below here is only needed if the sheet is editable
+		if (!this.isEditable) return;
+
 		html.find('.distribute-money').on("click", this.distribute_money.bind(this));		// Distribute money
 	}
 
@@ -1049,8 +1047,11 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	 * @inheritdoc
 	 * @override
 	 * */
-	getData() {
+	async getData() {
 		const context = super.getData();
+
+		// If this vehicle owned by the PCs?
+		context.data.system.is_pc = this.actor.hasPlayerOwner;
 
 		// Add constants for availability and handling dropdowns
 		context.data.system.VEHICLE_AVAILABILITY = VEHICLE_AVAILABILITY;
@@ -1067,6 +1068,9 @@ export class VehicleSheet extends SagaMachineActorSheet {
 		context.data.system.actions = this.gather_actions(context);
 		context.data.system.action_groups = this.skills_and_traits(context.data.system.actions, 'Attacks');
 
+		// Look up crewman uuids and create the active roster
+		await this.lookup_crew(context);
+
 		this.calc_health_progress_bar(context);	// Calculate health progress bar percentages
 		this.calc_space_progress_bar(context);	// Calculate space progress bar percentages
 
@@ -1079,12 +1083,16 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	 */
 	async activateListeners(html) {
 		super.activateListeners(html);
+		await this.draw_positions(html);
 
+		// Everything below here is only needed if the sheet is editable
+		if (!this.isEditable) return;
+
+		html.find('.rollable').click(this.on_test.bind(this));						// Open test dialog
 		html.find('.score').on("contextmenu", this.on_score_toggle.bind(this));		// Toggle custom score mode on/off
 		html.find('.score').on("click", this.on_score_increment.bind(this));		// Increment secondary score
 
 		// Handle positions
-		await this.draw_positions(html);
 		html.find('.position-list .lock-toggle').click(this.toggle_lock.bind(this));
 		html.find('.position-list .position-row').on("drop", this.drop_crewman.bind(this));
 		html.find('.position-list img.crewman').click(this.open_crewman.bind(this));
@@ -1093,6 +1101,7 @@ export class VehicleSheet extends SagaMachineActorSheet {
 		html.find('.position-list .position-delete').click(this.delete_position.bind(this));
 
 		// Handle actions
+		html.find('.action-crewman').on("change", this.on_action_crewman.bind(this));	// Change crewman for action
 		html.find('.action-edit').on("click", this.on_action_edit.bind(this));			// Action editing
 		html.find('.action-delete').on("click", this.on_action_delete.bind(this));		// Action deletion
 	}
@@ -1106,6 +1115,53 @@ export class VehicleSheet extends SagaMachineActorSheet {
 		if (!context.data.system.scores.space.max) context.data.system.scores.space.percent = 0;
 		else context.data.system.scores.space.percent =
 			Math.round((context.data.system.scores.space.value / context.data.system.scores.space.max) * 100);
+	}
+
+	/**
+	 * When a roll label is clicked, open the test dialog, pointing to the actor in the correct crew position
+	 *
+	 * @override
+	 * @param event
+	 * @returns {Promise<void>}
+	 */
+	async on_test(event) {
+		event.preventDefault();
+
+		const box = $(event.currentTarget).closest(".item");
+		const crewman = box.find("select.action-crewman");
+		const crewman_uuid = crewman.val();
+		event.currentTarget.dataset.uuid = crewman_uuid || this.actor.uuid;
+		const dataset_overrides = !!crewman_uuid ? {} : { score: 'crew', stat: null, skill: null };
+
+		await test_dialog( {...event.currentTarget.dataset, ...dataset_overrides }); // Show the dialog
+	}
+
+	/**
+	 * Look up all actors associated with the crew uuids and create the list of active crew members
+	 *
+	 * @param context
+	 * @return {Promise<void>}
+	 */
+	async lookup_crew(context) {
+		// Lookup actor for assigned crew positions
+		for (let position of context.data.system.scores.crew.positions)
+			if (position.character) {
+				position.actor = await fromUuid(position.character);
+				position.label = `${position.actor.name} (${position.position})`;
+			}
+
+		// Create the active crew roster
+		context.data.system.scores.crew.roster = context.data.system.scores.crew.positions.filter(i => i.character);
+	}
+
+	/**
+	 * Stop propgation when a new crewman is selected
+	 *
+	 * @param event
+	 */
+	on_action_crewman(event) {
+		event.preventDefault();
+		event.stopPropagation();
 	}
 
 	/**
@@ -1247,11 +1303,12 @@ export class VehicleSheet extends SagaMachineActorSheet {
 		event.stopPropagation();
 
 		// Get whether editing positions is locked or not
+		const list = $(event.currentTarget).closest('ol.position-list');
 		const locked = !!list.find('.lock-toggle').hasClass('locked');
 
 		// Get all positions
 		const position_nodes = position_list ? position_list.find('.position:not(.prototype)') :
-			$(event.currentTarget).closest('ol.position-list').find('.position:not(.prototype)');
+			list.find('.position:not(.prototype)');
 
 		// Iterate over each node and add to the list
 		const positions = [];
