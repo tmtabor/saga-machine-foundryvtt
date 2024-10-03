@@ -1127,13 +1127,13 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	async on_test(event) {
 		event.preventDefault();
 
-		const box = $(event.currentTarget).closest(".item");
-		const crewman = box.find("select.action-crewman");
+		const box = $(event.currentTarget).closest(".item, .position");
+		const crewman = box.find("select.action-crewman, input[name=character]");
 		const crewman_uuid = crewman.val();
 		event.currentTarget.dataset.uuid = crewman_uuid || this.actor.uuid;
-		const dataset_overrides = !!crewman_uuid ? {} : { score: 'crew', stat: null, skill: null };
+		const dataset_overrides = !!crewman_uuid ? {} : {score: 'crew', stat: null, skill: null};
 
-		await test_dialog( {...event.currentTarget.dataset, ...dataset_overrides }); // Show the dialog
+		await test_dialog({...event.currentTarget.dataset, ...dataset_overrides}); // Show the dialog
 	}
 
 	/**
@@ -1172,7 +1172,10 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	async drop_crewman(event) {
 		// Get the drag event data
 		let data = null;
-		try { data = JSON.parse(event.originalEvent?.dataTransfer?.getData("text")); } catch (error) {}
+		try {
+			data = JSON.parse(event.originalEvent?.dataTransfer?.getData("text"));
+		} catch (error) {
+		}
 		if (!data || !data.uuid || data.type !== 'Actor') return;
 
 		// Get the actor being dropped
@@ -1216,8 +1219,7 @@ export class VehicleSheet extends SagaMachineActorSheet {
 			list.find('.position-create').removeClass('hidden');
 			list.find('.position-delete').removeClass('hidden');
 			list.find('select').removeAttr('disabled');
-		}
-		else {			// Lock editing positions
+		} else {			// Lock editing positions
 			target.addClass('locked').find('i').removeClass('fa-unlock').addClass('fa-lock');
 			list.find('.position-create').addClass('hidden');
 			list.find('.position-delete').addClass('hidden');
@@ -1289,7 +1291,53 @@ export class VehicleSheet extends SagaMachineActorSheet {
 			// Set up the data handlers for the form, if this sheet is editable
 			if (!this.isEditable) continue;
 			clone.find('input, select').change(this.update_positions.bind(this));
+
+			// Add the position action buttons
+			if (position.position === 'Captain')
+				clone.find('.position-actions').html(
+					VehicleSheet.position_action_button('Coordinate', 'charisma', 'Persuade', 12) +
+					VehicleSheet.position_action_button('Inspire', 'perception', 'Empathy', 12));
+			else if (position.position === 'Driver/Pilot')
+				clone.find('.position-actions').html(
+					VehicleSheet.position_action_button('Regain Control', 'speed', 'Vehicles', 12) +
+					VehicleSheet.position_action_button('Evasive Actions', 'speed', 'Vehicles', '') +
+				    VehicleSheet.position_action_button('Close', 'speed', 'Vehicles', '', null, 'Vehicles vs. Vehicles') +
+					VehicleSheet.position_action_button('Escape', 'speed', 'Vehicles', '', null, 'Vehicles vs. Vehicles') +
+					VehicleSheet.position_action_button('On Alert', 'speed', 'Vehicles', 12));
+			else if (position.position === 'Engineer')
+				clone.find('.position-actions').html(
+					VehicleSheet.position_action_button('Reroute Power', 'intelligence', 'Academics (Engineering)', 12, 'academics') +
+					VehicleSheet.position_action_button('Boost', 'intelligence', 'Academics (Engineering)', 12, 'academics'));
+			else if (position.position === 'Gunner')
+				clone.find('.position-actions').html(
+					VehicleSheet.position_action_button('Point Defense', 'dexterity', 'Projectiles', '', null, 'Projectiles vs. Projectiles'));
+			else if (position.position === 'Jammer')
+				clone.find('.position-actions').html(
+					VehicleSheet.position_action_button('Jam', 'intelligence', 'Academics (Computing)', 12, 'academics') +
+					VehicleSheet.position_action_button('Unjam', 'intelligence', 'Academics (Computing)', 12, 'academics') +
+				    VehicleSheet.position_action_button('Countermeasures', 'intelligence', 'Academics (Computing)', '', 'academics', 'Academics (Computing) vs. Academics (Computing)'));
+			else if (position.position === 'Marine')
+				clone.find('.position-actions').html(
+					VehicleSheet.position_action_button('Board', 'strength', 'Athletics', 12));
+			else if (position.position === 'Mechanic')
+				clone.find('.position-actions').html(
+					VehicleSheet.position_action_button('Repair', 'dexterity', 'Trade (Mechanic)', 10, 'trade') +
+					VehicleSheet.position_action_button('Jury-rig', 'dexterity', 'Trade (Mechanic)', 12, 'trade') +
+				    VehicleSheet.position_action_button('Recalibrate', 'dexterity', 'Trade (Mechanic)', 12, 'trade'));
+			else if (position.position === 'Medic')
+				clone.find('.position-actions').html(
+					VehicleSheet.position_action_button('Treat', 'dexterity', 'Medicine', 10, null, 'Dex/Medicine-10') +
+				    VehicleSheet.position_action_button('Counsel', 'perception', 'Empathy', 12));
 		}
+	}
+
+	static position_action_button(name, stat, skill, tn, icon=null, test_label=null) {
+		if (!icon) icon = skill.toLowerCase();
+		if (!test_label) test_label = `${skill}-${tn}`;
+		return `<span class="item-img rollable" data-type="Test" data-stat="${stat}" data-skill="${skill}" data-tn="${tn}" draggable="true">
+				    <img class="item-img" src="systems/saga-machine/images/skills/${icon}.svg" title="${name}: ${test_label} test">
+				    <img class="item-img" src="systems/saga-machine/images/d10.svg" title="${name}: ${test_label} test">
+			    </span>`;
 	}
 
 	/**
