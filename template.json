@@ -230,6 +230,7 @@
       "tn": "",
       "modifiers": [],
       "properties":  [],
+      "attack_option": false,
       "action_effects": [],
       "description": ""
     },

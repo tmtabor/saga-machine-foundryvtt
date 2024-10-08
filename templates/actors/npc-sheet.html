@@ -50,7 +50,7 @@
                     {{#each actions.contents as |action|}}
                         <li class="item flexrow" data-id="{{ action._id }}" data-type="Item" data-parent-type="{{ action.parent.documentName }}" data-parent-id="{{ action.parent.id }}" data-uuid="{{ action.uuid }}">
                             <div class="item-name action-name">
-                                <span class="item-img rollable" data-type="Test" data-stat="{{ action.system.stat }}" data-skill="{{ action.system.skill }}" data-tn="{{ action.system.tn }}" data-modifiers="{{ action.system.modifiers }}" data-properties="{{ action.system.properties }}" data-effects='{{ action.sheet.effects_str }}'>
+                                <span class="item-img rollable" data-type="Test" data-option="{{ action.system.attack_option }}" data-stat="{{ action.system.stat }}" data-skill="{{ action.system.skill }}" data-tn="{{ action.system.tn }}" data-modifiers="{{ action.system.modifiers }}" data-properties="{{ action.system.properties }}" data-effects='{{ action.sheet.effects_str }}'>
                                     <img class="item-img" src="{{ action.img }}" title="Test {{ action.name }}" />
                                     <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ action.name }} Test" />
                                 </span>

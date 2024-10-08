@@ -710,7 +710,9 @@ export class SagaMachineActorSheet extends ActorSheet {
 	async on_test(event) {
 		event.preventDefault();
 		this.attach_uuid(event.currentTarget.dataset);		// Attach IDs to the dataset
-		await test_dialog(event.currentTarget.dataset);		// Show the dialog
+		let dataset = await CharacterHelper.merge_attack_option(event.currentTarget.dataset); // Merge attack option, if necessary
+
+		await test_dialog(dataset);		// Show the dialog
 	}
 }
 

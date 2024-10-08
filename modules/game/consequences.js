@@ -139,14 +139,14 @@ export function evaluate_formula(value, item) {
     function substitute_variables(raw, item) {
         raw = raw.replaceAll('@rank', item.system.rank);
         if (item.parent)
-            raw =     raw.replaceAll('@strength', item.parent.system.stats.strength.value)
-                         .replaceAll('@dexterity', item.parent.system.stats.dexterity.value)
-                         .replaceAll('@speed', item.parent.system.stats.speed.value)
-                         .replaceAll('@endurance', item.parent.system.stats.endurance.value)
-                         .replaceAll('@intelligence', item.parent.system.stats.intelligence.value)
-                         .replaceAll('@perception', item.parent.system.stats.perception.value)
-                         .replaceAll('@charisma', item.parent.system.stats.charisma.value)
-                         .replaceAll('@determination', item.parent.system.stats.determination.value);
+            raw =     raw.replaceAll('@str', item.parent.system.stats.strength.value)
+                         .replaceAll('@dex', item.parent.system.stats.dexterity.value)
+                         .replaceAll('@spd', item.parent.system.stats.speed.value)
+                         .replaceAll('@end', item.parent.system.stats.endurance.value)
+                         .replaceAll('@int', item.parent.system.stats.intelligence.value)
+                         .replaceAll('@per', item.parent.system.stats.perception.value)
+                         .replaceAll('@chr', item.parent.system.stats.charisma.value)
+                         .replaceAll('@det', item.parent.system.stats.determination.value);
         return raw;
     }
 

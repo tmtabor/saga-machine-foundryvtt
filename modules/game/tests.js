@@ -550,11 +550,7 @@ export class Test {
 
             // Special handling for _actor and target
             else if (key === '_actor' || key === 'target') {
-                // If not a token actor, copy over actor ID
-                if (!value.isToken) json[key] = {actor_id: value.id};
-
-                // If a token actor, copy over token and scene IDs
-                else json[key] = {token_id: value.token.id, scene_id: value.token.parent.id};
+                json[key] = { uuid: value.uuid };
             }
 
             // Special handling for effects
@@ -595,7 +591,7 @@ export class Test {
             // Special handling for _actor and target
             else if (key === '_actor' || key === 'target') {
                 if (value instanceof game.sagamachine.SagaMachineActor) dataset[key] = value;
-                else dataset[key] = token_actor(dataset);
+                else dataset[key] = token_actor(value);
             }
 
             // Special handling for effects

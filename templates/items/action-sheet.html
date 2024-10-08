@@ -84,6 +84,9 @@
                         by a comma. For a modifier, type the value. You may optionally prepend a descriptor; for example: "Aim +".</p>
                     <label>Properties</label>
                     <input class="grid-start-2 grid-span-5 modifier-tags tag-input" type="text" name="system.properties" value="{{ data.system.properties }}" />
+                    <label>Option</label>
+                    <input class="grid-start-2" type="checkbox" name="system.attack_option" {{checked data.system.attack_option}} />
+                    <p class="grid-span-4 hint">Is this an attack option meant to override the default test for attacking with a weapon?</p>
                 </div>
             </fieldset>
 

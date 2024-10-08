@@ -660,6 +660,63 @@ export class CharacterHelper {
         }
         return highest;
     }
+
+    /**
+     * Get the actor's equipped weapon with the highest damage
+     *
+     * @param {SagaMachineActor} actor
+     * @return {SagaMachineItem|null}
+     */
+    static primary_weapon(actor) {
+        const equipped_weapons = actor.items.filter(item => item.type === 'item' &&
+            item.system.group === 'Weapons' && item.system.equipped);
+
+        let highest_weapon = null;
+        let highest_value = 0;
+        for (const weapon of equipped_weapons) {
+            const val = Number(weapon?.system?.actions?.[0]?.system?.action_effects.filter(e => e.type === 'damage')?.[0]?.value) || 0;
+            if (val > highest_value) {
+                highest_value = val;
+                highest_weapon = weapon;
+            }
+        }
+        return highest_weapon;
+    }
+
+    /**
+	 * Merge attack option dataset with the dataset of the base attack of the actor's primary weapon, if necessary
+	 *
+	 * @param dataset
+	 * @return {*}
+	 */
+	static async merge_attack_option(dataset) {
+		// Is this an attack option?
+		if (dataset.option === "true") {
+			// Get the actor
+			const actor = await fromUuid(dataset.uuid);
+			if (!actor) return dataset;
+
+			// Get the actor's primary weapon
+			const weapon = CharacterHelper.primary_weapon(actor);
+			if (!weapon) return dataset;
+
+			// Get the basic attack of the primary weapon (assuming it's the first one)
+			const base_action = weapon?.system?.actions?.[0];
+			if (!base_action) return dataset;
+
+			return {
+				uuid: dataset.uuid,
+				type: dataset.type,
+				stat: dataset.stat || base_action.system.stat,
+				skill: dataset.skill || base_action.system.stat,
+				tn: dataset.tn,
+				modifiers: dataset.modifiers,
+				properties: ActionHelper.merge_properties(base_action?.system?.properties, dataset.properties, true),
+				effects: JSON.stringify(base_action.system.action_effects.concat(JSON.parse(dataset.effects)))
+			};
+		}
+		else return dataset;
+	}
 }
 
 /**

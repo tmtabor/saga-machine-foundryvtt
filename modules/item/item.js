@@ -151,11 +151,7 @@ export class ActionHelper {
      */
     static strength_met(dataset, actor = null) {
         // Get a reference to the actor if one has not been provided
-        if (!actor) actor = token_actor({
-            scene_id: dataset.sceneId,
-            token_id: dataset.tokenId,
-            actor_id: dataset.actorId
-        });
+        if (!actor) actor = token_actor(dataset);
 
         const strength = actor.system.stats.strength.value;                     // Get the actor's strength
         const damage = ActionHelper.damage(dataset);                                  // Get the attack's damage
@@ -203,6 +199,42 @@ export class ActionHelper {
             if (effects_list[i].type === 'defense') return true;
 
         return false;
+    }
+
+    /**
+     * Merge two sets of properties in the format output by property_set, with the second set overriding any
+     * colliding values from the first set
+     *
+     * @param initial_props
+     * @param override_props
+     * @param stringify_props - Return each prop as a string instead of a dict
+     * @return {{property: string, value: number|null}[]|string[]}
+     */
+    static merge_properties(initial_props, override_props, stringify_props=false) {
+        initial_props = ActionHelper.property_set(initial_props);
+        override_props = ActionHelper.property_set(override_props);
+
+        const found = []
+        const obj_set = override_props.concat(initial_props).filter(i => {
+            if (found.indexOf(i.property) >= 0) return false;
+            else return !!found.push(i.property);
+        });
+
+        if (stringify_props) return obj_set.map(p => `${p.property} ${p.value ?? ''}`.trim());
+        else return obj_set;
+    }
+
+    /**
+     * Parses properties into a list of objects, each separating the property name and value
+     *
+     * @param properties
+     * @return {{property: string, value: number|null}[]}
+     */
+    static property_set(properties) {
+        return ActionHelper.parse_properties(properties).map(p => {
+            const [prop, val] = p.split(' ');
+            return { property: prop, value: Number(val) || null };
+        });
     }
 
     /**

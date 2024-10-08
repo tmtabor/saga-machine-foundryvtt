@@ -90,14 +90,14 @@ export class Effect {
 
         // Search damage string for each stat and apply
         let str_dmg = String(this.value).toLowerCase();
-        if (str_dmg.includes('str')) damage += Number(this?.test?.actor?.system?.stats?.strength?.value);
-        if (str_dmg.includes('dex')) damage += Number(this?.test?.actor?.system?.stats?.dexterity?.value);
-        if (str_dmg.includes('spd')) damage += Number(this?.test?.actor?.system?.stats?.speed?.value);
-        if (str_dmg.includes('end')) damage += Number(this?.test?.actor?.system?.stats?.endurance?.value);
-        if (str_dmg.includes('int')) damage += Number(this?.test?.actor?.system?.stats?.intelligence?.value);
-        if (str_dmg.includes('per')) damage += Number(this?.test?.actor?.system?.stats?.perception?.value);
-        if (str_dmg.includes('chr')) damage += Number(this?.test?.actor?.system?.stats?.charisma?.value);
-        if (str_dmg.includes('det')) damage += Number(this?.test?.actor?.system?.stats?.determination?.value);
+        if (str_dmg.includes('@str')) damage += Number(this?.test?.actor?.system?.stats?.strength?.value);
+        if (str_dmg.includes('@dex')) damage += Number(this?.test?.actor?.system?.stats?.dexterity?.value);
+        if (str_dmg.includes('@spd')) damage += Number(this?.test?.actor?.system?.stats?.speed?.value);
+        if (str_dmg.includes('@end')) damage += Number(this?.test?.actor?.system?.stats?.endurance?.value);
+        if (str_dmg.includes('@int')) damage += Number(this?.test?.actor?.system?.stats?.intelligence?.value);
+        if (str_dmg.includes('@per')) damage += Number(this?.test?.actor?.system?.stats?.perception?.value);
+        if (str_dmg.includes('@chr')) damage += Number(this?.test?.actor?.system?.stats?.charisma?.value);
+        if (str_dmg.includes('@det')) damage += Number(this?.test?.actor?.system?.stats?.determination?.value);
 
         // Strip the damage string of any alphabetic characters, add and return
         str_dmg = str_dmg.replace(/[^\d.-]/g, '');
