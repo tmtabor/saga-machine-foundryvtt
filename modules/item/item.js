@@ -202,6 +202,19 @@ export class ActionHelper {
     }
 
     /**
+     * Merge two sets of modifiers into a single list
+     *
+     * @param initial_mods
+     * @param override_mods
+     * @return {string[]}
+     */
+    static merge_modifiers(initial_mods, override_mods) {
+        initial_mods = ActionHelper.parse_properties(initial_mods);
+        override_mods = ActionHelper.parse_properties(override_mods);
+        return override_mods.concat(initial_mods);
+    }
+
+    /**
      * Merge two sets of properties in the format output by property_set, with the second set overriding any
      * colliding values from the first set
      *

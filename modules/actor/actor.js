@@ -710,7 +710,7 @@ export class CharacterHelper {
 				stat: dataset.stat || base_action.system.stat,
 				skill: dataset.skill || base_action.system.stat,
 				tn: dataset.tn,
-				modifiers: dataset.modifiers,
+				modifiers: ActionHelper.merge_modifiers(base_action?.system?.modifiers, dataset.modifiers),
 				properties: ActionHelper.merge_properties(base_action?.system?.properties, dataset.properties, true),
 				effects: JSON.stringify(base_action.system.action_effects.concat(JSON.parse(dataset.effects)))
 			};
