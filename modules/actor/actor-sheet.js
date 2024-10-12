@@ -1,6 +1,7 @@
 import { test_dialog } from "../game/tests.js";
 import { ActionHelper, SagaMachineItem } from "../item/item.js";
 import { CharacterHelper } from "./actor.js";
+import { FloatingContextMenu } from "../system/contextmenu.js";
 
 /**
  * ActorSheet context used in getData() and dependent methods.
@@ -99,6 +100,7 @@ export const VEHICLE_HANDLING = {
  * This is a base class that's meant to be extended for specific actor types.
  */
 export class SagaMachineActorSheet extends ActorSheet {
+	_origin_menu = null;
 
 	/**********************************
 	 * METHODS THAT SET BASIC OPTIONS *
@@ -352,6 +354,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		html.find('.expandable').on("click", this.expand_description.bind(this));	// Expand description
 		html.find('.chatable').on("click", this.chat_description.bind(this));		// Send description to chat
 
+		this.init_origins_menu();					// Initialize the add origin menu
 		this.attach_drag_events(html);				// Make icons draggable to hot bar, disable drag for input elements
 		this.attach_drop_events(html);				// Enable drop events for containers and groups
 	}
@@ -525,6 +528,38 @@ export class SagaMachineActorSheet extends ActorSheet {
 		const item = this.actor.items.get(item_id);
 		if (!item) return;
 		this.to_chat(item);
+	}
+
+	/**
+	 * Initialize the new origin / path menu, if necessaryy
+	 */
+	init_origins_menu() {
+		// Skip is menu already initialized
+		if (this._origin_menu) return;
+
+		const items = [
+			{
+				name: 'Origin',
+				icon: '<img class="menu-img" src="systems/saga-machine/images/defaults/origin.svg" />',
+				condition: true,
+				callback: (i) => {
+					Item.create({name: 'New Origin', type: 'origin'}, { parent: this.actor });
+					//alert('Now?');
+					console.log(this);
+					return true;
+				}
+			},
+			{
+				name: 'Path',
+				icon: '<img class="menu-img" src="systems/saga-machine/images/defaults/path.svg" />',
+				condition: true,
+				callback: (i) => {
+					Item.create({name: 'New Path', type: 'path'}, { parent: this.actor });
+				}
+      		}
+		];
+
+		this._origin_menu = new FloatingContextMenu($('body'), '.origins-add', items, { eventName: 'click' });
 	}
 
 	/**

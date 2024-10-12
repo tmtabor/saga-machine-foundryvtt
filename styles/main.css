@@ -227,7 +227,7 @@ img.system-logo {
 }
 
 .saga-machine .sheet-header ol.origins > li.item {
-  display: inline-block;width: 100%;
+  display: inline-block;
   min-width: 100px;
   width: auto;
   position: relative;
@@ -238,6 +238,7 @@ img.system-logo {
 .saga-machine .sheet-header ol.origins > li.item > .item-name {
   display: inline-block;
   max-width: 150px;
+  height: 25px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -247,6 +248,27 @@ img.system-logo {
   display: inline-block;
   position: absolute;
   right: 5px;
+}
+
+.saga-machine .sheet-header ol.origins > li.item.origins-add {
+  position: relative;
+  right: 0;
+  top: -2px;
+  padding-right: 0;
+  height: 10px;
+  width: 10px;
+  min-width: 10px;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+#context-menu img.menu-img {
+  display: inline-block;
+  height: 18px;
+  border: none;
+  position: relative;
+  top: 4px;
+  margin-right: 5px;
 }
 
 .saga-machine .sheet-header .item-controls {
