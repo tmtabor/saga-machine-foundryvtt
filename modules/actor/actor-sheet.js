@@ -100,7 +100,6 @@ export const VEHICLE_HANDLING = {
  * This is a base class that's meant to be extended for specific actor types.
  */
 export class SagaMachineActorSheet extends ActorSheet {
-	_origin_menu = null;
 
 	/**********************************
 	 * METHODS THAT SET BASIC OPTIONS *
@@ -354,7 +353,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		html.find('.expandable').on("click", this.expand_description.bind(this));	// Expand description
 		html.find('.chatable').on("click", this.chat_description.bind(this));		// Send description to chat
 
-		this.init_origins_menu();					// Initialize the add origin menu
+		this.init_origins_menu(html);				// Initialize the add origin menu
 		this.attach_drag_events(html);				// Make icons draggable to hot bar, disable drag for input elements
 		this.attach_drop_events(html);				// Enable drop events for containers and groups
 	}
@@ -531,12 +530,11 @@ export class SagaMachineActorSheet extends ActorSheet {
 	}
 
 	/**
-	 * Initialize the new origin / path menu, if necessaryy
+	 * Initialize the new origin / path menu, if necessary
+	 *
+	 * @param html
 	 */
-	init_origins_menu() {
-		// Skip is menu already initialized
-		if (this._origin_menu) return;
-
+	init_origins_menu(html) {
 		const items = [
 			{
 				name: 'Origin',
@@ -559,7 +557,7 @@ export class SagaMachineActorSheet extends ActorSheet {
       		}
 		];
 
-		this._origin_menu = new FloatingContextMenu($('body'), '.origins-add', items, { eventName: 'click' });
+		new FloatingContextMenu(html, '.origins-add', items, { eventName: 'click' });
 	}
 
 	/**
