@@ -153,7 +153,8 @@ export class ActionHelper {
         // Get a reference to the actor if one has not been provided
         if (!actor) actor = token_actor(dataset);
 
-        const strength = actor.system.stats.strength.value;                     // Get the actor's strength
+        const strength = actor?.system?.stats?.strength?.value;                     // Get the actor's strength
+        if (strength == null) return true;
         const damage = ActionHelper.damage(dataset);                                  // Get the attack's damage
         const properties = ActionHelper.parse_properties(dataset.properties);
         const light = ActionHelper.property_value(properties, 'Light');       // Get the Light X property, if any
