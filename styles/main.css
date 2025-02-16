@@ -1134,19 +1134,19 @@ img.system-logo {
   margin-bottom: 0;
 }
 
-.chat-message .flavor-text .critical.success {
+.chat-message .critical.success {
   color: rgb(0, 128, 0);
 }
 
-.chat-message .flavor-text .success {
+.chat-message .success {
   color: rgb(0, 0, 255);
 }
 
-.chat-message .flavor-text .failure {
+.chat-message .failure {
   color: rgb(212, 107, 0);
 }
 
-.chat-message .flavor-text .critical.failure {
+.chat-message .critical.failure {
   color: rgb(255, 0, 0);
 }
 

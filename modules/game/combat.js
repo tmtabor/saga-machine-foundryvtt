@@ -99,6 +99,35 @@ export class SagaMachineCombat extends Combat {
     }
 
     /**
+     * Highlight Defense rolls for the GM in case this is a chase, picking out obstacles and a leg up
+     *
+     * @param {SagaMachineActor} actor
+     * @param {boolean} willpower
+     * @return {string}
+     */
+    chase_label(actor, willpower=false) {
+        const score = willpower ? actor?.system?.scores?.willpower : actor?.system?.scores?.defense;
+        if (!score) return `<span class="defense-tn">&mdash;</span>`;
+
+        const roll = actor.system.scores.defense.roll;
+        let highlight = '';
+        let title = '';
+        switch (roll) {
+            case 1:
+                highlight = 'critical failure';
+                title = 'If this is a chase, the character encounters an obstacle.';
+                break;
+            case 9:
+            case 10:
+                highlight = 'critical success';
+                title = 'If this is a chase, the character gains a leg up.';
+                break;
+        }
+
+        return `<span class="defense-tn ${highlight}" title="${title}">${score.tn}</span>`;
+    }
+
+    /**
      * Perform all start of combat and start of round tasks
      *
      * @return {Promise<void>}
@@ -133,7 +162,7 @@ export class SagaMachineCombat extends Combat {
             // Whisper all defenses to GM
             content = '<h4><strong>Defenses This Round</strong></h4><table>';
             for (let c of this.combatants)
-                content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${c.actor.system.scores.defense.tn}</td><td>Willpower ${c.actor.system.scores.willpower.tn || '&mdash;'}</td></tr>`;
+                content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${this.chase_label(c.actor)}</td><td>Willpower ${this.chase_label(c.actor, true)}</td></tr>`;
             content += '</table>';
             await ChatMessage.create({
                 content: content,

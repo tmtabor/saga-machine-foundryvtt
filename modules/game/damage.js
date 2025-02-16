@@ -196,9 +196,11 @@ export class Effect {
         // Update defense and willpower
         target.update({
             'system.scores.defense.tn': defense_tn,
+            'system.scores.defense.roll': this.test.randomizer,
             'system.scores.defense.parry_on': false,
             'system.scores.defense.dodge_on': false,
             'system.scores.willpower.tn': willpower_tn,
+            'system.scores.willpower.roll': this.test.randomizer,
             'system.scores.willpower.resist_on': false,
         });
 
