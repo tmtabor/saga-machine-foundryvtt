@@ -40,6 +40,7 @@
           "defense": {
             "value": 0,
             "tn": 0,
+            "roll": 0,
             "custom": false,
             "test": "",
             "round_tn": 0,
@@ -151,6 +152,7 @@
         "defense": {
           "value": 0,
           "tn": 0,
+          "roll": 0,
           "custom": false,
           "test": "",
           "round_tn": 0,

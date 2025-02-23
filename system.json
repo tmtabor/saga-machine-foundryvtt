@@ -6,7 +6,7 @@
     "compatibility": {
         "minimum": "12",
         "verified": "12",
-        "maximum": "12"
+        "maximum": "13"
     },
     "templateVersion": 1,
     "author": "Thorin Tabor",
@@ -33,6 +33,20 @@
             "system": "saga-machine",
             "path": "packs/skills",
             "type": "Item"
+        },
+        {
+            "name": "sos",
+            "label": "Shadows Over Sol Items",
+            "system": "saga-machine",
+            "path": "packs/sos",
+            "type": "Item"
+        },
+        {
+            "name": "sos-tables",
+            "label": "Shadows Over Sol Tables",
+            "system": "saga-machine",
+            "path": "packs/sos-tables",
+            "type": "RollTable"
         }
     ],
     "languages": [

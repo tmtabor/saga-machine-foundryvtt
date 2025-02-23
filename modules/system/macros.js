@@ -1,6 +1,6 @@
 import { token_actor } from "./utils.js";
 import { Test, test_dialog } from "../game/tests.js";
-import {CharacterHelper} from "../actor/actor";
+import { CharacterHelper } from "../actor/actor";
 
 /**
  * Create a Macro from an Item drop. Get an existing item macro if one exists, otherwise create a new one.

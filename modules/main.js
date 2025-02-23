@@ -9,6 +9,7 @@ import { create_active_effect, create_item, delete_active_effect, delete_item, d
     get_chat_log_entry_context, hotbar_drop, pre_create_active_effect, pre_delete_active_effect, pre_update_combat,
     render_chat_message, update_active_effect, update_actor, update_item } from "./system/hooks.js";
 import { sm_test_macro } from "./system/macros.js";
+import { level_config, stress_config } from "./system/config.js";
 
 // Turn on debugging
 CONFIG.debug.hooks = true;
@@ -77,20 +78,6 @@ Hooks.once("init", async () => {
     Hooks.on("getChatLogEntryContext", get_chat_log_entry_context);
 
     // Register system config
-    game.settings.register('saga-machine', 'level', {
-        name: 'Starting Power Level',
-        hint: 'The starting power level of all player characters.',
-        scope: 'world',
-        config: true,
-        type: Number,
-        default: 120,
-        choices: {
-            85: "Mundane",
-            120: "Novice",
-            160: "Exceptional",
-            200: "Distinguished",
-            240: "Renowned",
-            280: "Legendary"
-        }
-    });
+    game.settings.register('saga-machine', 'level', level_config);
+    game.settings.register('saga-machine', 'stress', stress_config);
 });
