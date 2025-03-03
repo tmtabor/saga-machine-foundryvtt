@@ -772,6 +772,9 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	getData() {
 		const context = super.getData();
 
+		// Add Luck label
+		context.data.system.scores.luck.label = game.settings.get('saga-machine', 'luck_label', 'Luck');
+
 		// Add constant for Lifestyles dropdown
 		context.data.system.LIFESTYLES = LIFESTYLES;
 

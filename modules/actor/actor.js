@@ -586,6 +586,16 @@ export class CharacterHelper {
     }
 
     /**
+     * Return the experience offset of the character's starting Luck score - use in Shadows Over Sol genelines
+     *
+     * @param {number} luck
+     * @return {number}
+     */
+    static luck_cost(luck) {
+        return (luck * 6) - 30;
+    }
+
+    /**
      * Determine the experience value of a stat or skill.
      *
      * @param {number} value - The current value of the stat or skill
@@ -620,8 +630,9 @@ export class CharacterHelper {
             if (item.type === 'skill') skills += CharacterHelper.stat_cost(item.system.rank, item.system.free_ranks);
             if (item.type === 'trait') traits += item.system.ranked ? item.system.cost * item.system.rank : item.system.cost;
         }
+        let luck = CharacterHelper.luck_cost(actor.system.scores.luck.max);
 
-        const total = stats + skills + traits;
+        const total = stats + skills + traits + luck;
 
         return {total: total, stats: stats, skills: skills, traits: traits};
     }

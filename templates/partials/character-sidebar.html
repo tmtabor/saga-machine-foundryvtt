@@ -69,7 +69,7 @@
 
         <div class="scores grid grid-2col">
             <div class="score flex-group-center">
-                <label class="score-label">Luck</label>
+                <label class="score-label">{{ data.system.scores.luck.label }}</label>
                 <input class="score-input" type="number" name="system.scores.luck.value" value="{{ data.system.scores.luck.value }}" step="1" data-dtype="Number" />
                 <div class="score-secondary" name="system.scores.luck.max">Starting {{ data.system.scores.luck.max }}</div>
             </div>

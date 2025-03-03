@@ -18,8 +18,43 @@ export const level_config = {
         160: "Exceptional",
         200: "Distinguished",
         240: "Renowned",
-        280: "Legendary"
+        280: "Legendary",
+        146: "Shadows Over Sol"
     }
+}
+
+/**
+ * The label to use for Luck in this setting
+ *
+ * @type SettingConfig
+ */
+export const luck_label_config = {
+    name: 'Name for Luck',
+    hint: 'Luck, Edge, Karma, Moxie, etc.',
+    scope: 'world',
+    config: true,
+    type: String,
+    default: 'Luck',
+    choices: {
+        "Luck": "Luck",
+        "Edge": "Edge",
+        "Karma": "Karma",
+        "Moxie": "Moxie"
+    }
+}
+
+/**
+ * Whether a character's starting Luck should affect their experience total (e.g. for Shadows Over Sol)
+ *
+ * @type SettingConfig
+ */
+export const luck_exp_config = {
+    name: 'Starting Luck Affects Experience',
+    hint: 'Used in Shadows Over Sol',
+    scope: 'world',
+    config: true,
+    type: Boolean,
+    default: false
 }
 
 /**
