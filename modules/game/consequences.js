@@ -6,7 +6,7 @@
 export const generate_conditions = () => {
     const system_conditions = [];
     const standard_consequences = ['Bleeding', 'Bolstered', 'Dazed', 'Defeated', 'Desire', 'Disabled', 'Dying', 'Fatigue',
-      'Fear', 'Fixated', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stun', 'Wound'];
+      'Fear', 'Fixation', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stunned', 'Wound'];
 
     // Generate and append an object for each consequence
     standard_consequences.forEach(consequence => system_conditions.push({
@@ -17,9 +17,9 @@ export const generate_conditions = () => {
         flags: {
             core: { overlay: ['Defeated'].includes(consequence) },
             system: {
-                subject_prompt: ['Bleeding', 'Desire', 'Fear', 'Fixated'].includes(consequence),
+                subject_prompt: ['Bleeding', 'Desire', 'Fear', 'Fixation'].includes(consequence),
                 value_prompt: ['Fatigue', 'Grave Wound', 'Wound'].includes(consequence),
-                remove_others: ['Desire', 'Fixated'].includes(consequence),
+                remove_others: ['Desire', 'Fixation'].includes(consequence),
                 no_consequence: ['Defeated', 'Unconscious'].includes(consequence)
             }
         }
