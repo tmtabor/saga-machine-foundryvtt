@@ -6,24 +6,20 @@
 export const generate_conditions = () => {
     const system_conditions = [];
     const standard_consequences = ['Bleeding', 'Bolstered', 'Dazed', 'Defeated', 'Desire', 'Disabled', 'Dying', 'Fatigue',
-      'Fear', 'Fixation', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stressed', 'Stunned', 'Wound'];
-    // try {
-    //     const using_stress = game.settings.get('saga-machine', 'stress');
-    //     if (using_stress) standard_consequences.splice(14, 0, 'Stressed');
-    // } catch (e) {}
+      'Fear', 'Fixated', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stun', 'Wound'];
 
     // Generate and append an object for each consequence
     standard_consequences.forEach(consequence => system_conditions.push({
-        img: `systems/saga-machine/images/consequences/${consequence.slugify()}.svg`,
+        icon: `systems/saga-machine/images/consequences/${consequence.slugify()}.svg`,
         statuses: [consequence.slugify()],
         name: consequence,
         id: consequence.slugify(),
         flags: {
             core: { overlay: ['Defeated'].includes(consequence) },
             system: {
-                subject_prompt: ['Bleeding', 'Desire', 'Fear', 'Fixation'].includes(consequence),
-                value_prompt: ['Fatigue', 'Grave Wound', 'Stressed', 'Wound'].includes(consequence),
-                remove_others: ['Desire', 'Fixation'].includes(consequence),
+                subject_prompt: ['Bleeding', 'Desire', 'Fear', 'Fixated'].includes(consequence),
+                value_prompt: ['Fatigue', 'Grave Wound', 'Wound'].includes(consequence),
+                remove_others: ['Desire', 'Fixated'].includes(consequence),
                 no_consequence: ['Defeated', 'Unconscious'].includes(consequence)
             }
         }
