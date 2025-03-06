@@ -19,7 +19,7 @@ export const level_config = {
         200: "Distinguished",
         240: "Renowned",
         280: "Legendary",
-        146: "Shadows Over Sol"
+        150: "Shadows Over Sol"
     }
 }
 

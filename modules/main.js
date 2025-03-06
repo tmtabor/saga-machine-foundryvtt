@@ -51,6 +51,12 @@ Hooks.once("init", async () => {
     Items.registerSheet("saga-machine", AmbitionSheet, { types: ["ambition"], makeDefault: true });
     Items.registerSheet("saga-machine", ActionSheet, { types: ["action"], makeDefault: true });
 
+    // Register system config
+    game.settings.register('saga-machine', 'level', level_config);
+    game.settings.register('saga-machine', 'luck_label', luck_label_config);
+    game.settings.register('saga-machine', 'luck_exp', luck_exp_config);
+    game.settings.register('saga-machine', 'stress', stress_config);
+
     // Register custom status effects
     CONFIG.statusEffects = generate_conditions();
     CONFIG.specialStatusEffects.DEFEATED = 'defeated';
@@ -76,10 +82,4 @@ Hooks.once("init", async () => {
     Hooks.on("renderChatMessage", render_chat_message);
     Hooks.on("dropActorSheetData", drop_actor_sheet_data);
     Hooks.on("getChatLogEntryContext", get_chat_log_entry_context);
-
-    // Register system config
-    game.settings.register('saga-machine', 'level', level_config);
-    game.settings.register('saga-machine', 'luck_label', luck_label_config);
-    game.settings.register('saga-machine', 'luck_exp', luck_exp_config);
-    game.settings.register('saga-machine', 'stress', stress_config);
 });

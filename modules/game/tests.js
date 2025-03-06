@@ -391,7 +391,7 @@ export class Test {
             if (ActionHelper.has_property(properties, 'Stun'))
                 this.effects.push(new Effect({
                     type: 'consequence',
-                    name: 'Stun',
+                    name: 'Stunned',
                     when: 'success',
                     target: 'target'
                 }, this));
