@@ -6,7 +6,9 @@
 export const generate_conditions = () => {
     const system_conditions = [];
     const standard_consequences = ['Bleeding', 'Bolstered', 'Dazed', 'Defeated', 'Desire', 'Disabled', 'Dying', 'Fatigue',
-      'Fear', 'Fixation', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stressed', 'Stunned', 'Wound'];
+      'Fear', 'Fixation', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stunned', 'Wound'];
+    const use_stress = game.settings.get('saga-machine', 'stress');
+    if (use_stress) standard_consequences.splice(14, 0, 'Stressed');
 
     // Generate and append an object for each consequence
     standard_consequences.forEach(consequence => system_conditions.push({
