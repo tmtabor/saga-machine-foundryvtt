@@ -1170,11 +1170,11 @@ img.system-logo {
 
 .chat-message .dice-tooltip .dice-rolls .roll.stress {
   color: #896222;
-  filter: drop-shadow(0 0 0.1rem rgba(255, 100, 0, 0.5));
+  filter: drop-shadow(0 0 0.1rem rgb(255, 100, 0));
 }
 
 .chat-message .dice-tooltip .dice-rolls .roll.discarded.stress {
-  filter: sepia(0.5) contrast(0.75) opacity(0.4) drop-shadow(0 0 0 rgba(255, 100, 0, 0.5));
+  filter: sepia(0.5) contrast(0.75) opacity(0.4) drop-shadow(0 0 0.1rem rgb(255, 100, 0));
 }
 
 .chat-message .dice-tooltip .dice-rolls .roll.stress.panic {
