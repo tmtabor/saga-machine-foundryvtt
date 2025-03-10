@@ -586,6 +586,17 @@ export class CharacterHelper {
     }
 
     /**
+     * Counts the total points of stress
+     *
+     * @param {SagaMachineActor} actor
+     * @return {number}
+     */
+    static stress(actor) {
+        const fatigue = actor.items.filter(item => item.type === 'consequence' && item.name.toLowerCase() === 'stressed');
+        return fatigue.map(a => a.system.rank).reduce((a, b) => a + b, 0);
+    }
+
+    /**
      * Return the experience offset of the character's starting Luck score - use in Shadows Over Sol genelines
      *
      * @param {number} luck

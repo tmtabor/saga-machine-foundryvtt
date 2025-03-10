@@ -2,7 +2,8 @@ import Tagify from "../libraries/tagify.min.js";
 import { capitalize, test_label, token_actor } from "../system/utils.js";
 import { ModifierSet } from "./modifiers.js";
 import { Effect } from "./damage.js";
-import { ActionHelper } from "../item/item";
+import { ActionHelper } from "../item/item.js";
+import { CharacterHelper } from "../actor/actor.js";
 
 /**
  * Register Handlebars helpers for test dialog
@@ -69,6 +70,8 @@ export class Test {
     randomizer = null;
     total = null;
     use_pair = false;
+    stressed = 0;
+    panic = false;
 
     /**
      * Initialize test from a dataset and validate
@@ -96,6 +99,7 @@ export class Test {
         if (this.boons && !isNaN(this.boons)) this.boons = Number(this.boons); else this.boons = 0;
         if (this.banes && !isNaN(this.banes)) this.banes = Number(this.banes); else this.banes = 0;
         if (this.modifier && !isNaN(this.modifier)) this.modifier = Number(this.modifier); else this.modifier = 0;
+        if (this.stress_boons && !isNaN(this.stress_boons)) this.stress_boons = Number(this.stress_boons); else this.stress_boons = 0;
 
         // Parse the effects, if any
         if (this.effects) {
@@ -275,6 +279,29 @@ export class Test {
     }
 
     /**
+     * If Stress is being used, check for Panic
+     */
+    check_stress() {
+        // If using Stress
+        if (game.settings.get('saga-machine', 'stress')) {
+            // Get the Stressed value
+            const stressed = CharacterHelper.stress(this.actor) || 0;
+
+            // Get the Stress dice
+            const stress_dice = this.results.dice[0].results.slice(this.stress_boons * -1);
+
+            // Check for Panic
+            let panic = false;
+            for (let i of stress_dice)
+                if (i.result <= stressed) panic = true;
+
+            return [stressed, panic];
+        }
+        // Not using stress, no panic
+        else return [0, false];
+    }
+
+    /**
      * Look up the Defense or Willpower TN of the targeted token
      *
      * @returns {[number, SagaMachineActor|null, string|number]} - TN value, target actor, TN string (defense, willpower)
@@ -347,6 +374,7 @@ export class Test {
         // Make pairs and calculate the total
         [this.pairs, this.use_pair] = this.make_pairs();
         [this.total, this.randomizer, this.stat_value, this.skill_value] = this.calc_total();
+        [this.stressed, this.panic] = this.check_stress();
 
         // Determine success, critical and calculate the margin
         [this.tn, this.target, this.target_score] = this.lookup_tn();
@@ -438,9 +466,13 @@ export class Test {
 
         // Create the effect message, if any
         let effect_message = '';
+        if (this.panic) effect_message += '<div><strong>Panic:</strong> <span class="critical failure">Make a Panic test!</span></div>';
         if (this.effects)
             for (let c of this.effects)
                 effect_message += c.message;
+
+        // Get the label for Luck
+        const luck_label = game.settings.get('saga-machine', 'luck_label');
 
         // Create the tags
         let tags = '';
@@ -449,7 +481,7 @@ export class Test {
         if (this.skill && this.skill_value === 0) tags += '<span class="tag">Unskilled</span>';
         if (!!this.tags && this.tags.length) this.tags.forEach(t => tags += `<span class="tag">${t}</span>`);
         if (this.use_pair) tags += '<span class="tag">Pairs!</span>';
-        if (this.use_luck) tags += '<span class="tag">Luck</span>';
+        if (this.use_luck) tags += `<span class="tag">${luck_label}</span>`;
         if (this.edited) tags += '<span class="tag">Edited</span>';
 
         // Return the result
@@ -467,10 +499,16 @@ export class Test {
      * @returns {string}
      */
     dice_html() {
+        const use_stress = game.settings.get('saga-machine', 'stress');
         let to_return = '<ol class="dice-rolls">';
-        for (let i of this.results.dice[0].results) {
-            const discarded = i.discarded ? 'discarded' : '';
-            to_return += `<li class="roll die d10 ${discarded}">${i.result}</li>`;
+        for (let i = 0; i < this.results.dice[0].results.length; i++) {
+            const die = this.results.dice[0].results[i];
+            const discarded = die.discarded ? 'discarded' : '';
+
+            let stress = use_stress && i >= this.results.dice[0].results.length - this.stress_boons ? 'stress' : '';
+            if (use_stress && die.result <= this.stressed) stress += ' panic';
+
+            to_return += `<li class="roll die d10 ${discarded} ${stress}">${die.result}</li>`;
         }
 
         to_return += '</ol>';
@@ -686,7 +724,7 @@ export async function test_dialog(dataset, callback=null) {
                         let stat = html.find('select[name=stat] > option:selected').val();
                         let score = html.find('select[name=score] > option:selected').val();
                         let skill = html.find('select[name=skill] > option:selected').val();
-                        const {boons, banes, modifier, tags} = ModifierSet.total_modifiers(
+                        const { boons, banes, modifier, tags, stress_boons } = ModifierSet.total_modifiers(
                             ModifierSet.list_from_string(html.find('input[name=modifiers]').val())
                         );
                         const tn = html.find('input[name=tn]').val();
@@ -700,6 +738,7 @@ export async function test_dialog(dataset, callback=null) {
                             boons: boons || 0,
                             banes: banes || 0,
                             modifier: modifier || 0,
+                            stress_boons: stress_boons || 0,
                             tags: tags,
                             tn: tn || null,
                             effects: effects || null

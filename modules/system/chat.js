@@ -70,6 +70,8 @@ export async function add_push_luck(options) {
 
             // Add additional boon, mark luck tag and re-evaluate
             test.boons++;
+            if (game.settings.get('saga-machine', 'stress'))
+                test.stress_boons++;
             test.use_luck = true;
             await test.evaluate()
 

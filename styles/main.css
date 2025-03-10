@@ -1168,6 +1168,19 @@ img.system-logo {
   font-size: 0.9em;
 }
 
+.chat-message .dice-tooltip .dice-rolls .roll.stress {
+  color: #896222;
+  filter: drop-shadow(0 0 0.1rem rgba(255, 100, 0, 0.5));
+}
+
+.chat-message .dice-tooltip .dice-rolls .roll.discarded.stress {
+  filter: sepia(0.5) contrast(0.75) opacity(0.4) drop-shadow(0 0 0 rgba(255, 100, 0, 0.5));
+}
+
+.chat-message .dice-tooltip .dice-rolls .roll.stress.panic {
+  color: #aa0200;
+}
+
 /* Test Dialog */
 
 .test-dialog {
