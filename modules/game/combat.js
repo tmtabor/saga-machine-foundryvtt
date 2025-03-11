@@ -150,7 +150,7 @@ export class SagaMachineCombat extends Combat {
             }
 
             // New Round Card - prompt players to choose fast / slow turn and display statuses
-            let content = `<h3>Round ${this.round + 1}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table>`;
+            let content = `<h3>Round ${this.round}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table>`;
             for (let c of this.combatants) {
                 if (c.hidden) continue; // Don't show hidden combatants
                 const statuses = Array.from(c.actor.statuses.map(s => s.split(/\s|-/).map(w => w.capitalize()).join(' '))).sort().join(', ');
