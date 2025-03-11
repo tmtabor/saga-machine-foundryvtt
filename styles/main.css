@@ -1146,7 +1146,8 @@ img.system-logo {
   color: rgb(212, 107, 0);
 }
 
-.chat-message .critical.failure {
+.chat-message .critical.failure,
+.chat-message .panic {
   color: rgb(255, 0, 0);
 }
 

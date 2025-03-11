@@ -288,7 +288,7 @@ export class Test {
             const stressed = CharacterHelper.stress(this.actor) || 0;
 
             // Get the Stress dice
-            const stress_dice = this.results.dice[0].results.slice(this.stress_boons * -1);
+            const stress_dice = this.stress_boons ? this.results.dice[0].results.slice(this.stress_boons * -1): [];
 
             // Check for Panic
             let panic = false;
@@ -466,7 +466,7 @@ export class Test {
 
         // Create the effect message, if any
         let effect_message = '';
-        if (this.panic) effect_message += '<div><strong>Panic:</strong> <span class="critical failure">Make a Panic test!</span></div>';
+        if (this.panic) effect_message += '<div><strong>Panic:</strong> <span class="panic">Make a Panic test!</span></div>';
         if (this.effects)
             for (let c of this.effects)
                 effect_message += c.message;
