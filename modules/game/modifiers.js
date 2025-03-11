@@ -1,3 +1,5 @@
+import { system_setting } from "../system/utils.js";
+
 /**
  * Object representing a set of modifiers for a score or test
  */
@@ -125,7 +127,7 @@ export class ModifierSet {
      * @return {string}
      */
     static color(name) {
-        const use_stress = game.settings.get('saga-machine', 'stress');
+        const use_stress = system_setting('stress', false);
 
         const includes_plus = name.includes('+') || name.includes('⊕');
         const includes_minus = name.includes('-') || name.includes('⊖');

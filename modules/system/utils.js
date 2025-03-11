@@ -87,3 +87,15 @@ export function test_label(stat, skill, tn) {
 export function mock_id() {
 	return btoa(Number(Math.random()*10000).toString()).substring(1, 17)
 }
+
+/**
+ * Get the config value from the world's specified key, returning the default value if not found
+ *
+ * @param {string} key
+ * @param {*} default_value
+ * @return {*}
+ */
+export function system_setting(key, default_value=null) {
+	try { return game.settings.get('saga-machine', key); }
+	catch (e) { return default_value; }
+}

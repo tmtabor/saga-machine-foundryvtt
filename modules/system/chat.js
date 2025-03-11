@@ -1,6 +1,7 @@
 import { Test } from "../game/tests.js";
 import { Effect } from "../game/damage.js";
 import { ActionHelper } from "../item/item.js";
+import { system_setting } from "./utils.js";
 
 /**
  * Attach test data to the chat card
@@ -70,7 +71,7 @@ export async function add_push_luck(options) {
 
             // Add additional boon, mark luck tag and re-evaluate
             test.boons++;
-            if (game.settings.get('saga-machine', 'stress'))
+            if (system_setting('stress', false))
                 test.stress_boons++;
             test.use_luck = true;
             await test.evaluate()

@@ -2,6 +2,7 @@ import { test_dialog } from "../game/tests.js";
 import { ActionHelper, SagaMachineItem } from "../item/item.js";
 import { CharacterHelper } from "./actor.js";
 import { FloatingContextMenu } from "../system/contextmenu.js";
+import { system_setting } from "../system/utils.js";
 
 /**
  * ActorSheet context used in getData() and dependent methods.
@@ -773,7 +774,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		const context = super.getData();
 
 		// Add Luck label
-		context.data.system.scores.luck.label = game.settings.get('saga-machine', 'luck_label', 'Luck');
+		context.data.system.scores.luck.label = system_setting('luck_label', 'Luck');
 
 		// Add constant for Lifestyles dropdown
 		context.data.system.LIFESTYLES = LIFESTYLES;

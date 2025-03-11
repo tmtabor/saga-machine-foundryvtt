@@ -1,5 +1,5 @@
 import Tagify from "../libraries/tagify.min.js";
-import { capitalize, test_label, token_actor } from "../system/utils.js";
+import { capitalize, system_setting, test_label, token_actor } from "../system/utils.js";
 import { ModifierSet } from "./modifiers.js";
 import { Effect } from "./damage.js";
 import { ActionHelper } from "../item/item.js";
@@ -283,7 +283,7 @@ export class Test {
      */
     check_stress() {
         // If using Stress
-        if (game.settings.get('saga-machine', 'stress')) {
+        if (system_setting('stress', false)) {
             // Get the Stressed value
             const stressed = CharacterHelper.stress(this.actor) || 0;
 
@@ -472,7 +472,7 @@ export class Test {
                 effect_message += c.message;
 
         // Get the label for Luck
-        const luck_label = game.settings.get('saga-machine', 'luck_label');
+        const luck_label = system_setting('luck_label', 'Luck');
 
         // Create the tags
         let tags = '';
@@ -499,7 +499,7 @@ export class Test {
      * @returns {string}
      */
     dice_html() {
-        const use_stress = game.settings.get('saga-machine', 'stress');
+        const use_stress = system_setting('stress', false);
         let to_return = '<ol class="dice-rolls">';
         for (let i = 0; i < this.results.dice[0].results.length; i++) {
             const die = this.results.dice[0].results[i];

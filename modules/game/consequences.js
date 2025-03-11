@@ -1,3 +1,5 @@
+import { system_setting } from "../system/utils.js";
+
 /**
  * Put the standard Saga Machine consequences in the formated expected for Foundry status effects
  *
@@ -7,7 +9,7 @@ export const generate_conditions = () => {
     const system_conditions = [];
     const standard_consequences = ['Bleeding', 'Bolstered', 'Dazed', 'Defeated', 'Desire', 'Disabled', 'Dying', 'Fatigue',
       'Fear', 'Fixation', 'Grave Wound', 'Hidden', 'Hindered', 'Prone', 'Stunned', 'Wound'];
-    const use_stress = game.settings.get('saga-machine', 'stress');
+    const use_stress = system_setting('stress', false);
     if (use_stress) standard_consequences.splice(14, 0, 'Stressed');
 
     // Generate and append an object for each consequence

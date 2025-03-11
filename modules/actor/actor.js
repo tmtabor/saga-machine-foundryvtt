@@ -1,7 +1,7 @@
 import { INITIATIVE } from "../game/combat.js";
 import { Test } from "../game/tests.js";
 import { standard_consequence } from "../game/consequences.js";
-import { median } from "../system/utils.js";
+import { median, system_setting } from "../system/utils.js";
 import { Effect, WoundFactory } from "../game/damage.js";
 import { ModifierSet } from "../game/modifiers.js";
 import { ActionHelper } from "../item/item";
@@ -631,7 +631,7 @@ export class CharacterHelper {
             stats += CharacterHelper.stat_cost(actor.system.stats[stat].value);
 
         // Subtract the cost of the character's starting stats, based on power level
-        stats -= game.settings.get('saga-machine', 'level', 120);
+        stats -= system_setting('level', 120);
 
 
         // Add total of all skills and traits
@@ -655,7 +655,7 @@ export class CharacterHelper {
      * @returns {string}
      */
     static power_level(actor) {
-        const total_spent = actor.system.experiences.spent + game.settings.get('saga-machine', 'level', 120);
+        const total_spent = actor.system.experiences.spent + system_setting('level', 120);
 
         if (total_spent < 150)        return "Mundane";
         else if (total_spent < 200)   return "Novice";
