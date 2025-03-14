@@ -112,7 +112,7 @@ export async function add_apply_damage(options) {
 
             // For all valid actors
             for (let token of valid_tokens) {
-                let actor = token?.document?.actor;
+                let actor = token?.document?.actor || token;
                 if (actor && actor.isOwner) {
                     // Is the first hit a critical hit?
                     let critical = !!html.find('.critical').length;
