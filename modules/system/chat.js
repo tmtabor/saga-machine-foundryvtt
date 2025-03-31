@@ -107,7 +107,7 @@ export async function add_apply_damage(options) {
             if (!tokens.length && game.user.isGM) { ui.notifications.warn("No valid character selected."); return; }
 
             // Filter for owned token actors, falling back to player character is none are selected
-            let valid_tokens = tokens.filter(t => t?.document?.actor?.isOwner)
+            let valid_tokens = tokens.filter(t => t?.document?.actor?.isOwner);
             if (!valid_tokens.length && game.user.character) valid_tokens = [game.user.character];
 
             // For all valid actors
