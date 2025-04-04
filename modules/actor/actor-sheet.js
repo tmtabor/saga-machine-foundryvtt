@@ -41,6 +41,7 @@ Hooks.once("init", async () => {
 	Handlebars.registerHelper("is_wearable",
 		item => item.system.group.toLowerCase() === 'armors' || item.system.group.toLowerCase() === 'apparel');
 	Handlebars.registerHelper("has_uses", item => Number.isFinite(parseInt(item.system.uses)));
+	Handlebars.registerHelper('if_equal', (arg1, arg2, options) => arg1 === arg2 ? options.fn(this) : options.inverse(this));
 
 	// Register handlebars partials
 	await loadTemplates([

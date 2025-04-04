@@ -67,7 +67,7 @@ export class SagaMachineItem extends Item {
         }
 
         this.system.container = this.property_value('Container');
-        this.system.armor = this.property_value('Armor');
+        this.system.armor = ItemHelper.calc_armor(this);
         this.system.bulky = this.property_value('Bulky');
         this.system.parry = this.property_value('Parry');
         this.system.powered = this.property_value('Powered');
@@ -363,5 +363,17 @@ export class ItemHelper {
      */
     static calc_loads(item) {
         return Math.floor(item.system.unit_loads * item.system.quantity);
+    }
+
+    /**
+     * Calculate the armor value of the item based on uses and Armor property
+     *
+     * @param {SagaMachineItem} item
+     * @return {number}
+     */
+    static calc_armor(item) {
+        if (item.system.group !== 'Armors') return 0;
+        else if (Number.isFinite(parseInt(item.system.uses))) return parseInt(item.system.uses);
+        else return item.property_value('Armor') || 0;
     }
 }

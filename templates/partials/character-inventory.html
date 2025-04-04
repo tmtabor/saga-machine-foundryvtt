@@ -17,7 +17,12 @@
                 <li class="item flexrow items-header" {{#if items.container }}data-id="{{items.container.id}}" data-type="Item" data-uuid="{{items.container.uuid}}"{{/if}}>
                     <div class="item-name">{{ items.name }}{{#if items.container }} ({{ items.encumbrance }}/{{ items.max }}){{/if}}</div>
                     <div class="item-name">{{#if items.container }}{{ items.container.system.properties }}{{else}}Properties{{/if}}</div>
-                    <div class="item-prop">Uses</div>
+                    <div class="item-prop">
+                        {{#if_equal items.name "Weapons" }}Shots
+                        {{else}}{{#if_equal items.name "Armors" }}Armor
+                        {{else}}Uses{{/if_equal}}
+                        {{/if_equal}}
+                    </div>
                     <div class="item-prop">Quantity</div>
                     <div class="item-controls container">
                         {{#if items.container }}
@@ -71,6 +76,7 @@
                 <li class="item flexrow items-header">
                     <div class="item-name">Equipment</div>
                     <div class="item-name">Properties</div>
+                    <div class="item-prop">Uses</div>
                     <div class="item-prop">Quantity</div>
                     <div class="item-controls">
                         <a class="item-control item-create" title="Create item" data-type="item"><i class="fas fa-plus"></i> Add</a>
