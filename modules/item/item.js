@@ -157,12 +157,12 @@ export class ActionHelper {
         if (strength == null) return true;
         const damage = ActionHelper.damage(dataset);                                  // Get the attack's damage
         const properties = ActionHelper.parse_properties(dataset.properties);
-        const light = ActionHelper.property_value(properties, 'Light');       // Get the Light X property, if any
+        const str = ActionHelper.property_value(properties, 'Str');       // Get the Str X property, if any
         const hands = ActionHelper.property_value(properties, 'Hands');  // Get the Hands X property
 
         // Check to see if the strength requirement is met
-        if (hands >= 2) return strength >= (light || (damage / 2))
-        else return strength >= (light || damage)
+        if (hands >= 2) return strength >= (str || (damage / 2))
+        else return strength >= (str || damage)
     }
 
     /**
