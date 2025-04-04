@@ -56,7 +56,9 @@
                 <input class="item-input" type="checkbox" name="system.carried" {{ checked data.system.carried }} />
                 <label class="item-label">Equipped</label>
                 <input class="item-input" type="checkbox" name="system.equipped" {{ checked data.system.equipped }} />
-                <label class="item-label">Load</label>
+                <label class="item-label">Uses</label>
+                <input class="item-input" type="number" name="system.uses" value="{{ data.system.uses }}" step="1" />
+                <label class="item-label" title="This an entire load of items intended as trade goods">Bulk Load</label>
                 <input class="item-input" type="checkbox" name="system.load" {{ checked data.system.load }} />
             </div>
         </div>

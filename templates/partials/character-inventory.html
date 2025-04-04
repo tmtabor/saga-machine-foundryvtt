@@ -17,6 +17,7 @@
                 <li class="item flexrow items-header" {{#if items.container }}data-id="{{items.container.id}}" data-type="Item" data-uuid="{{items.container.uuid}}"{{/if}}>
                     <div class="item-name">{{ items.name }}{{#if items.container }} ({{ items.encumbrance }}/{{ items.max }}){{/if}}</div>
                     <div class="item-name">{{#if items.container }}{{ items.container.system.properties }}{{else}}Properties{{/if}}</div>
+                    <div class="item-prop">Uses</div>
                     <div class="item-prop">Quantity</div>
                     <div class="item-controls container">
                         {{#if items.container }}
@@ -40,6 +41,11 @@
                         </h4>
 
                         <div class="item-name">{{item.system.properties}}</div>
+                        {{#if (has_uses item) }}
+                            <input class="item-input item-prop" type="number" data-name="system.uses" value="{{ item.system.uses }}" step="1" data-dtype="Number" />
+                        {{else}}
+                            <div class="item-prop">&nbsp;</div>
+                        {{/if}}
                         <input class="item-input item-prop" type="number" data-name="system.quantity" value="{{ item.system.quantity }}" step="1" data-dtype="Number" />
                         <div class="item-controls">
                             {{#if (is_weapon item) }}

@@ -279,6 +279,7 @@
       "templates": ["basics", "actions"],
       "parent": null,
       "quantity": 1,
+      "uses": null,
       "properties": [],
       "group": "",
       "carried": true,
