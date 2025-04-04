@@ -99,7 +99,7 @@ export class SagaMachineActor extends Actor {
      */
     armor_properties() {
         const equipped_armor = this.items.filter(item => item.type === 'item' &&
-            item.system.group === 'Armor' && item.system.equipped);
+            item.system.group === 'Armors' && item.system.equipped);
         let highest = {
             'Armor': 0,
             'Bulky': 0,
