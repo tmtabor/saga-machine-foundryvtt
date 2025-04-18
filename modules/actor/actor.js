@@ -641,7 +641,7 @@ export class CharacterHelper {
             if (item.type === 'skill') skills += CharacterHelper.stat_cost(item.system.rank, item.system.free_ranks);
             if (item.type === 'trait') traits += item.system.ranked ? item.system.cost * item.system.rank : item.system.cost;
         }
-        let luck = CharacterHelper.luck_cost(actor.system.scores.luck.max);
+        let luck = system_setting('luck_exp', false) ? CharacterHelper.luck_cost(actor.system.scores.luck.max) : 0;
 
         const total = stats + skills + traits + luck;
 
