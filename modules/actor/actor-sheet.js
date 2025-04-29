@@ -37,7 +37,7 @@ import { system_setting } from "../system/utils.js";
 Hooks.once("init", async () => {
 	// Register handlebars helpers
 	Handlebars.registerHelper("is_GM", () => game.user.isGM);
-	Handlebars.registerHelper("is_weapon", item => item.system.group.toLowerCase() === 'weapons');
+	Handlebars.registerHelper("is_weapon", item => item?.system?.group?.toLowerCase() === 'weapons');
 	Handlebars.registerHelper("is_wearable",
 		item => item.system.group.toLowerCase() === 'armors' || item.system.group.toLowerCase() === 'apparel');
 	Handlebars.registerHelper("has_uses", item => Number.isFinite(parseInt(item.system.uses)));
@@ -187,8 +187,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	gather_actions(context) {
 		const actions = this.items(context, 'action');
-		const action_items = context.actor.items.filter(item => item.system.actions?.length &&
-			(item.system.equipped || item.system.equipped === undefined));
+		const action_items = context.actor.items.filter(item => item.system.actions?.length);
 
 		for (let item of action_items)
 			for (let action of item.system.actions)
@@ -988,7 +987,8 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	 */
 	async on_item_equip(event) {
 		const box = $(event.currentTarget).parents(".item");
-		const item = this.actor.items.get(box.data("id"));
+		let item = this.actor.items.get(box.data("id"));
+		if (!item) item = this.actor.items.get(box.data("parentId"));
 		const update = {_id: item.id, 'system.equipped': !item.system.equipped};
 		this.actor.updateEmbeddedDocuments("Item", [update]);
 	}
