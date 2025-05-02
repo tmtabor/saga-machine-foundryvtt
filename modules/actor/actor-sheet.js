@@ -187,7 +187,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	gather_actions(context) {
 		const actions = this.items(context, 'action');
-		const action_items = context.actor.items.filter(item => item.system.actions?.length);
+		const action_items = context.actor.items.filter(item => item.system.actions?.length && !item.system.parent);
 
 		for (let item of action_items)
 			for (let action of item.system.actions)
