@@ -528,7 +528,44 @@ export class SagaMachineActorSheet extends ActorSheet {
 		if (!item_id) return;
 		const item = this.actor.items.get(item_id);
 		if (!item) return;
-		this.to_chat(item);
+
+		// Check for actions associated with the item
+		if (item.system.actions && item.system.actions.length) {
+			let actions = [];
+			for (let action of item.system.actions)
+				actions.push(new SagaMachineItem(action, {parent: item, parentCollection: item.collection}));
+			let buttons = {
+				display: {
+					icon: `<img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display ${item.name}">`,
+					label: 'Display in Chat',
+					callback: () => this.to_chat(item)
+				}
+			};
+			for (let action of actions)
+				buttons[`do_${action.name}`] = {
+					icon: `<img class="item-img" src="${item.img}" title="${item.name}">`,
+					label: action.name,
+					callback: () => this.on_test(event, {
+						type: "Test",
+						option: action.system.attack_option,
+						stat: action.system.stat,
+						skill: action.system.skill,
+						tn: action.system.tn,
+						modifiers: action.system.modifiers,
+						properties: action.system.properties,
+						effects: action.sheet.effects_str
+					})
+				};
+			new Dialog({
+				title: `Choose Action`,
+				content: `<p>What would you like to do?</p>`,
+				buttons: buttons,
+				default: 'Yes'
+			}).render(true);
+		}
+
+		// If no actions, just display the chat card
+		else this.to_chat(item);
 	}
 
 	/**
@@ -740,12 +777,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 * When a roll label is clicked, open the test dialog
 	 *
 	 * @param event
+	 * @param {null|{}} dataset
 	 * @returns {Promise<void>}
 	 */
-	async on_test(event) {
+	async on_test(event, dataset = null) {
 		event.preventDefault();
-		this.attach_uuid(event.currentTarget.dataset);		// Attach IDs to the dataset
-		let dataset = await CharacterHelper.merge_attack_option(event.currentTarget.dataset); // Merge attack option, if necessary
+		if (!dataset) dataset = event.currentTarget.dataset;
+		this.attach_uuid(dataset);		// Attach IDs to the dataset
+		dataset = await CharacterHelper.merge_attack_option(dataset); // Merge attack option, if necessary
 
 		await test_dialog(dataset);		// Show the dialog
 	}
