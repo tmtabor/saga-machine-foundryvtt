@@ -151,7 +151,7 @@ export class SagaMachineItemSheet extends ItemSheet {
         const id = box.data("id");
         const name = box.data("name");
         const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
-        if (effect) effect.sheet.render(true);
+        if (effect) effect.sheet.render({ force: true });
     }
 
     /**
@@ -165,8 +165,9 @@ export class SagaMachineItemSheet extends ItemSheet {
         const id = box.data("id");
         const name = box.data("name");
         const effect = id ? this.item.effects.get(id) : this.item.effects.getName(name);
-        effect.delete();
-        box.slideUp(200, () => this.render(false));
+        await effect.delete();
+        if (box && box.length) box[0].style.display = 'none';
+        await this.render();
     }
 
     /**
@@ -226,7 +227,7 @@ export class SagaMachineItemSheet extends ItemSheet {
         if (index > this.item.system.actions.length) return;
         const action = new SagaMachineItem(this.item.system.actions[index],
             { parent: this.item, parentCollection: this.item.collection });
-        action.sheet.render(true);
+        action.sheet.render({ force: true });
     }
 
     /**

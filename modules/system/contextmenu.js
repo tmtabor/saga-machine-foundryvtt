@@ -18,9 +18,12 @@ export class FloatingContextMenu extends ContextMenu {
      * Stores the pageX / pageY position from the  JQuery event to be applied in `_setPosition`.
      */
     bind() {
-        this.element.on(this.eventName, this.selector, (event) => {
-            event.preventDefault();
-            const { right, bottom } = event.currentTarget.getBoundingClientRect();
+        const el = this.element instanceof HTMLElement ? this.element : (this.element?.[0] ?? document.body);
+        el.addEventListener(this.eventName, (ev) => {
+            const t = ev.target instanceof Element ? ev.target.closest(this.selector) : null;
+            if (!t) return;
+            ev.preventDefault();
+            const { right, bottom } = t.getBoundingClientRect();
             this._position = { left: right, top: bottom };
         });
         super.bind();
@@ -34,11 +37,16 @@ export class FloatingContextMenu extends ContextMenu {
      * @private
      */
     _setPosition(html, _target) {
-        const target = $('body');
-        super._setPosition(html, target);
-        target.css('position', 'fixed');
-        html.css(this.defaultStyle); //apply the default style
-        this._position.left -= this.menu.width() ?? 0; //calculate the final position
-        html.css(this._position); //set the absolute position
+        const el = html instanceof HTMLElement ? html : (html?.[0] ?? null);
+        if (!el) return;
+        // Apply default style and fixed positioning
+        Object.assign(el.style, this.defaultStyle);
+        el.style.position = 'fixed';
+        // Calculate final position based on stored anchor and menu width
+        const menuWidth = this.menu?.offsetWidth ?? el.offsetWidth ?? 0;
+        const left = Math.max(0, (this._position.left ?? 0) - menuWidth);
+        const top = Math.max(0, (this._position.top ?? 0));
+        el.style.left = `${left}px`;
+        el.style.top = `${top}px`;
     }
 }

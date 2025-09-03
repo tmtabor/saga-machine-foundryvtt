@@ -268,7 +268,7 @@ export async function add_edit_test(options) {
                         }
                     }
                 }
-            }).render(true);
+            }).render({ force: true });
         }
     });
 }

@@ -760,5 +760,5 @@ export async function test_dialog(dataset, callback=null) {
             }
         },
         default: "roll"
-    }).render(true, { width: 450 });
+    }).render({ force: true, width: 450 });
 }

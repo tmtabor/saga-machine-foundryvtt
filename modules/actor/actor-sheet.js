@@ -404,7 +404,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 		};
 
 		// Finally, create the item!
-		return await Item.create(itemData, {parent: this.actor});
+		const created = await this.actor.createEmbeddedDocuments("Item", [itemData]);
+		return created?.[0];
 	}
 
 	/**
@@ -416,7 +417,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 	async on_item_edit(event) {
 		const box = $(event.currentTarget).parents(".item");
 		const item = this.actor.items.get(box.data("id"));
-		item.sheet.render(true);
+		item.sheet.render({ force: true });
 	}
 
 	/**
@@ -435,8 +436,9 @@ export class SagaMachineActorSheet extends ActorSheet {
 				'system.parent': null
 			})));
 		}
-		item.delete();
-		box.slideUp(200, () => this.render(false));
+		await item.delete();
+		if (box && box.length) box[0].style.display = 'none';
+		await this.render();
 	}
 
 	/**
@@ -475,7 +477,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 			if (index > parent.system.actions.length || index < 0) return;
 			const action = new SagaMachineItem(parent.system.actions[index],
 				{ parent: parent, parentCollection: parent.collection });
-			action.sheet.render(true);
+				action.sheet.render({ force: true });
 		}
 	}
 
@@ -556,12 +558,12 @@ export class SagaMachineActorSheet extends ActorSheet {
 						effects: action.sheet.effects_str
 					})
 				};
-			new Dialog({
+ 		new Dialog({
 				title: `Choose Action`,
 				content: `<p>What would you like to do?</p>`,
 				buttons: buttons,
 				default: 'Yes'
-			}).render(true);
+			}).render({ force: true });
 		}
 
 		// If no actions, just display the chat card
@@ -579,9 +581,8 @@ export class SagaMachineActorSheet extends ActorSheet {
 				name: 'Origin',
 				icon: '<img class="menu-img" src="systems/saga-machine/images/defaults/origin.svg" />',
 				condition: true,
-				callback: (i) => {
-					Item.create({name: 'New Origin', type: 'origin'}, { parent: this.actor });
-					//alert('Now?');
+				callback: async (i) => {
+					await this.actor.createEmbeddedDocuments("Item", [{ name: 'New Origin', type: 'origin' }]);
 					console.log(this);
 					return true;
 				}
@@ -590,13 +591,13 @@ export class SagaMachineActorSheet extends ActorSheet {
 				name: 'Path',
 				icon: '<img class="menu-img" src="systems/saga-machine/images/defaults/path.svg" />',
 				condition: true,
-				callback: (i) => {
-					Item.create({name: 'New Path', type: 'path'}, { parent: this.actor });
+				callback: async (i) => {
+					await this.actor.createEmbeddedDocuments("Item", [{ name: 'New Path', type: 'path' }]);
 				}
       		}
 		];
 
-		new FloatingContextMenu(html, '.origins-add', items, { eventName: 'click' });
+		new FloatingContextMenu(html?.[0] ?? html, '.origins-add', items, { eventName: 'click' });
 	}
 
 	/**
@@ -621,7 +622,7 @@ export class SagaMachineActorSheet extends ActorSheet {
 		}).on({
 			'dragstart': function (e) {
 				e.stopPropagation();
-				let dt = e.originalEvent.dataTransfer;
+				let dt = (e.originalEvent && e.originalEvent.dataTransfer) ? e.originalEvent.dataTransfer : e.dataTransfer;
 				if (dt) {
 					dt.effectAllowed = 'move';
 					dt.setData('text/html', '');
@@ -637,14 +638,14 @@ export class SagaMachineActorSheet extends ActorSheet {
 	 */
 	attach_drop_events(html) {
 		// Handle drop events for containers and item groups
-		html.find('.item-group').on('drop', async event => {
-			// Get the drag event data
-			let data = null;
-			try {
-				data = JSON.parse(event.originalEvent.dataTransfer.getData("text"));
-			} catch (error) {
-			}
-			if (!data || !data.uuid || data.type !== 'Item') return;
+			html.find('.item-group').on('drop', async event => {
+				// Get the drag event data
+				let data = null;
+				try {
+					data = JSON.parse((event.dataTransfer || event.originalEvent?.dataTransfer).getData("text/plain"));
+				} catch (error) {
+				}
+				if (!data || !data.uuid || data.type !== 'Item') return;
 
 			// Get the item being dropped
 			const drop_item = await fromUuid(data.uuid);
@@ -1055,7 +1056,7 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		event.preventDefault();
 		const box = $(event.currentTarget).closest(".item");
 		const item = this.actor.items.get(box.data("id"));
-		item.sheet.render(true);
+		item.sheet.render({ force: true });
 	}
 }
 
@@ -1253,10 +1254,10 @@ export class VehicleSheet extends SagaMachineActorSheet {
 		// Get the drag event data
 		let data = null;
 		try {
-			data = JSON.parse(event.originalEvent?.dataTransfer?.getData("text"));
-		} catch (error) {
-		}
-		if (!data || !data.uuid || data.type !== 'Actor') return;
+				data = JSON.parse((event.dataTransfer || event.originalEvent?.dataTransfer)?.getData("text/plain"));
+			} catch (error) {
+			}
+			if (!data || !data.uuid || data.type !== 'Actor') return;
 
 		// Get the actor being dropped
 		const drop_actor = await fromUuid(data.uuid);
@@ -1270,7 +1271,7 @@ export class VehicleSheet extends SagaMachineActorSheet {
 	async open_crewman(event) {
 		const uuid = $(event.currentTarget).data("uuid");
 		const crewman = await fromUuid(uuid);
-		crewman.sheet.render(true);
+		crewman.sheet.render({ force: true });
 	}
 
 	/**

@@ -351,7 +351,7 @@ export class SagaMachineActor extends Actor {
                 }
             },
             default: 'Confirm'
-        }).render(true);
+        }).render({ force: true });
     }
 
     /*****************

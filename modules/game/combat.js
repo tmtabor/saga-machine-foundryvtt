@@ -224,7 +224,7 @@ export class SagaMachineCombat extends Combat {
                 }
             },
             default: 'Yes'
-        }).render(true);
+        }).render({ force: true });
     }
 }
 

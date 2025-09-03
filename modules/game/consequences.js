@@ -239,7 +239,7 @@ export async function add_effect_from_ui(effect) {
                     }
                 },
                 default: 'Confirm'
-            }).render(true);
+            }).render({ force: true });
 
         // Prompt for consequence value
         if (effect?.flags?.system?.value_prompt)
