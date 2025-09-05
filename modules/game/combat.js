@@ -150,7 +150,7 @@ export class SagaMachineCombat extends Combat {
             }
 
             // New Round Card - prompt players to choose fast / slow turn and display statuses
-            let content = `<h3>Round ${this.round}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table>`;
+            let content = `<h3>Round ${this.round}</h3><p><strong>Choose a Fast or Slow turn now!</strong></p><table class="sm-table">`;
             for (let c of this.combatants) {
                 if (c.hidden) continue; // Don't show hidden combatants
                 const statuses = Array.from(c.actor.statuses.map(s => s.split(/\s|-/).map(w => w.capitalize()).join(' '))).sort().join(', ');
@@ -160,7 +160,7 @@ export class SagaMachineCombat extends Combat {
             await ChatMessage.create({content: content});
 
             // Whisper all defenses to GM
-            content = '<h4><strong>Defenses This Round</strong></h4><table>';
+            content = '<h4><strong>Defenses This Round</strong></h4><table class="sm-table">';
             for (let c of this.combatants)
                 content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${this.chase_label(c.actor)}</td><td>Willpower ${this.chase_label(c.actor, true)}</td></tr>`;
             content += '</table>';
@@ -229,44 +229,47 @@ export class SagaMachineCombat extends Combat {
 }
 
 /**
- * Modified combat tracker that includes a fast/slow turn toggle
+ * Hook to modify combat tracker with a fast/slow turn toggle
  *
- * @inheritDoc
  */
-export class SagaMachineCombatTracker extends CombatTracker {
-    /**
-     * @inheritDoc
-     * @param html
-     */
-    activateListeners(html) {
-        const combatants = this.viewed?.combatants;
+Hooks.on('renderCombatTracker', (app, element) => {
+    try {
+        const combatants = app.viewed?.combatants;
+        const root = element instanceof HTMLElement ? element : (element?.[0] ?? null);
+        if (!root || !combatants) return;
 
-        // For each combatant in the tracker, change the initiative selector
-        html.find('.combatant').each((i, el) => {
+        // Update each combatant's initiative display
+        const nodes = root.querySelectorAll('.combatant');
+        nodes.forEach((el) => {
             const combatant_id = el.getAttribute('data-combatant-id');
             const combatant = combatants.get(combatant_id);
             if (!combatant) return;
 
-            const initiative = combatant.isNPC ? 'NPC' :
-                (combatant.actor?.system?.fast_turn ? 'FAST' : 'SLOW');
-
-            el.getElementsByClassName('token-initiative')[0].innerHTML =
-                `<a class="combatant-control dlturnorder" title="Change Turn">${initiative}</a>`;
-        });
-
-        super.activateListeners(html);
-
-        // When the turn type is clicked in the tracker, toggle the type, unless NPC
-        html.find('.dlturnorder').click(async ev => {
-            const li = ev.currentTarget.closest('li');
-            const combatant_id = li.dataset.combatantId;
-            const combatant = combatants.get(combatant_id);
-            if (!combatant || combatant.isNPC) return;
-
-            if (game.user.isGM || combatant.actor.isOwner) {
-                await combatant.actor.update({'system.fast_turn': !combatant.actor.system.fast_turn});
-                if (this.viewed) this.viewed.setupTurns();
+            const initiative = combatant.isNPC ? 'NPC' : (combatant.actor?.system?.fast_turn ? 'FAST' : 'SLOW');
+            const tokenInit = el.querySelector('.token-initiative');
+            if (tokenInit) {
+                tokenInit.innerHTML = `<a class="combatant-control dlturnorder" title="Change Turn">${initiative}</a>`;
             }
         });
+
+        // Toggle fast/slow on click for PCs
+        const toggles = root.querySelectorAll('.dlturnorder');
+        toggles.forEach((anchor) => {
+            anchor.addEventListener('click', async (ev) => {
+                ev.preventDefault();
+                const li = (ev.currentTarget instanceof Element) ? ev.currentTarget.closest('li') : null;
+                const combatant_id = li?.dataset?.combatantId;
+                if (!combatant_id) return;
+                const combatant = combatants.get(combatant_id);
+                if (!combatant || combatant.isNPC) return;
+
+                if (game.user.isGM || combatant.actor?.isOwner) {
+                    await combatant.actor.update({ 'system.fast_turn': !combatant.actor.system.fast_turn });
+                    if (app.viewed) app.viewed.setupTurns();
+                }
+            });
+        });
+    } catch (err) {
+        console.error('SagaMachine renderCombatTracker hook error:', err);
     }
-}
+});

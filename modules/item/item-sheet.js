@@ -47,7 +47,7 @@ export const ITEM_AVAILABILITY = {
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SagaMachineItemSheet extends ItemSheet {
+export class SagaMachineItemSheet extends foundry.appv1.sheets.ItemSheet {
     /**********************************
      * METHODS THAT SET BASIC OPTIONS *
      **********************************/

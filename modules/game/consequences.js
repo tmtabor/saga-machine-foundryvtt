@@ -272,7 +272,7 @@ export async function add_effect_from_ui(effect) {
                     }
                 },
                 default: 'Confirm'
-            }).render(true);
+            }).render({ force: true });
 
         // Add a copy to the actor
         [consequence] = await actor.createEmbeddedDocuments('Item', [consequence]);
@@ -329,7 +329,7 @@ export function prompt_on_effect_deletion(effect) {
                     }
                 },
                 default: 'Confirm'
-            }).render(true);
+            }).render({ force: true });
 
             return false;
         }

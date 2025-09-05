@@ -102,7 +102,7 @@ export const VEHICLE_HANDLING = {
  * Extend Foundry's ActorSheet with modifications to support the Saga Machine system.
  * This is a base class that's meant to be extended for specific actor types.
  */
-export class SagaMachineActorSheet extends ActorSheet {
+export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
 
 	/**********************************
 	 * METHODS THAT SET BASIC OPTIONS *

@@ -1,7 +1,7 @@
 /**
  * Subclass of Foundry's ContextMenu that gets over overflow issues in sheets
  */
-export class FloatingContextMenu extends ContextMenu {
+export class FloatingContextMenu extends foundry.applications.ux.ContextMenu.implementation {
     _position = {};
     defaultStyle = {
         'position': 'absolute',

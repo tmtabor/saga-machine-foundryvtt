@@ -281,7 +281,7 @@ img.system-logo {
   -ms-flex: 0;
   flex: 0;
   align-items: center;
-  height: 20px;
+  height: 21px;
   background: #11114a;
   box-shadow: 0 -1px 1px rgb(0 0 0 / 25%);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -289,9 +289,13 @@ img.system-logo {
   position: relative;
   margin: 0px;
   padding: 0 110px 0 0;
-  color: #dcb95f;
+  /*color: #dcb95f;*/
   text-shadow: 2px 2px black;
   text-rendering: optimizeLegibility;
+}
+
+.saga-machine.actor .tabs .item {
+  color: #dcb95f;
 }
 
 .saga-machine.actor .tabs .item.active {
@@ -650,6 +654,7 @@ img.system-logo {
   flex: none;
   color: #191813;
   min-height: 32px;
+  height: 33px;
 }
 
 .saga-machine .initiative div.grouping {
@@ -665,10 +670,17 @@ img.system-logo {
   margin-left: 5px;
 }
 
+.saga-machine .initiative div.grouping.defense > label {
+  position: relative;
+  top: -5px;
+}
+
 .saga-machine .initiative select {
   background: rgba(255, 255, 255, 0.35);
   width: 150px;
   margin-left: 5px;
+  position: relative;
+  top: -5px;
 }
 
 .saga-machine .initiative a {
@@ -704,6 +716,7 @@ img.system-logo {
   display: inline-block;
   position: relative;
   top: 3px;
+  height: 26px;
   padding: 0 5px 0 0;
   border: 1px solid var(--color-border-light-tertiary);
   background: rgba(255, 255, 255, 0.35);
@@ -1115,6 +1128,10 @@ img.system-logo {
 }
 
 /* Chat Card Styles */
+
+.chat-message .sm-table {
+  font-size: 0.9em;
+}
 
 .chat-message .flavor-text > header.item-header {
   margin: 10px 0 0 0;

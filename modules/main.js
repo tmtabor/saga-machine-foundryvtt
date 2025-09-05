@@ -1,6 +1,6 @@
 import { SagaMachineActor } from "./actor/actor.js";
 import { CharacterSheet, StashSheet, VehicleSheet } from "./actor/actor-sheet.js";
-import { SagaMachineCombat, SagaMachineCombatant, SagaMachineCombatTracker } from "./game/combat.js";
+import { SagaMachineCombat, SagaMachineCombatant } from "./game/combat.js";
 import { generate_conditions } from "./game/consequences.js";
 import { SagaMachineItem } from "./item/item.js";
 import { SkillSheet, TraitSheet, OriginSheet, PathSheet, ConsequenceSheet, PhysicalItemSheet, AmbitionSheet,
@@ -32,11 +32,10 @@ Hooks.once("init", async () => {
     CONFIG.Item.documentClass = SagaMachineItem;
     CONFIG.Combatant.documentClass = SagaMachineCombatant
     CONFIG.Combat.documentClass = SagaMachineCombat
-    CONFIG.ui.combat = SagaMachineCombatTracker
 
     // Unregister the core sheets
-    Actors.unregisterSheet("core", ActorSheet);
-    Items.unregisterSheet("core", ItemSheet);
+    Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+    Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
 
     // Register Saga Machine sheet classes
     Actors.registerSheet("saga-machine", CharacterSheet, { types: ["character"], makeDefault: true });
