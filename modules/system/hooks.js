@@ -212,16 +212,16 @@ export async function hotbar_drop(bar, data, slot) {
 }
 
 /**
- * Run when a chat card is displayed: Hooks.on('renderChatMessage')
+ * Run when a chat card is displayed: Hooks.on('renderChatMessageHTML')
  *
- * @param {ChatMessage} app
- * @param {jQuery} html
- * @param msg
+ * @param {ChatMessage} message
+ * @param {HTMLElement} html
+ * @param data
  * @return {Promise<void>}
  */
-export async function render_chat_message(app, html, msg) {
-    // Attach test data to the chat card
-    await attach_test_data(html);
+export async function render_chat_message(message, html, data) {
+    // Attach test data to the chat card (wrap HTMLElement as jQuery)
+    await attach_test_data($(html));
 }
 
 /**

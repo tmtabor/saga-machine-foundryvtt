@@ -34,21 +34,21 @@ Hooks.once("init", async () => {
     CONFIG.Combat.documentClass = SagaMachineCombat
 
     // Unregister the core sheets
-    Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
-    Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
+    foundry.documents.collections.Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+    foundry.documents.collections.Items.unregisterSheet("core", foundry.appv1.sheets.ItemSheet);
 
     // Register Saga Machine sheet classes
-    Actors.registerSheet("saga-machine", CharacterSheet, { types: ["character"], makeDefault: true });
-    Actors.registerSheet("saga-machine", StashSheet, { types: ["stash"], makeDefault: true });
-    Actors.registerSheet("saga-machine", VehicleSheet, { types: ["vehicle"], makeDefault: true });
-    Items.registerSheet("saga-machine", SkillSheet, { types: ["skill"], makeDefault: true });
-    Items.registerSheet("saga-machine", TraitSheet, { types: ["trait"], makeDefault: true });
-    Items.registerSheet("saga-machine", OriginSheet, { types: ["origin"], makeDefault: true });
-    Items.registerSheet("saga-machine", PathSheet, { types: ["path"], makeDefault: true });
-    Items.registerSheet("saga-machine", ConsequenceSheet, { types: ["consequence"], makeDefault: true });
-    Items.registerSheet("saga-machine", PhysicalItemSheet, { types: ["item"], makeDefault: true });
-    Items.registerSheet("saga-machine", AmbitionSheet, { types: ["ambition"], makeDefault: true });
-    Items.registerSheet("saga-machine", ActionSheet, { types: ["action"], makeDefault: true });
+    foundry.documents.collections.Actors.registerSheet("saga-machine", CharacterSheet, { types: ["character"], makeDefault: true });
+    foundry.documents.collections.Actors.registerSheet("saga-machine", StashSheet, { types: ["stash"], makeDefault: true });
+    foundry.documents.collections.Actors.registerSheet("saga-machine", VehicleSheet, { types: ["vehicle"], makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("saga-machine", SkillSheet, { types: ["skill"], makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("saga-machine", TraitSheet, { types: ["trait"], makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("saga-machine", OriginSheet, { types: ["origin"], makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("saga-machine", PathSheet, { types: ["path"], makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("saga-machine", ConsequenceSheet, { types: ["consequence"], makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("saga-machine", PhysicalItemSheet, { types: ["item"], makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("saga-machine", AmbitionSheet, { types: ["ambition"], makeDefault: true });
+    foundry.documents.collections.Items.registerSheet("saga-machine", ActionSheet, { types: ["action"], makeDefault: true });
 
     // Register system config
     game.settings.register('saga-machine', 'level', level_config);
@@ -78,7 +78,7 @@ Hooks.once("init", async () => {
 
     Hooks.on('preUpdateCombat', pre_update_combat);
     Hooks.on("hotbarDrop", hotbar_drop);
-    Hooks.on("renderChatMessage", render_chat_message);
+    Hooks.on("renderChatMessageHTML", render_chat_message);
     Hooks.on("dropActorSheetData", drop_actor_sheet_data);
     Hooks.on("getChatLogEntryContext", get_chat_log_entry_context);
 });

@@ -44,7 +44,7 @@ Hooks.once("init", async () => {
 	Handlebars.registerHelper('if_equal', (arg1, arg2, options) => arg1 === arg2 ? options.fn(this) : options.inverse(this));
 
 	// Register handlebars partials
-	await loadTemplates([
+	await foundry.applications.handlebars.loadTemplates([
 		'systems/saga-machine/templates/partials/character-header.html',
 		'systems/saga-machine/templates/partials/character-sidebar.html',
 		'systems/saga-machine/templates/partials/character-inventory.html'
