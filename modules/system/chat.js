@@ -56,10 +56,11 @@ export async function add_push_luck(options) {
     options.push({
         name: 'Push Your Luck',
         icon: '<i class="fas fa-dice"></i>',
-        condition: html => !!html.find('.test-json').length,
+        condition: html => !!$(html).find('.test-json').length,
         callback: async html => {
+            const $html = $(html);
             // Recreate test object from json
-            const test = Test.from_json(JSON.parse(html.find('.test-json').val()));
+            const test = Test.from_json(JSON.parse($html.find('.test-json').val()));
 
             // Check for ownership
             if (!test?.actor?.isOwner)
@@ -83,7 +84,7 @@ export async function add_push_luck(options) {
             await test.apply_effects();
 
             // Display the new chat card
-            await test.to_chat({ whisper: html.hasClass('whisper'), rolls: [test.results] });
+            await test.to_chat({ whisper: $html.hasClass('whisper'), rolls: [test.results] });
         }
     });
 }
@@ -98,8 +99,9 @@ export async function add_apply_damage(options) {
     options.push({
         name: 'Apply Damage',
         icon: '<i class="fas fa-user-minus"></i>',
-        condition: html => !!html.find('.damage').length,
+        condition: html => !!$(html).find('.damage').length,
         callback: html => {
+            const $html = $(html);
             // Get all selected tokens
             let tokens = game?.canvas?.tokens?.controlled;
 
@@ -115,10 +117,10 @@ export async function add_apply_damage(options) {
                 let actor = token?.document?.actor || token;
                 if (actor && actor.isOwner) {
                     // Is the first hit a critical hit?
-                    let critical = !!html.find('.critical').length;
+                    let critical = !!$html.find('.critical').length;
 
                     // Apply each damage
-                    html.find('.damage').each((i, e) => {
+                    $html.find('.damage').each((i, e) => {
                         const damage = Number($(e).text());
                         const damage_type = $(e).parent().find('.damage-type').text();
                         const pierce_armor = Number($(e).data('pierce')) || 0;
@@ -144,8 +146,9 @@ export async function add_edit_test(options) {
         icon: '<i class="fa fa-edit"></i>',
         condition: html => game.user.isGM,
         callback: html => {
-            const message_id = html.data('messageId');
-            const test = Test.from_json(JSON.parse(html.find('.test-json').val()));
+            const $html = $(html);
+            const message_id = $html.data('messageId');
+            const test = Test.from_json(JSON.parse($html.find('.test-json').val()));
 
             // Open edit dialog
             new Dialog({

@@ -237,7 +237,7 @@ export async function drop_actor_sheet_data(actor, sheet, data) {
 }
 
 /**
- * Run when a chat card is right-clicked: Hooks.on('getChatLogEntryContext')
+ * Run when a chat card is right-clicked: Hooks.on('getChatMessageContextOptions')
  *
  * @param {jQuery} html
  * @param {ContextMenuEntry[]} options

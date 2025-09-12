@@ -80,5 +80,5 @@ Hooks.once("init", async () => {
     Hooks.on("hotbarDrop", hotbar_drop);
     Hooks.on("renderChatMessageHTML", render_chat_message);
     Hooks.on("dropActorSheetData", drop_actor_sheet_data);
-    Hooks.on("getChatLogEntryContext", get_chat_log_entry_context);
+    Hooks.on("getChatMessageContextOptions", get_chat_log_entry_context);
 });
