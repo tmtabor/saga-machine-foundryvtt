@@ -536,16 +536,18 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
 			let actions = [];
 			for (let action of item.system.actions)
 				actions.push(new SagaMachineItem(action, {parent: item, parentCollection: item.collection}));
-			let buttons = {
-				display: {
-					icon: `<img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display ${item.name}">`,
+			let buttons = [
+				{
+					action: 'display',
+					icon: 'fa-solid fa-message', //`<img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display ${item.name}">`,
 					label: 'Display in Chat',
 					callback: () => this.to_chat(item)
 				}
-			};
+			];
 			for (let action of actions)
-				buttons[`do_${action.name}`] = {
-					icon: `<img class="item-img" src="${item.img}" title="${item.name}">`,
+				buttons.push({
+					action: `do_${action.name}`,
+					icon: 'fa-solid fa-hand', //`<img class="item-img" src="${item.img}" title="${item.name}">`,
 					label: action.name,
 					callback: () => this.on_test(event, {
 						type: "Test",
@@ -557,12 +559,14 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
 						properties: action.system.properties,
 						effects: action.sheet.effects_str
 					})
-				};
- 		new Dialog({
-				title: `Choose Action`,
+				});
+
+			new foundry.applications.api.DialogV2({
+				window: {title: 'Choose Action' },
 				content: `<p>What would you like to do?</p>`,
 				buttons: buttons,
-				default: 'Yes'
+				default: "display",
+				close: () => {}
 			}).render({ force: true });
 		}
 
@@ -597,7 +601,7 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
       		}
 		];
 
-		new FloatingContextMenu(html?.[0] ?? html, '.origins-add', items, { eventName: 'click' });
+		new FloatingContextMenu(html?.[0] ?? html, '.origins-add', items, { eventName: 'click', jQuery: false });
 	}
 
 	/**

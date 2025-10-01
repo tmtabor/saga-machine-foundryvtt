@@ -70,7 +70,7 @@ export class SagaMachineCombat extends Combat {
 
           // Produce an initiative roll for the Combatant
           const roll = combatant.getInitiativeRoll(formula);
-          await roll.evaluate({async: true});
+          await roll.evaluate();
           updates.push({_id: id, initiative: roll.total});
         }
         if (!updates.length) return this;
@@ -208,23 +208,28 @@ export class SagaMachineCombat extends Combat {
             }
         };
 
-        new Dialog({
-            title: `Begin New Round?`,
+        const dialog = new foundry.applications.api.DialogV2({
+            window: {
+                title: `Begin New Round?`,
+            },
             content: `<p>Do you want to begin a new round? Make sure to prompt your players to set their defenses first, if necessary.</p>`,
-            buttons: {
-                Yes: {
-                    icon: "<i class='fas fa-check'></i>",
-                    label: 'Yes',
+            buttons: [
+                {
+                    action: "yes",
+                    label: "Yes",
+                    icon: "fas fa-check",
                     callback: new_round
                 },
-                No: {
-                    icon: "<i class='fas fa-times'></i>",
-                    label: 'No',
+                {
+                    action: "no", 
+                    label: "No",
+                    icon: "fas fa-times",
                     callback: () => {}
                 }
-            },
-            default: 'Yes'
-        }).render({ force: true });
+            ],
+            default: "yes"
+        });
+        dialog.render({ force: true });
     }
 }
 
