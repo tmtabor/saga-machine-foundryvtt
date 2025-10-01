@@ -150,7 +150,7 @@ export class ModifierSet {
         let boons = 0;
         let banes = 0;
         let modifier = 0;
-        let divide = 0;
+        let divide = 1;
         let percent = 0;
         let stress_boons = 0;
         let tags = [];
@@ -160,7 +160,7 @@ export class ModifierSet {
             boons += m.boons || 0;
             banes += m.banes || 0;
             modifier += m.modifier || 0;
-            divide += m.divide || 0;
+            divide *= m.divide || 0;
             percent += m.percent || 0;
             stress_boons += m.stress_boons || 0;
             if (!!m.name) tags.push(m.name);
