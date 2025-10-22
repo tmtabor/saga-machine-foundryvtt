@@ -167,12 +167,12 @@ img.system-logo {
 
 .saga-machine .sheet-header {
   height: 90px;
-  overflow: hidden;
   padding: 0 10px 0 10px;
   color: #dcb95f;
   text-shadow: 2px 2px black;
   letter-spacing: 0.05em;
   text-rendering: optimizeLegibility;
+  overflow-x:visible;
 }
 
 .saga-machine header.sheet-header > img.profile-img {
@@ -221,9 +221,8 @@ img.system-logo {
   position: relative;
   width: calc(100% - 110px);
   white-space: nowrap;
-  overflow-x: auto;
   height: 25px;
-  overflow-y: hidden;
+  overflow: visible;
 }
 
 .saga-machine .sheet-header ol.origins > li.item {
@@ -260,6 +259,18 @@ img.system-logo {
   min-width: 10px;
   font-size: 1.2em;
   cursor: pointer;
+}
+
+.saga-machine .sheet-header ol.origins > li.item.origins-add > nav {
+  background: #782e22;
+  color: #dcb95f;
+  border-color: #11114a;
+}
+
+.saga-machine .sheet-header ol.origins > li.item.origins-add > nav > menu > li.context-item:hover {
+  border: inherit;
+  background: #8d3c2f;
+  color: inherit;
 }
 
 #context-menu img.menu-img {

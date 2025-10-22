@@ -1,7 +1,6 @@
 import { test_dialog } from "../game/tests.js";
 import { ActionHelper, SagaMachineItem } from "../item/item.js";
 import { CharacterHelper } from "./actor.js";
-import { FloatingContextMenu } from "../system/contextmenu.js";
 import { system_setting } from "../system/utils.js";
 
 /**
@@ -601,7 +600,7 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
       		}
 		];
 
-		new FloatingContextMenu(html?.[0] ?? html, '.origins-add', items, { eventName: 'click', jQuery: false });
+		foundry.applications.ux.ContextMenu.create(this, html?.[0], '.origins-add', items, { eventName: 'click', jQuery: false });
 	}
 
 	/**
