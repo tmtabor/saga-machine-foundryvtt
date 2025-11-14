@@ -70,3 +70,24 @@ export const stress_config = {
     type: Boolean,
     default: false
 }
+
+/**
+ * The theme to use for the system's sheets
+ *
+ * @type SettingConfig
+ */
+export const theme_config = {
+    name: 'Theme',
+    hint: 'The visual theme for character sheets and UI. Requires reload to take effect.',
+    scope: 'world',
+    config: true,
+    type: String,
+    default: 'unified',
+    choices: {
+        "unified": "Unified",
+        "sos": "Shadows Over Sol"
+    },
+    onChange: () => {
+        window.location.reload();
+    }
+}

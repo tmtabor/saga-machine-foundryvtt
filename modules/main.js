@@ -9,7 +9,7 @@ import { create_active_effect, create_item, delete_active_effect, delete_item, d
     get_chat_log_entry_context, hotbar_drop, pre_create_active_effect, pre_delete_active_effect, pre_update_combat,
     render_chat_message, update_active_effect, update_actor, update_item } from "./system/hooks.js";
 import { sm_test_macro } from "./system/macros.js";
-import { level_config, luck_exp_config, luck_label_config, stress_config } from "./system/config.js";
+import { level_config, luck_exp_config, luck_label_config, stress_config, theme_config } from "./system/config.js";
 
 // Turn on debugging
 CONFIG.debug.hooks = true;
@@ -55,6 +55,16 @@ Hooks.once("init", async () => {
     game.settings.register('saga-machine', 'luck_label', luck_label_config);
     game.settings.register('saga-machine', 'luck_exp', luck_exp_config);
     game.settings.register('saga-machine', 'stress', stress_config);
+    game.settings.register('saga-machine', 'theme', theme_config);
+
+    // Load the appropriate theme stylesheet
+    const theme = game.settings.get('saga-machine', 'theme');
+    const stylesheet = `systems/saga-machine/styles/${theme}.css`;
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = stylesheet;
+    document.head.appendChild(link);
 
     // Register custom status effects
     CONFIG.statusEffects = generate_conditions();

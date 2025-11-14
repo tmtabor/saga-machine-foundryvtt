@@ -1,0 +1,1430 @@
+@import "./framework.css";
+@import "./tagify.css";
+
+/*
+  GENERAL UI STYLES
+*/
+
+#logo {
+    content: url(../images/theme/saga-machine-logo.png);
+    width: 110px;
+}
+
+/*
+  ACTOR SHEET STYLES
+*/
+
+.saga-machine.sheet.actor > section.window-content {
+    padding: 0;
+    overflow: hidden;
+}
+
+.sheet form.saga-machine {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 90px 20px 1fr;
+  gap: 0;
+  height: 100%;
+  background: #c4c6c6;
+  background-attachment: local;
+}
+
+/* Scrollbar styling for all elements within saga-machine sheets */
+.sheet form.saga-machine,
+.sheet form.saga-machine * {
+  /* Firefox */
+  scrollbar-color: #507279 #c4c6c6;
+  scrollbar-width: thin;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+.sheet form.saga-machine::-webkit-scrollbar,
+.sheet form.saga-machine *::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.sheet form.saga-machine::-webkit-scrollbar-track,
+.sheet form.saga-machine *::-webkit-scrollbar-track {
+  background: #c4c6c6;
+}
+
+.sheet form.saga-machine::-webkit-scrollbar-thumb,
+.sheet form.saga-machine *::-webkit-scrollbar-thumb {
+  background-color: #507279;
+  border-radius: 6px;
+  border: 2px solid #c4c6c6;
+}
+
+.sheet form.saga-machine::-webkit-scrollbar-thumb:hover,
+.sheet form.saga-machine *::-webkit-scrollbar-thumb:hover {
+  background-color: #5f8289;
+}
+
+.saga-machine .sheet-sidebar {
+  grid-row-start: 1;
+  grid-row-end: 4;
+  margin-left: 10px;
+  background: #8c8b8b;
+  padding: 10px;
+  color: #000000;
+  text-shadow: none;
+  letter-spacing: 0.05em;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  box-shadow: 3px 0 8px rgba(0, 0, 0, 0.3);
+  z-index: 10;
+}
+
+.saga-machine .sidebar-frame {
+  overflow: auto;
+  position: absolute;
+  left: 5px;
+  right: 5px;
+  top: 90px;
+  bottom: 40px;
+}
+
+.saga-machine .sheet-sidebar .grid {
+  gap: 5px;
+}
+
+img.system-logo {
+  border: none;
+}
+
+.saga-machine .sheet-sidebar h3 {
+  text-align: center;
+  border-bottom: 1px solid #507279;
+  color: #000000;
+}
+
+.saga-machine .sheet-sidebar input,
+.saga-machine .sheet-sidebar select {
+  color: #000000;
+  background: #a8a7a7;
+  border: 1px solid #6a6969;
+  text-shadow: none;
+  letter-spacing: 0.05em;
+  text-rendering: optimizeLegibility;
+}
+
+.saga-machine .sheet-sidebar select {
+  width: calc(100% - 2px);
+  text-align: inherit;
+}
+
+.saga-machine .sheet-sidebar input:disabled,
+.saga-machine .sheet-sidebar select:disabled {
+  color: #373737;
+  background-color: #a1a1a1;
+  border: 1px solid #6a6969;
+}
+
+.saga-machine .sheet-sidebar hr {
+  opacity: 0;
+}
+
+.saga-machine label.stat-label,
+.saga-machine label.score-label {
+  font-weight: bold;
+}
+
+.saga-machine .sheet-sidebar .rollable:hover,
+.saga-machine .sheet-sidebar .rollable:focus,
+.saga-machine .sheet-header .rollable:hover,
+.saga-machine .sheet-header .rollable:focus {
+    color: #507279;
+    text-shadow: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.saga-machine .rollable:hover,
+.saga-machine .rollable:focus,
+.saga-machine .expandable:hover,
+.saga-machine .expandable:focus,
+.saga-machine .chatable:hover,
+.saga-machine .chatable:focus {
+    color: #507279;
+    text-shadow: none;
+    cursor: pointer;
+    /* font-weight: bold; */
+}
+
+.saga-machine input[type="number"].stat-input,
+.saga-machine input[type="number"].score-input,
+.saga-machine select.score-input {
+  font-size: 1.9em;
+  height: 1.5em;
+}
+
+.saga-machine input[type="text"]:focus,
+.saga-machine input[type="number"]:focus,
+.saga-machine input[type="password"]:focus,
+.saga-machine input[type="date"]:focus,
+.saga-machine input[type="time"]:focus,
+.saga-machine input[type="search"]:focus,
+.saga-machine select:focus {
+    box-shadow: 0 0 3px #507279;
+    border-color: #507279;
+    outline: none;
+}
+
+.saga-machine .score-secondary {
+  font-size: 0.8em;
+}
+
+.saga-machine input[disabled] {
+  pointer-events: none;
+}
+
+.saga-machine progress {
+  width: 100%;
+  background-color: #a8a7a7;
+  height: 6px;
+  border: 1px solid #6a6969;
+  border-radius: 3px;
+}
+
+.saga-machine progress::-webkit-progress-value {
+    background-color: #507279;
+    border-radius: 3px;
+}
+
+.saga-machine progress::-webkit-progress-bar {
+    background-color: #a8a7a7;
+}
+
+.saga-machine .item-form {
+  font-family: "Roboto", sans-serif;
+}
+
+.saga-machine .sheet-header {
+  height: 90px;
+  padding: 0 10px 0 10px;
+  background: #97a2a6;
+  color: #000000;
+  text-shadow: none;
+  letter-spacing: 0.05em;
+  text-rendering: optimizeLegibility;
+  overflow-x:visible;
+}
+
+.saga-machine header.sheet-header > img.profile-img {
+  height: 100px;
+  width: 100px;
+  max-height: 100px;
+  max-width: 100px;
+  margin-right: 0px;
+  position: absolute;
+  right: 10px;
+  top: 34px;
+  z-index: 10;
+  border: #507279 2px solid;
+  background-color: #8c8b8b;
+}
+
+.saga-machine .sheet-header .header-fields {
+  -webkit-box-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+  width: 100%;
+}
+
+.saga-machine .sheet-header h1.charname {
+  height: 50px;
+  padding: 0px;
+  margin: 5px 0;
+  border-bottom: 0;
+}
+
+.saga-machine .sheet-header h1.charname input {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  color: #000000;
+  text-shadow: none;
+  letter-spacing: 0.05em;
+  text-rendering: optimizeLegibility;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.saga-machine .sheet-header ol.origins {
+  display: block;
+  padding: 0;
+  position: relative;
+  width: calc(100% - 110px);
+  white-space: nowrap;
+  height: 25px;
+  overflow: visible;
+}
+
+.saga-machine .sheet-header ol.origins > li.item {
+  display: inline-block;
+  min-width: 100px;
+  width: auto;
+  position: relative;
+  margin-right: 15px;
+  padding-right: 35px;
+}
+
+.saga-machine .sheet-header ol.origins > li.item > .item-name {
+  display: inline-block;
+  max-width: 150px;
+  height: 25px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.saga-machine .sheet-header ol.origins > li.item > .item-controls {
+  display: inline-block;
+  position: absolute;
+  right: 5px;
+}
+
+.saga-machine .sheet-header ol.origins > li.item.origins-add {
+  position: relative;
+  right: 0;
+  top: -2px;
+  padding-right: 0;
+  height: 10px;
+  width: 10px;
+  min-width: 10px;
+  font-size: 1.2em;
+  cursor: pointer;
+}
+
+.saga-machine .sheet-header ol.origins > li.item.origins-add > nav {
+  background: #8c8b8b;
+  color: #FFFFFF;
+  border: 1px solid #6a6969;
+}
+
+.saga-machine .sheet-header ol.origins > li.item.origins-add > nav > menu > li.context-item:hover {
+  border: inherit;
+  background: #a8a7a7;
+  color: #FFFFFF;
+}
+
+#context-menu img.menu-img {
+  display: inline-block;
+  height: 18px;
+  border: none;
+  position: relative;
+  top: 4px;
+  margin-right: 5px;
+}
+
+.saga-machine .sheet-header .item-controls {
+  font-size: 0.7em;
+  padding-top: 3px;
+}
+
+.saga-machine > nav.sheet-tabs {
+  -webkit-box-flex: 0;
+  -ms-flex: 0;
+  flex: 0;
+  align-items: center;
+  height: 21px;
+  background: #507279;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-top: 1px solid #5f8289;
+  border-bottom: 1px solid #3d5a60;
+  position: relative;
+  margin: 0px;
+  padding: 0 110px 0 0;
+  text-shadow: none;
+  text-rendering: optimizeLegibility;
+  z-index: 5;
+}
+
+.saga-machine.actor .tabs .item {
+  color: #c0c2c2;
+}
+
+.saga-machine.actor .tabs .item.active {
+  text-shadow: none;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.saga-machine .sheet-body {
+  height: 100%;
+  position: relative;
+  padding: 0 10px 0 10px;
+  overflow: auto;
+}
+
+.saga-machine .sheet-body h1,
+.saga-machine .sheet-body h2,
+.saga-machine .sheet-body h3 {
+  border-bottom: 1px solid #507279;
+}
+
+.saga-machine .sheet-body a:hover,
+.saga-machine .sheet-tabs a:hover {
+  text-shadow: 0 0 8px #b9d5db
+}
+
+.saga-machine .sheet-body .tab {
+  height: calc(100% - 20px);
+}
+
+.saga-machine .sheet-body .tab.combat,
+.saga-machine .sheet-body .tab.inventory {
+  padding-top: 10px;
+}
+
+.saga-machine.sheet .editor-content {
+    padding: 5px;
+}
+
+.saga-machine.sheet .editor-edit {
+  top: 10px;
+  right: 10px;
+}
+
+.saga-machine.sheet .prosemirror menu .pm-dropdown {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.saga-machine .prosemirror menu button:hover,
+.saga-machine .prosemirror menu button.active {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.saga-machine .items-header {
+  height: 28px;
+  margin: 2px 0;
+  padding: 0;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background: #97a2a6;
+  border: 1px solid #6a6969;
+  font-weight: bold;
+  color: #000000;
+}
+.saga-machine .items-header > * {
+  font-size: 14px;
+  text-align: center;
+}
+.saga-machine .items-header .item-name {
+  font-weight: bold;
+  padding-left: 5px;
+  text-align: left;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.saga-machine .sheet-body .items-list {
+  list-style: none;
+  margin: 0 0 27px 0;
+  padding: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  color: #000000;
+}
+
+.saga-machine .sheet-body .skill-list li {
+  display: grid;
+  grid-template-columns: 1fr 50px 50px;
+}
+
+.saga-machine .sheet-body .items-list .item-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.saga-machine .sheet-body .items-list .item-name {
+  -webkit-box-flex: 2;
+  -ms-flex: 2;
+  flex: 2;
+  margin: 0;
+  overflow: hidden;
+  font-size: 13px;
+  text-align: left;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+.saga-machine .sheet-body .items-list .item-name h3,
+.saga-machine .sheet-body .items-list .item-name h4 {
+  margin: 0;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+.saga-machine .sheet-body .items-list .item-controls {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 100px;
+  flex: 0 0 100px;
+  -webkit-box-pack: end;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+}
+
+.saga-machine .sheet-body .items-list .item-controls a {
+  font-size: 12px;
+  text-align: center;
+  margin: 0 6px;
+}
+
+.saga-machine .sheet-body .items-list .item-controls.container a {
+  margin: 0 3px;
+}
+
+.saga-machine .sheet-body .items-list .item {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0 2px;
+  border-bottom: 1px solid #a8a7a7;
+  min-height: 27px;
+}
+
+.saga-machine .sheet-body .items-list .item:last-child:not(.items-header) {
+  border-bottom: none;
+}
+
+.saga-machine .sheet-body .items-list .item .item-name {
+  color: #000000;
+  min-height: 26px;
+}
+
+.saga-machine .sheet-body .items-list .item .item-name .item-image {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 30px;
+  flex: 0 0 30px;
+  height: 30px;
+  background-size: 30px;
+  border: none;
+  margin-right: 5px;
+}
+
+.saga-machine .sheet-body .items-list .item-prop {
+  text-align: center;
+  border-left: 1px solid #a8a7a7;
+  border-right: 1px solid #a8a7a7;
+  font-size: 12px;
+  max-width: 50px;
+  color: #000000;
+}
+
+.saga-machine .sheet-body .items-list .item-prop-expanded {
+  text-align: center;
+  text-transform: capitalize;
+  border-left: 1px solid #a8a7a7;
+  border-right: 1px solid #a8a7a7;
+  font-size: 12px;
+  max-width: 100px;
+  color: #000000;
+}
+
+.saga-machine .sheet-body .items-list .items-header {
+  height: 28px;
+  margin: 2px 0;
+  padding: 0;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background: #97a2a6;
+  border: 1px solid #6a6969;
+  font-weight: bold;
+  color: #000000;
+}
+.saga-machine .sheet-body .items-list .items-header > * {
+  font-size: 12px;
+  text-align: center;
+}
+.saga-machine .sheet-body .items-list .items-header .item-name {
+  padding-left: 5px;
+  text-align: left;
+}
+.saga-machine .item-formula {
+  -webkit-box-flex: 0;
+  -ms-flex: 0 0 200px;
+  flex: 0 0 200px;
+  padding: 0 8px;
+}
+.saga-machine .effects .item .effect-source,
+.saga-machine .effects .item .effect-duration,
+.saga-machine .effects .item .effect-controls {
+  text-align: center;
+  border-left: 1px solid #a8a7a7;
+  border-right: 1px solid #a8a7a7;
+  font-size: 12px;
+  color: #000000;
+}
+
+.saga-machine .effects .item .effect-controls {
+  border: none;
+}
+
+.saga-machine .attack-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 150px;
+  gap: 0 10px;
+}
+
+.saga-machine .items-list > .attack-row > .attack-name,
+.saga-machine .items-list > .attack-row > .attack-effect,
+.saga-machine .items-list > .attack-row > .attack-properties {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-left: 5px;
+  display: block;
+  line-height: 24px;
+}
+
+.saga-machine .items-list > .attack-row > .attack-name > .item-img {
+  position: absolute;
+}
+
+.saga-machine .items-list > .attack-row > .attack-name > .expandable {
+  margin-left: 30px;
+}
+
+.saga-machine .attack.prototype, .consequence.prototype {
+  display: none !important;
+}
+
+.saga-machine .sheet-body ol.ambitions-list {
+  margin: 0;
+  padding: 0;
+}
+
+.saga-machine .character-notes > .editor,
+.saga-machine .gm-notes > .editor,
+.saga-machine .description > .editor {
+  background-color: rgba(0,0,0,0.05);
+  height: 200px;
+}
+
+.saga-machine .character-notes,
+.saga-machine .gm-notes {
+  margin-bottom: 15px;
+}
+
+.saga-machine .hidden {
+  display: none !important;
+}
+
+.saga-machine .toggle-check:checked~.toggle-visible {
+  visibility: visible;
+}
+
+.saga-machine .toggle-check:checked~.toggle-display {
+  display: grid;
+}
+
+.saga-machine .toggle-visible {
+  visibility: hidden;
+}
+
+.saga-machine .toggle-display {
+  display: none;
+}
+
+.saga-machine span.item-img {
+  margin-right: 5px;
+  height: 24px;
+}
+
+.saga-machine img.item-img {
+  background: rgba(0, 0, 0, 0.5);
+  height: 24px;
+  width: 24px;
+  margin: 0;
+  padding: 0;
+  min-height: 24px;
+  min-width: 24px;
+}
+
+.saga-machine img.item-img:hover {
+  background: rgba(0, 0, 0, 0.75);
+}
+
+.saga-machine span.item-img > img.item-img:first-child {
+  display: inline-block;
+}
+
+.saga-machine span.item-img:hover > img.item-img:first-child {
+  display: none;
+}
+
+.saga-machine span.item-img > img.item-img:last-child {
+  display: none;
+}
+
+.saga-machine span.item-img:hover > img.item-img:last-child {
+  display: inline-block;
+}
+
+.saga-machine li.item .item-description {
+  display: none;
+  flex-basis: 100%;
+  font-size: 0.9em;
+  border: 2px solid #507279;
+  background: #b8baba;
+  padding: 5px 10px;
+  margin: 5px 0;
+  grid-column: 1/-1;
+  color: #000000;
+}
+
+.saga-machine textarea.item-input {
+  min-height: 100px;
+  height: auto;
+  resize: none;
+}
+
+.saga-machine .unequipped {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+.saga-machine .inventory-top {
+  height: calc(100% - 35px);
+  width: calc(100% + 10px);
+  padding-right: 10px;
+  overflow: auto;
+}
+
+.saga-machine .score.encumbrance {
+  position: absolute;
+  bottom: 10px;
+  width: calc(100% - 20px);
+}
+
+.saga-machine .initiative {
+  display: flex;
+  list-style: none;
+  margin: -10px -10px 10px -10px;
+  padding: 0 10px 3px 10px;
+  gap: 5px;
+  background: #97a2a6;
+  border-bottom: 1px solid #6a6969;
+  flex-wrap: wrap;
+  flex: none;
+  color: #000000;
+  min-height: 32px;
+  height: 33px;
+}
+
+.saga-machine .initiative div.grouping {
+  margin-right: 20px;
+}
+
+.saga-machine .initiative div.grouping.turn {
+  position: relative;
+  top: 8px;
+}
+
+.saga-machine .initiative div.toggle-switch {
+  margin-left: 5px;
+}
+
+.saga-machine .initiative div.grouping.defense > label {
+  position: relative;
+  top: -5px;
+}
+
+.saga-machine .initiative select {
+  background: #b8baba;
+  border: 1px solid #6a6969;
+  color: #000000;
+  width: 150px;
+  margin-left: 5px;
+  position: relative;
+  top: -5px;
+}
+
+.saga-machine .initiative a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  line-height: 24px;
+  border-radius: 3px;
+  text-align: left;
+  padding: 0 5px;
+  color: #000000;
+}
+
+.saga-machine .initiative a:hover {
+  background: #b8baba;
+}
+
+.saga-machine .initiative .toggle-switch {
+  top: 1px;
+  margin-left: 3px;
+}
+
+.saga-machine .initiative input[type=checkbox].button-checkbox {
+  display: none;
+}
+
+.saga-machine .initiative input[type=checkbox].button-checkbox:checked + label.init-button {
+  background: #507279;
+  color: #c0c2c2;
+  border-color: #3d5a60;
+}
+
+.saga-machine .initiative .init-button {
+  display: inline-block;
+  position: relative;
+  top: 3px;
+  height: 26px;
+  padding: 0 5px 0 0;
+  border: 1px solid #6a6969;
+  background: #b8baba;
+  border-radius: 3px;
+  color: #000000;
+}
+
+.saga-machine .initiative .init-button:hover {
+  background: #a8a7a7;
+  cursor: pointer;
+}
+
+.saga-machine .initiative .init-button > img {
+  filter: invert(1);
+  height: 20px;
+  width: 20px;
+  min-height: 20px;
+  min-width: 20px;
+  margin-left: 5px;
+  position: relative;
+  top: 3px;
+  background: none;
+  border: solid 1px transparent;
+}
+
+/*
+  NPC SHEET STYLES
+*/
+
+.saga-machine.npc-sheet .basics,
+.saga-machine.npc-sheet .advancement {
+  padding-top: 10px;
+}
+
+.saga-machine.npc-sheet .float-right {
+  float: right;
+  margin-bottom: 0;
+}
+
+.saga-machine.npc-sheet .sheet-body .float-right .item-control,
+.saga-machine.npc-sheet .sheet-body .float-right .item-control {
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.saga-machine.npc-sheet .sheet-body .float-right .item-control:hover,
+.saga-machine.npc-sheet .sheet-body .float-right .item-control:active {
+  color: #507279;
+  font-weight: bold;
+}
+
+.saga-machine.npc-sheet .sheet-body .items-inline {
+  margin: 0 0 27px 0;
+}
+
+.saga-machine.npc-sheet .sheet-body .items-inline .item {
+  display: inline-block;
+  margin-right: 5px;
+  padding: 0;
+  min-height: auto;
+  border-bottom: none;
+}
+
+.saga-machine.npc-sheet div.items-inline .item-description {
+  display: none;
+  flex-basis: 100%;
+  font-size: 0.9em;
+  border: 2px solid #507279;
+  background: #b8baba;
+  padding: 5px 10px;
+  margin: 5px 0;
+  grid-column: 1/-1;
+  color: #000000;
+}
+
+.saga-machine .toggle-switch.npc-switch {
+  position: absolute;
+  top: 2px;
+  left: 10px;
+}
+
+.saga-machine .toggle-switch.npc-switch > .slider {
+  font-weight: normal;
+  background-color: #6a6969;
+  border: 1px solid #555;
+}
+
+.saga-machine .toggle-switch.npc-switch > .slider::before {
+  background-color: #507279;
+}
+
+.saga-machine .toggle-switch.npc-switch > .slider > .on,
+.saga-machine .toggle-switch.npc-switch > .slider > .off {
+  color: #c0c2c2;
+}
+
+/*
+  LIMITED SHEET STYLES
+*/
+
+.saga-machine form.limited-sheet {
+  display: grid;
+  grid-template-rows: 90px 30px 1fr;
+  gap: 0;
+  height: 100%;
+  background: #c4c6c6;
+  background-attachment: local;
+}
+
+.saga-machine form.limited-sheet > nav.sheet-tabs {
+  -webkit-box-flex: 0;
+  -ms-flex: 0;
+  flex: 0;
+  align-items: center;
+  height: 20px;
+  background: #507279;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-top: 1px solid #5f8289;
+  border-bottom: 1px solid #3d5a60;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  color: #c0c2c2;
+  text-shadow: none;
+  text-rendering: optimizeLegibility;
+}
+
+.saga-machine form.limited-sheet .editor {
+  height: 100%;
+}
+
+/*
+  STASH SHEET STYLES
+*/
+
+.saga-machine form.stash-sheet {
+  display: grid;
+  grid-template-rows: 90px 30px 1fr;
+  gap: 0;
+  height: 100%;
+  background: #c4c6c6;
+  background-attachment: local;
+}
+
+.saga-machine form.stash-sheet > header > img.profile-img {
+  height: 100px;
+  width: 100px;
+  max-height: 100px;
+  max-width: 100px;
+  margin-right: 0;
+  position: absolute;
+  left: 10px;
+  top: 34px;
+  z-index: 1;
+  border: #507279 2px solid;
+  background-color: #8c8b8b;
+}
+
+.saga-machine form.stash-sheet > header {
+  background: #97a2a6;
+}
+
+.saga-machine form.stash-sheet > header > .top-right {
+  margin-left: 120px;
+  gap: 0;
+  margin-top: 5px;
+  margin-right: 10px;
+  color: #000000;
+  text-shadow: none;
+  position: relative;
+}
+
+.saga-machine form.stash-sheet > header > .top-right .right {
+  text-align: right;
+  position: absolute;
+  top: 55px;
+  right: 10px;
+}
+
+.saga-machine form.stash-sheet .score-secondary {
+  font-size: 1em;
+}
+
+.saga-machine form.stash-sheet > header h1.stash-name {
+  height: 50px;
+  padding: 0;
+  margin: 0;
+  border-bottom: 0;
+}
+
+.saga-machine form.stash-sheet > header h1.stash-name input {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  color: #000000;
+  text-shadow: none;
+  letter-spacing: 0.05em;
+  text-rendering: optimizeLegibility;
+  border: none;
+  background: transparent;
+}
+
+.saga-machine form.stash-sheet > header select {
+  color: #000000;
+  background: #b8baba;
+  text-shadow: none;
+  border: 1px solid #6a6969;
+  width: 100px;
+}
+
+.saga-machine form.stash-sheet > header .item-label {
+  padding-left: 20px;
+}
+
+.saga-machine form.stash-sheet > nav.sheet-tabs {
+  -webkit-box-flex: 0;
+  -ms-flex: 0;
+  flex: 0;
+  align-items: center;
+  height: 20px;
+  background: #507279;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-top: 1px solid #5f8289;
+  border-bottom: 1px solid #3d5a60;
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 110px;
+  color: #c0c2c2;
+  text-shadow: none;
+  text-rendering: optimizeLegibility;
+}
+
+.saga-machine form.stash-sheet .right {
+  text-align: right;
+  position: relative;
+  top: 4px;
+}
+
+.saga-machine form.stash-sheet button:hover,
+.saga-machine form.stash-sheet button:focus,
+.saga-machine form.stash-sheet button:active {
+    box-shadow: 0 0 3px #507279;
+    border-color: #507279;
+}
+
+.saga-machine form.stash-sheet .sheet-body {
+  height: calc(100% + 10px);
+  position: relative;
+  top: -10px;
+}
+
+.saga-machine form.stash-sheet .sheet-body .tab {
+    height: 100%;
+    padding-top: 10px;
+}
+
+.saga-machine form.stash-sheet .sheet-body .tab ol:last-child {
+    padding-bottom: 10px;
+}
+
+.saga-machine form.stash-sheet .editor {
+  height: 100%;
+}
+
+/**
+  VEHICLE SHEET STYLES
+ */
+
+.saga-machine.sheet.vehicle > section.window-content {
+    padding: 0;
+    overflow: hidden;
+}
+
+.saga-machine .sheet-body .position-list .position {
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  padding: 0 2px;
+  border-bottom: 1px solid #a8a7a7;
+  min-height: 27px;
+}
+
+.saga-machine .position-list .character span.item-img > img.item-img:last-child {
+  display: block;
+  visibility: hidden;
+}
+
+.saga-machine .position-list .character.filled span.item-img > img.item-img:last-child {
+  display: block;
+  visibility: visible;
+  cursor: pointer;
+}
+
+.saga-machine .sheet-body .position-list .character .item-name {
+  opacity: 0.8;
+}
+
+.saga-machine .sheet-body .position-list .character.filled .item-name {
+  opacity: inherit;
+}
+
+.saga-machine .sheet-body .position-list .character .crew-delete {
+  display: none;
+}
+
+.saga-machine .sheet-body .position-list .character.filled .crew-delete {
+  display: block;
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+.saga-machine .sheet-body .position-list select.item-name {
+  margin-right: 10px;
+  margin-left: 15px;
+}
+
+.saga-machine .sheet-body .position-list select.item-name:disabled {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.saga-machine .position.prototype {
+  display: none !important;
+}
+
+.saga-machine form.vehicle-sheet .editor {
+  height: calc(100% - 80px);
+}
+
+/* Toggle Switch Styles */
+
+.saga-machine .toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 12px;
+}
+
+.saga-machine .toggle-switch > input[type=checkbox] {
+  position: absolute;
+  cursor: pointer;
+  z-index: 1;
+  height: 12px;
+  width: 48px;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+}
+
+.saga-machine .toggle-switch > .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-weight: bold;
+  background-color: #6a6969;
+  border: 1px solid #555;
+  border-radius: 16px;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.saga-machine .toggle-switch > .slider::before {
+  position: absolute;
+  content: "";
+  height: 8px;
+  width: 8px;
+  left: 2px;
+  bottom: 2px;
+  background-color: #507279;
+  border-radius: 16px;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.saga-machine .toggle-switch > .slider > .on,
+.saga-machine .toggle-switch > .slider > .off {
+  color: #c0c2c2;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  font-size: 9px;
+  font-family: Verdana, sans-serif;
+}
+
+.saga-machine .toggle-switch > .slider > .on {
+  display: none;
+}
+
+.saga-machine .toggle-switch > .slider > .off {
+  display: block;
+}
+
+.saga-machine .toggle-switch > input:checked + .slider::before {
+  right: 2px;
+  left: unset;
+}
+
+.saga-machine .toggle-switch > input:checked + .slider .on {
+    display: block;
+}
+
+.saga-machine .toggle-switch > input:checked + .slider .off {
+    display: none;
+}
+
+/* Chat Card Styles */
+
+.chat-message .sm-table {
+  font-size: 0.9em;
+}
+
+.chat-message .flavor-text > header.item-header {
+  margin: 10px 0 0 0;
+}
+
+.chat-message .flavor-text > header.item-header > img {
+  float: right;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.25);
+  position: relative;
+  top: -6px;
+}
+
+.chat-message .flavor-text > .action {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 0;
+}
+
+.chat-message .critical.success {
+  color: rgb(0, 128, 0);
+}
+
+.chat-message .success {
+  color: rgb(0, 0, 255);
+}
+
+.chat-message .failure {
+  color: rgb(212, 107, 0);
+}
+
+.chat-message .critical.failure,
+.chat-message .panic {
+  color: rgb(255, 0, 0);
+}
+
+.chat-message .flavor-text > hr {
+  margin: 3px 0 5px 0;
+}
+
+.chat-message .tags {
+  margin-bottom: 3px;
+}
+
+.chat-message .tags > .tag {
+  border: solid 1px rgba(0, 0, 0, 0.2);
+  padding: 2px 3px 2px 3px;
+  border-radius: 3px;
+  margin-right: 5px;
+  display: inline-block;
+  line-height: 1em;
+  font-size: 0.9em;
+}
+
+.chat-message .dice-tooltip .dice-rolls .roll.stress {
+  color: #896222;
+  filter: drop-shadow(0 0 0.1rem rgb(255, 100, 0));
+}
+
+.chat-message .dice-tooltip .dice-rolls .roll.discarded.stress {
+  filter: sepia(0.5) contrast(0.75) opacity(0.4) drop-shadow(0 0 0.1rem rgb(255, 100, 0));
+}
+
+.chat-message .dice-tooltip .dice-rolls .roll.stress.panic {
+  color: #aa0200;
+}
+
+/* General Dialogs */
+
+div.app.dialog img.item-img {
+  background: rgba(0, 0, 0, 0.5);
+  height: 24px;
+  width: 24px;
+  padding: 0;
+  min-height: 24px;
+  min-width: 24px;
+  position: relative;
+  top: 5px;
+  display: inline-block;
+  margin: 0 5px 0 0;
+}
+
+/* Test Dialog */
+
+.test-dialog {
+  padding-bottom: 10px;
+}
+
+/* Item Sheet */
+
+.saga-machine.sheet.item > .window-content {
+    padding: 0;
+    overflow: hidden;
+}
+
+.saga-machine.sheet.item > .window-content > form {
+    height: 100px;
+}
+
+.saga-machine.sheet.item header.item-top > img.profile-img {
+    height: 100px;
+    width: 100px;
+    max-height: 100px;
+    max-width: 100px;
+    margin-right: 0;
+    position: absolute;
+    left: 10px;
+    top: 34px;
+    z-index: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.saga-machine.sheet.item header.item-top {
+  margin: 0 10px 0 120px;
+  height: 75px;
+  background: #97a2a6;
+  color: #000000;
+}
+
+.saga-machine.sheet.item header.item-top label {
+  font-size: 1.1em;
+  position: relative;
+  top: 3px;
+}
+
+.saga-machine.sheet.item nav.sheet-tabs {
+  -webkit-box-flex: 0;
+  -ms-flex: 0;
+  flex: 0;
+  align-items: center;
+  height: 20px;
+  background: #507279;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border-top: 1px solid #5f8289;
+  border-bottom: 1px solid #3d5a60;
+  padding: 0;
+  position: relative;
+  text-rendering: optimizeLegibility;
+  left: 115px;
+  width: calc(100% - 120px);
+  color: #c0c2c2;
+}
+
+.saga-machine.sheet.item section.sheet-body {
+  height: calc(100% - 115px);
+}
+
+.saga-machine.sheet.item .description > .editor {
+  height: 100%;
+}
+
+.saga-machine.sheet.item .attack-row {
+  display: grid;
+  grid-template-columns: 100px 110px 100px 90px 1fr 50px;
+  gap: 1px;
+}
+
+.saga-machine.sheet.item .attack-row:not(.items-header) {
+  padding-bottom: 2px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid;
+}
+
+.saga-machine.sheet.item .attack-row input,
+.saga-machine.sheet.item .attack-row select {
+  border-left: 1px solid #a8a7a7;
+  border-right: 1px solid #a8a7a7;
+  background: #b8baba;
+  color: #000000;
+  font-size: 0.85em;
+}
+
+.saga-machine.sheet.item .action-list {
+    margin-bottom: 0;
+}
+
+.saga-machine.sheet.item .action-row {
+    display: grid;
+    grid-template-columns: 105px 1fr 75px 65px 50px;
+    gap: 1px;
+}
+
+.saga-machine.sheet.item .action-effect.prototype {
+  display: none !important;
+}
+
+.saga-machine.sheet.item .action-row .action-damage,
+.saga-machine.sheet.item .action-row .action-consequence,
+.saga-machine.sheet.item .action-row .action-message {
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr;
+    gap: 1px;
+}
+
+.saga-machine.sheet.item .action-row .action-consequence > input::placeholder,
+.saga-machine.sheet.item .action-row .action-message > input::placeholder {
+    font-size: 0.8em;
+    opacity: 0.75;
+}
+
+.saga-machine.sheet.item .item-effect {
+  text-align: right;
+  padding-right: 3px;
+  display: block;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.saga-machine.sheet.item input.items-provided {
+  display: none;
+}
+
+.saga-machine.sheet.item div.items-provided {
+  display: block;
+  min-height: 27px;
+  background: #b8baba;
+  padding: 1px 3px 1px 3px;
+  line-height: 23px;
+  margin: 0;
+  border: 1px solid #6a6969;
+  border-radius: 3px;
+  width: calc(100% - 2px);
+  min-width: 20px;
+  color: #000000;
+}
+
