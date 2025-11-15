@@ -25,7 +25,10 @@
   grid-template-rows: 90px 20px 1fr;
   gap: 0;
   height: 100%;
-  background: #c4c6c6;
+  background: url(../images/theme/sos/sos-background.jpg);
+  background-color: #c4c6c6;
+  background-size: cover;
+  background-position: center;
   background-attachment: local;
 }
 
@@ -65,7 +68,10 @@
   grid-row-start: 1;
   grid-row-end: 4;
   margin-left: 10px;
-  background: #8c8b8b;
+  background: url(../images/theme/sos/sos-sidebar.jpg);
+  background-color: #8c8b8b;
+  background-size: cover;
+  background-position: center;
   padding: 10px;
   color: #000000;
   text-shadow: none;
@@ -116,7 +122,7 @@ img.system-logo {
 
 .saga-machine .sheet-sidebar input:disabled,
 .saga-machine .sheet-sidebar select:disabled {
-  color: #373737;
+  color: #535353;
   background-color: #a1a1a1;
   border: 1px solid #6a6969;
 }
@@ -203,7 +209,7 @@ img.system-logo {
 .saga-machine .sheet-header {
   height: 90px;
   padding: 0 10px 0 10px;
-  background: #97a2a6;
+  background: rgb(151 162 166 / 75%);
   color: #000000;
   text-shadow: none;
   letter-spacing: 0.05em;
@@ -365,6 +371,7 @@ img.system-logo {
   border-bottom: 1px solid #507279;
 }
 
+.saga-machine .sheet-header a:hover,
 .saga-machine .sheet-body a:hover,
 .saga-machine .sheet-tabs a:hover {
   text-shadow: 0 0 8px #b9d5db
