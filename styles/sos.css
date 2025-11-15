@@ -1324,7 +1324,6 @@ div.app.dialog img.item-img {
 .saga-machine.sheet.item header.item-top {
   margin: 0 10px 0 120px;
   height: 75px;
-  background: #97a2a6;
   color: #000000;
 }
 
@@ -1340,10 +1339,6 @@ div.app.dialog img.item-img {
   flex: 0;
   align-items: center;
   height: 20px;
-  background: #507279;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  border-top: 1px solid #5f8289;
-  border-bottom: 1px solid #3d5a60;
   padding: 0;
   position: relative;
   text-rendering: optimizeLegibility;
