@@ -7,7 +7,7 @@
             <select class="score-select" name="system.wealth.lifestyle">
                 {{ selectOptions data.system.LIFESTYLES selected=data.system.wealth.lifestyle }}
             </select>
-            <label class="item-label" for="system.wealth.money">Money</label>
+            <label class="item-label" for="system.wealth.money">{{ data.system.wealth.money_label }}</label>
             <input class="money-input" type="number" name="system.wealth.money" value="{{ data.system.wealth.money }}" step="1" data-dtype="Number" />
         </div>
 

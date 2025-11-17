@@ -820,6 +820,9 @@ export class CharacterSheet extends SagaMachineActorSheet {
 		// Add Luck label
 		context.data.system.scores.luck.label = system_setting('luck_label', 'Luck');
 
+		// Add Money label
+		context.data.system.wealth.money_label = system_setting('money_label', 'Money');
+
 		// Add constant for Lifestyles dropdown
 		context.data.system.LIFESTYLES = LIFESTYLES;
 
@@ -1076,6 +1079,9 @@ export class StashSheet extends SagaMachineActorSheet {
 
 		// Add constant for type dropdown
 		context.data.system.STASH_TYPES = STASH_TYPES;
+
+		// Add Money label
+		context.data.system.wealth.money_label = system_setting('money_label', 'Money');
 
 		// Organize inventory
 		context.data.system.equipment_groups = this.groups_and_containers({

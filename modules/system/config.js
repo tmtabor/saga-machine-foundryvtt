@@ -44,6 +44,27 @@ export const luck_label_config = {
 }
 
 /**
+ * The label to use for money in this setting
+ *
+ * @type SettingConfig
+ */
+export const money_label_config = {
+    name: 'Name for Money',
+    hint: 'Money, Coins, Credits, etc.',
+    scope: 'world',
+    config: true,
+    type: String,
+    default: 'Money',
+    choices: {
+        "Money": "Money",
+        "Microcredits": "Microcredits",
+        "Dollars": "Dollars",
+        "Bronze Pennies": "Bronze Pennies",
+        "Coins": "Coins"
+    }
+}
+
+/**
  * Whether a character's starting Luck should affect their experience total (e.g. for Shadows Over Sol)
  *
  * @type SettingConfig
