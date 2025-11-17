@@ -579,23 +579,26 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
 	 * @param html
 	 */
 	init_origins_menu(html) {
+		const origin_label = system_setting('origin_label', 'Origin');
+		const path_label = system_setting('path_label', 'Path');
+
 		const items = [
 			{
-				name: 'Origin',
+				name: origin_label,
 				icon: '<img class="menu-img" src="systems/saga-machine/images/defaults/origin.svg" />',
 				condition: true,
 				callback: async (i) => {
-					await this.actor.createEmbeddedDocuments("Item", [{ name: 'New Origin', type: 'origin' }]);
+					await this.actor.createEmbeddedDocuments("Item", [{ name: `New ${origin_label}`, type: 'origin' }]);
 					console.log(this);
 					return true;
 				}
 			},
 			{
-				name: 'Path',
+				name: path_label,
 				icon: '<img class="menu-img" src="systems/saga-machine/images/defaults/path.svg" />',
 				condition: true,
 				callback: async (i) => {
-					await this.actor.createEmbeddedDocuments("Item", [{ name: 'New Path', type: 'path' }]);
+					await this.actor.createEmbeddedDocuments("Item", [{ name: `New ${path_label}`, type: 'path' }]);
 				}
       		}
 		];

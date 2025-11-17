@@ -65,6 +65,47 @@ export const money_label_config = {
 }
 
 /**
+ * The label to use for Origins in this setting
+ *
+ * @type SettingConfig
+ */
+export const origin_label_config = {
+    name: 'Name for Origins',
+    hint: 'Origins, Genelines, Species, etc.',
+    scope: 'world',
+    config: true,
+    type: String,
+    default: 'Origin',
+    choices: {
+        "Origin": "Origin",
+        "Geneline": "Geneline",
+        "Species": "Species",
+        "Background": "Background",
+        "People": "People"
+    }
+}
+
+/**
+ * The label to use for Paths in this setting
+ *
+ * @type SettingConfig
+ */
+export const path_label_config = {
+    name: 'Name for Paths',
+    hint: 'Paths, Roles, Careers, etc.',
+    scope: 'world',
+    config: true,
+    type: String,
+    default: 'Path',
+    choices: {
+        "Path": "Path",
+        "Role": "Role",
+        "Career": "Career",
+        "Archetype": "Archetype"
+    }
+}
+
+/**
  * Whether a character's starting Luck should affect their experience total (e.g. for Shadows Over Sol)
  *
  * @type SettingConfig
