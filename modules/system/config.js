@@ -1,6 +1,18 @@
 // Config objects for the system settings
 
 /**
+ * Register a config for the system with the specifed default
+ * 
+ * @param {string} key 
+ * @param {*} config 
+ * @param {*} default_to_set 
+ */
+export function register_config(key, config, default_to_set) {
+    config['default'] = default_to_set;
+    game.settings.register('saga-machine', key, config);
+}
+
+/**
  * The starting number of experiences player characters should have, including stat costs
  *
  * @type SettingConfig
