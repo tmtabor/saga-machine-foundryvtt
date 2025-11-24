@@ -1,7 +1,7 @@
 import { test_dialog } from "../game/tests.js";
 import { ActionHelper, SagaMachineItem } from "../item/item.js";
 import { CharacterHelper } from "./actor.js";
-import { system_setting } from "../system/utils.js";
+import { system_setting, saga_machine_path, load_template_partials } from "../system/utils.js";
 
 /**
  * ActorSheet context used in getData() and dependent methods.
@@ -41,13 +41,14 @@ Hooks.once("init", async () => {
 		item => item.system.group.toLowerCase() === 'armors' || item.system.group.toLowerCase() === 'apparel');
 	Handlebars.registerHelper("has_uses", item => Number.isFinite(parseInt(item.system.uses)));
 	Handlebars.registerHelper('if_equal', (arg1, arg2, options) => arg1 === arg2 ? options.fn(this) : options.inverse(this));
+    Handlebars.registerHelper('system_path', (path) => `${saga_machine_path()}/${path}`);
 
 	// Register handlebars partials
-	await foundry.applications.handlebars.loadTemplates([
-		'systems/saga-machine/templates/partials/character-header.html',
-		'systems/saga-machine/templates/partials/character-sidebar.html',
-		'systems/saga-machine/templates/partials/character-inventory.html'
-	]);
+    await load_template_partials([
+        {name: 'character-header', path: `${saga_machine_path()}/templates/partials/character-header.html`},
+        {name: 'character-sidebar', path: `${saga_machine_path()}/templates/partials/character-sidebar.html`},
+        {name: 'character-inventory', path: `${saga_machine_path()}/templates/partials/character-inventory.html`}
+    ]);
 });
 
 /**
@@ -108,6 +109,14 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
 	 **********************************/
 
 	/**
+	 * Override the default ID to avoid issues with bundlers (like Parcel) mangling class names.
+	 * 
+	 * @override
+	 * @returns {string}
+	 */
+	get id() { return `saga-machine-actor-${this.document.uuid.replace(/\./g, "-")}`; }
+
+	/**
 	 * The default options for actor sheets
 	 *
 	 * @override
@@ -130,8 +139,8 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
 	 * @returns {string}
 	 */
 	get template() {
-		if (!game.user.isGM && this.actor.limited) return "systems/saga-machine/templates/actors/limited-sheet.html";
-		else return `systems/saga-machine/templates/actors/${this.actor.type}-sheet.html`;
+		if (!game.user.isGM && this.actor.limited) return `${saga_machine_path()}/templates/actors/limited-sheet.html`;
+		else return `${saga_machine_path()}/templates/actors/${this.actor.type}-sheet.html`;
 	}
 
 	/**********************************
@@ -585,7 +594,7 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
 		const items = [
 			{
 				name: origin_label,
-				icon: '<img class="menu-img" src="systems/saga-machine/images/defaults/origin.svg" />',
+				icon: `<img class="menu-img" src="${saga_machine_path()}/images/defaults/origin.svg" />`,
 				condition: true,
 				callback: async (i) => {
 					await this.actor.createEmbeddedDocuments("Item", [{ name: `New ${origin_label}`, type: 'origin' }]);
@@ -595,7 +604,7 @@ export class SagaMachineActorSheet extends foundry.appv1.sheets.ActorSheet {
 			},
 			{
 				name: path_label,
-				icon: '<img class="menu-img" src="systems/saga-machine/images/defaults/path.svg" />',
+				icon: `<img class="menu-img" src="${saga_machine_path()}/images/defaults/path.svg" />`,
 				condition: true,
 				callback: async (i) => {
 					await this.actor.createEmbeddedDocuments("Item", [{ name: `New ${path_label}`, type: 'path' }]);
@@ -808,9 +817,9 @@ export class CharacterSheet extends SagaMachineActorSheet {
 	 * @override
 	 */
 	get template() {
-		if (!game.user.isGM && this.actor.limited) return "systems/saga-machine/templates/actors/limited-sheet.html";
-		if (this.actor.is_pc()) return `systems/saga-machine/templates/actors/pc-sheet.html`;
-		else return `systems/saga-machine/templates/actors/npc-sheet.html`;
+		if (!game.user.isGM && this.actor.limited) return `${saga_machine_path()}/templates/actors/limited-sheet.html`;
+		if (this.actor.is_pc()) return `${saga_machine_path()}/templates/actors/pc-sheet.html`;
+		else return `${saga_machine_path()}/templates/actors/npc-sheet.html`;
 	}
 
 	/**
@@ -1428,8 +1437,8 @@ export class VehicleSheet extends SagaMachineActorSheet {
 		if (!icon) icon = skill.toLowerCase();
 		if (!test_label) test_label = `${skill}-${tn}`;
 		return `<span class="item-img rollable" data-type="Test" data-stat="${stat}" data-skill="${skill}" data-tn="${tn}" draggable="true">
-				    <img class="item-img" src="systems/saga-machine/images/skills/${icon}.svg" title="${name}: ${test_label} test">
-				    <img class="item-img" src="systems/saga-machine/images/d10.svg" title="${name}: ${test_label} test">
+				    <img class="item-img" src="${saga_machine_path()}/images/skills/${icon}.svg" title="${name}: ${test_label} test">
+				    <img class="item-img" src="${saga_machine_path()}/images/d10.svg" title="${name}: ${test_label} test">
 			    </span>`;
 	}
 

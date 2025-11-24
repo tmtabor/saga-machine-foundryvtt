@@ -1,6 +1,6 @@
 <form class="{{cssClass}} saga-machine vehicle-sheet" autocomplete="off">
     <aside class="sheet-sidebar">
-        <img class="system-logo" src="systems/saga-machine/images/theme/saga-machine-logo.png" title="Saga Machine" />
+        <img class="system-logo" src='{{system_path "images/theme/saga-machine-logo.png"}}' title="Saga Machine" />
         <div class="sidebar-frame">
             <h3>Scores</h3>
             <div class="score grid grid-2col">
@@ -168,7 +168,7 @@
                             <div class="item-name action-name">
                                 <span class="item-img rollable" data-type="Test" data-option="{{ action.system.attack_option }}" data-stat="{{ action.system.stat }}" data-skill="{{ action.system.skill }}" data-tn="{{ action.system.tn }}" data-modifiers="{{ action.system.modifiers }}" data-properties="{{ action.system.properties }}" data-effects='{{ action.sheet.effects_str }}'>
                                     <img class="item-img" src="{{ action.img }}" title="Test {{ action.name }}" />
-                                    <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ action.name }} Test" />
+                                    <img class="item-img" src="{{system_path 'images/d10.svg'}}" title="{{ action.name }} Test" />
                                 </span>
                                 <span class="expandable">{{ action.name }}</span>
                             </div>
@@ -215,7 +215,7 @@
                         <h4 class="item-name">
                             <span class="chatable item-img">
                                 <img class="item-img" src="{{ consequence.img }}" title="Display {{ consequence.system.full_name }}" />
-                                <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ consequence.system.full_name }}" />
+                                <img class="item-img" src="{{system_path 'images/talk.svg'}}" title="Display {{ consequence.system.full_name }}" />
                             </span>
                             <span class="expandable">{{ consequence.system.full_name }}</span>
                         </h4>
@@ -256,7 +256,7 @@
                             <h4 class="item-name">
                                 <span class="chatable item-img">
                                     <img class="item-img" src="{{ item.img }}" title="Display {{ item.system.full_name }}" />
-                                    <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ item.system.full_name }}" />
+                                    <img class="item-img" src="{{system_path 'images/talk.svg'}}" title="Display {{ item.system.full_name }}" />
                                 </span>
                                 <span class="expandable">{{ item.system.full_name }}</span>
                             </h4>

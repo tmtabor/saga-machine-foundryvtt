@@ -1,4 +1,4 @@
-import { system_setting } from "../system/utils.js";
+import { system_setting, saga_machine_path } from "../system/utils.js";
 
 /**
  * Put the standard Saga Machine consequences in the formated expected for Foundry status effects
@@ -14,7 +14,7 @@ export const generate_conditions = () => {
 
     // Generate and append an object for each consequence
     standard_consequences.forEach(consequence => system_conditions.push({
-        icon: `systems/saga-machine/images/consequences/${consequence.slugify()}.svg`,
+        icon: `${saga_machine_path()}/images/consequences/${consequence.slugify()}.svg`,
         statuses: [consequence.slugify()],
         name: consequence,
         id: consequence.slugify(),

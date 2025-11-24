@@ -2,7 +2,7 @@ import Tagify from "../libraries/tagify.min.js";
 import { SCORE_OPTIONS, STAT_OPTIONS } from "../game/tests.js";
 import { ActionHelper, SagaMachineItem } from "./item.js";
 import { ModifierSet } from "../game/modifiers.js";
-import { mock_id } from "../system/utils.js";
+import { mock_id, saga_machine_path } from "../system/utils.js";
 import { Effect } from "../game/damage.js";
 
 /**
@@ -52,6 +52,14 @@ export class SagaMachineItemSheet extends foundry.appv1.sheets.ItemSheet {
      * METHODS THAT SET BASIC OPTIONS *
      **********************************/
 
+	/**
+	 * Override the default ID to avoid issues with bundlers (like Parcel) mangling class names.
+	 * 
+	 * @override
+	 * @returns {string}
+	 */
+	get id() { return `saga-machine-item-${this.document.uuid.replace(/\./g, "-")}`; }
+
     /**
      * The default options for item sheets
      *
@@ -74,7 +82,7 @@ export class SagaMachineItemSheet extends foundry.appv1.sheets.ItemSheet {
      * @returns {string}
      */
     get template() {
-        return `systems/saga-machine/templates/items/${this.item.type}-sheet.html`;
+        return `${saga_machine_path()}/templates/items/${this.item.type}-sheet.html`;
     }
 
     /**********************************

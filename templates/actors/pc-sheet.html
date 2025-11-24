@@ -1,10 +1,10 @@
 <form class="flexcol saga-machine {{cssClass}} pc-sheet" autocomplete="off">
 
     {{!-- Sheet Sidebar --}}
-    {{>  systems/saga-machine/templates/partials/character-sidebar.html}}
+    {{> character-sidebar}}
 
     {{!-- Sheet Header --}}
-    {{>  systems/saga-machine/templates/partials/character-header.html}}
+    {{> character-header}}
 
     {{!-- Sheet Tab Navigation --}}
     <nav class="sheet-tabs tabs" data-group="primary">
@@ -36,7 +36,7 @@
                                     <h4 class="item-name">
                                         <span class="item-img rollable" data-type="Test" data-stat="{{ skill.system.default }}" data-skill="{{ skill.system.full_name }}">
                                             <img class="item-img" src="{{ skill.img }}" title="Test {{ skill.name }}" />
-                                            <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ skill.name }} Test" />
+                                            <img class="item-img" src="{{system_path 'images/d10.svg'}}" title="{{ skill.name }} Test" />
                                         </span>
                                         <span class="expandable">{{ skill.system.full_name }}</span>
                                     </h4>
@@ -53,8 +53,8 @@
                                 <li class="item flexrow">
                                     <h4 class="item-name">
                                         <span class="item-img rollable" data-type="Test" data-stat="strength" data-skill="Unskilled">
-                                            <img class="item-img" src="systems/saga-machine/images/defaults/skill.svg" title="Unskilled Test" />
-                                            <img class="item-img" src="systems/saga-machine/images/d10.svg" title="Unskilled Test" />
+                                            <img class="item-img" src="{{system_path 'images/defaults/skill.svg'}}" title="Unskilled Test" />
+                                            <img class="item-img" src="{{system_path 'images/d10.svg'}}" title="Unskilled Test" />
                                         </span>
                                         <span class="expandable">Unskilled</span>
                                     </h4>
@@ -104,7 +104,7 @@
                                     <h4 class="item-name">
                                         <span class="chatable item-img">
                                             <img class="item-img" src="{{ trait.img }}" title="Display {{ trait.name }}" />
-                                            <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ trait.name }}" />
+                                            <img class="item-img" src="{{system_path 'images/talk.svg'}}" title="Display {{ trait.name }}" />
                                         </span>
                                         <span class="expandable">{{ trait.system.full_name }}</span>
                                     </h4>
@@ -159,16 +159,16 @@
                         <option value="">Standard</option>
                         {{ selectOptions data.system.defenses selected=data.system.scores.defense.test valueAttr="_id" labelAttr="name" }}
                     </select>
-                    <a class="init-button defense-test" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-effects='{"type": "defense"}'><img class="item-img" src="systems/saga-machine/images/combat/defense.svg" title="Set Defense TN for the Round" /></a>
+                    <a class="init-button defense-test" title="Defense Test" data-type="Test" data-score="defense" data-whisper="true" data-effects='{"type": "defense"}'><img class="item-img" src="{{system_path 'images/combat/defense.svg'}}" title="Set Defense TN for the Round" /></a>
                 </div>
 
                 <div class="grouping reactions">
                     <input id="{{ data._id }}-dodge" class="button-checkbox" type="checkbox" name="system.scores.defense.dodge_on" data-dtype="Boolean" {{checked data.system.scores.defense.dodge_on}} />
-                    <label class="init-button dodge-toggle" title="Dodge" for="{{ data._id }}-dodge"><img class="item-img" src="systems/saga-machine/images/combat/dodge.svg" title="Dodge" /></label>
+                    <label class="init-button dodge-toggle" title="Dodge" for="{{ data._id }}-dodge"><img class="item-img" src="{{system_path 'images/combat/dodge.svg'}}" title="Dodge" /></label>
                     <input id="{{ data._id }}-parry" class="button-checkbox" type="checkbox" name="system.scores.defense.parry_on" data-dtype="Boolean" {{checked data.system.scores.defense.parry_on}} />
-                    <label class="init-button parry-toggle" title="Parry" for="{{ data._id }}-parry"><img class="item-img" src="systems/saga-machine/images/combat/parry.svg" title="Parry" /></label>
+                    <label class="init-button parry-toggle" title="Parry" for="{{ data._id }}-parry"><img class="item-img" src="{{system_path 'images/combat/parry.svg'}}" title="Parry" /></label>
                     <input id="{{ data._id }}-resist" class="button-checkbox" type="checkbox" name="system.scores.willpower.resist_on" data-dtype="Boolean" {{checked data.system.scores.willpower.resist_on}} />
-                    <label class="init-button resist-toggle" title="Resist" for="{{ data._id }}-resist"><img class="item-img" src="systems/saga-machine/images/combat/resist.svg" title="Resist" /></label>
+                    <label class="init-button resist-toggle" title="Resist" for="{{ data._id }}-resist"><img class="item-img" src="{{system_path 'images/combat/resist.svg'}}" title="Resist" /></label>
                 </div>
             </nav>
 
@@ -188,7 +188,7 @@
                             <div class="item-name action-name">
                                 <span class="item-img rollable" data-type="Test" data-option="{{ action.system.attack_option }}" data-stat="{{ action.system.stat }}" data-skill="{{ action.system.skill }}" data-tn="{{ action.system.tn }}" data-modifiers="{{ action.system.modifiers }}" data-properties="{{ action.system.properties }}" data-effects='{{ action.sheet.effects_str }}'>
                                     <img class="item-img" src="{{ action.img }}" title="Test {{ action.name }}" />
-                                    <img class="item-img" src="systems/saga-machine/images/d10.svg" title="{{ action.name }} Test" />
+                                    <img class="item-img" src="{{system_path 'images/d10.svg'}}" title="{{ action.name }} Test" />
                                 </span>
                                 <span class="expandable">{{ action.name }}</span>
                             </div>
@@ -232,7 +232,7 @@
                         <h4 class="item-name">
                             <span class="chatable item-img">
                                 <img class="item-img" src="{{ consequence.img }}" title="Display {{ consequence.system.full_name }}" />
-                                <img class="item-img" src="systems/saga-machine/images/talk.svg" title="Display {{ consequence.system.full_name }}" />
+                                <img class="item-img" src="{{system_path 'images/talk.svg'}}" title="Display {{ consequence.system.full_name }}" />
                             </span>
                             <span class="expandable">{{ consequence.system.full_name }}</span>
                         </h4>
@@ -249,7 +249,7 @@
 		</div>
 
         {{!-- Inventory Tab --}}
-        {{>  systems/saga-machine/templates/partials/character-inventory.html}}
+        {{> character-inventory}}
 
         <div class="tab advancement" data-group="primary" data-tab="advancement">
     		<div class="grid grid-3col">

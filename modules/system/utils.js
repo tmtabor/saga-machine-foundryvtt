@@ -99,3 +99,25 @@ export function system_setting(key, default_value=null) {
 	try { return game.settings.get('saga-machine', key); }
 	catch (e) { return default_value; }
 }
+
+/**
+ * Load the template partials with the specified names
+ * 
+ * @param {Object[]} partials - An array of objects with name and path properties
+ */
+export async function load_template_partials(partials) {
+	for (const partial of partials) {
+		const template = await getTemplate(partial.path);
+		Handlebars.registerPartial(partial.name, template);
+	}
+}
+
+/**
+ * Returns the path to the Saga Machine system implementation 
+ * 
+ * @return {string}
+ */
+export function saga_machine_path() {
+	if (game.system.id === 'saga-machine') return 'systems/saga-machine';
+	else return `systems/${game.system.id}/saga-machine`;
+}

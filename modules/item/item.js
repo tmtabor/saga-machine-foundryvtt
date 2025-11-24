@@ -1,4 +1,4 @@
-import { token_actor } from "../system/utils.js";
+import { token_actor, saga_machine_path } from "../system/utils.js";
 import { Effect } from "../game/damage.js";
 
 /**
@@ -35,13 +35,13 @@ export class SagaMachineItem extends Item {
 
         // Set new default icons
         if (data.img === foundry.documents.BaseItem.DEFAULT_ICON) { // If default
-            if (this.type === 'skill') this.update({'img': 'systems/saga-machine/images/defaults/skill.svg'});
-            if (this.type === 'trait') this.update({'img': 'systems/saga-machine/images/defaults/trait.svg'});
-            if (this.type === 'origin') this.update({'img': 'systems/saga-machine/images/defaults/origin.svg'});
-            if (this.type === 'path') this.update({'img': 'systems/saga-machine/images/defaults/path.svg'});
-            if (this.type === 'ambition') this.update({'img': 'systems/saga-machine/images/defaults/ambition.svg'});
-            if (this.type === 'consequence') this.update({'img': 'systems/saga-machine/images/defaults/consequence.svg'});
-            if (this.type === 'action') this.update({'img': 'systems/saga-machine/images/defaults/action.svg'});
+            if (this.type === 'skill') this.update({'img': `${saga_machine_path()}/images/defaults/skill.svg`});
+            if (this.type === 'trait') this.update({'img': `${saga_machine_path()}/images/defaults/trait.svg`});
+            if (this.type === 'origin') this.update({'img': `${saga_machine_path()}/images/defaults/origin.svg`});
+            if (this.type === 'path') this.update({'img': `${saga_machine_path()}/images/defaults/path.svg`});
+            if (this.type === 'ambition') this.update({'img': `${saga_machine_path()}/images/defaults/ambition.svg`});
+            if (this.type === 'consequence') this.update({'img': `${saga_machine_path()}/images/defaults/consequence.svg`});
+            if (this.type === 'action') this.update({'img': `${saga_machine_path()}/images/defaults/action.svg`});
         }
     }
 

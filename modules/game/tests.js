@@ -1,5 +1,5 @@
 import Tagify from "../libraries/tagify.min.js";
-import { capitalize, system_setting, test_label, token_actor } from "../system/utils.js";
+import { capitalize, system_setting, test_label, token_actor, saga_machine_path } from "../system/utils.js";
 import { ModifierSet } from "./modifiers.js";
 import { Effect } from "./damage.js";
 import { ActionHelper } from "../item/item.js";
@@ -661,7 +661,7 @@ export async function test_dialog(dataset, callback=null) {
     const actor = token_actor(dataset);
     const score_options = actor.type === 'vehicle' ? VEHICLE_SCORE_OPTIONS : SCORE_OPTIONS;
 
-    const dialog_content = await renderTemplate("systems/saga-machine/templates/apps/test-dialog.html",
+    const dialog_content = await renderTemplate(`${saga_machine_path()}/templates/apps/test-dialog.html`,
         {actor: { ...actor.sheet.getData().data }, STAT_OPTIONS: STAT_OPTIONS, SCORE_OPTIONS: score_options, ...dataset});
 
     new Dialog({

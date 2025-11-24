@@ -9,6 +9,7 @@ import { create_active_effect, create_item, delete_active_effect, delete_item, d
     get_chat_log_entry_context, hotbar_drop, pre_create_active_effect, pre_delete_active_effect, pre_update_combat,
     render_chat_message, update_active_effect, update_actor, update_item } from "./system/hooks.js";
 import { sm_test_macro } from "./system/macros.js";
+import { saga_machine_path } from "./system/utils.js";
 import { register_config, level_config, luck_exp_config, luck_label_config, money_label_config, origin_label_config, path_label_config, stress_config, theme_config } from "./system/config.js";
 
 export function init_saga_machine({level = 100, luck_label = 'Luck', money_label = 'Money', 
@@ -65,7 +66,7 @@ export function init_saga_machine({level = 100, luck_label = 'Luck', money_label
 
         // Load the appropriate theme stylesheet
         const theme_sheet = game.settings.get('saga-machine', 'theme');
-        const stylesheet = `systems/saga-machine/styles/${theme_sheet}.css`;
+        const stylesheet = `${saga_machine_path()}/styles/${theme_sheet}.css`;
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.type = 'text/css';
