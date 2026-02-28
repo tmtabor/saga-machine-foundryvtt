@@ -63,7 +63,7 @@ export class SagaMachineCombat extends Combat {
         if (customOrder.length === 0) return result;
 
         // Remember current combatant before re-sorting
-        const currentId = (this.turn != null && this.turns[this.turn]) ? this.turns[this.turn].id : null;
+        const currentId = (this.turn !== null && this.turn !== undefined && this.turns[this.turn]) ? this.turns[this.turn].id : null;
 
         // Re-sort: group by initiative (FAST > NPC > SLOW), then by custom order within each group
         this.turns.sort((a, b) => {
@@ -79,7 +79,7 @@ export class SagaMachineCombat extends Combat {
         });
 
         // Fix turn index to continue tracking the same combatant
-        if (currentId != null && this.turn != null) {
+        if (currentId !== null && this.turn !== null && this.turn !== undefined) {
             const newIndex = this.turns.findIndex(t => t.id === currentId);
             if (newIndex !== -1) this.turn = newIndex;
         }
