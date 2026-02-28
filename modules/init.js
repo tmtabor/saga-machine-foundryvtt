@@ -7,7 +7,7 @@ import { SkillSheet, TraitSheet, OriginSheet, PathSheet, ConsequenceSheet, Physi
     ActionSheet } from "./item/item-sheet.js";
 import { create_active_effect, create_item, delete_active_effect, delete_item, drop_actor_sheet_data,
     get_chat_log_entry_context, hotbar_drop, pre_create_active_effect, pre_delete_active_effect, pre_update_combat,
-    render_chat_message, update_active_effect, update_actor, update_item } from "./system/hooks.js";
+    render_chat_message, update_active_effect, update_actor, update_combat, update_item } from "./system/hooks.js";
 import { sm_test_macro } from "./system/macros.js";
 import { saga_machine_path } from "./system/utils.js";
 import { register_config, level_config, luck_exp_config, luck_label_config, money_label_config, origin_label_config, path_label_config, stress_config, theme_config } from "./system/config.js";
@@ -94,6 +94,7 @@ export function init_saga_machine({level = 100, luck_label = 'Luck', money_label
         Hooks.on('deleteActiveEffect', delete_active_effect);
 
         Hooks.on('preUpdateCombat', pre_update_combat);
+        Hooks.on('updateCombat', update_combat);
         Hooks.on("hotbarDrop", hotbar_drop);
         Hooks.on("renderChatMessageHTML", render_chat_message);
         Hooks.on("dropActorSheetData", drop_actor_sheet_data);

@@ -183,7 +183,7 @@ export async function delete_active_effect(effect, options, id) {
 }
 
 /**
- * Run after the current combat has been updated: Hooks.on('preUpdateCombat')
+ * Run before the current combat has been updated: Hooks.on('preUpdateCombat')
  *
  * @param {SagaMachineCombat} combat
  * @param update
@@ -195,6 +195,42 @@ export async function pre_update_combat(combat, update, options, id){
     // Perform start of combat and start of round tasks
     if (game.user.id === id && update.round && update.round !== combat.round) {
         await combat.start_of_round();
+    }
+
+    // Store previous round and turn for use in updateCombat hook
+    if (game.user.id === id) {
+        options._sagaPreviousRound = combat.round;
+        options._sagaPreviousTurn = combat.turn;
+    }
+}
+
+/**
+ * Run after the current combat has been updated: Hooks.on('updateCombat')
+ *
+ * @param {SagaMachineCombat} combat
+ * @param update
+ * @param options
+ * @param {string} id
+ * @return {Promise<void>}
+ */
+export async function update_combat(combat, update, options, id) {
+    if (game.user.id !== id) return;
+
+    const previousRound = options._sagaPreviousRound;
+    const previousTurn = options._sagaPreviousTurn;
+
+    // When the round changes, clear all turn complete flags
+    if (update.round !== undefined && update.round !== previousRound) {
+        for (const combatant of combat.combatants) {
+            if (combatant.getFlag('saga-machine', 'turnComplete'))
+                await combatant.unsetFlag('saga-machine', 'turnComplete');
+        }
+    }
+    // When the turn changes (but not the round), mark the previous combatant as turn complete
+    else if (update.turn !== undefined && previousTurn !== undefined && update.turn !== previousTurn) {
+        const previousCombatant = combat.turns[previousTurn];
+        if (previousCombatant && !previousCombatant.getFlag('saga-machine', 'turnComplete'))
+            await previousCombatant.setFlag('saga-machine', 'turnComplete', true);
     }
 }
 
