@@ -160,10 +160,21 @@ export class SagaMachineCombat extends Combat {
             await ChatMessage.create({content: content});
 
             // Whisper all defenses to GM
-            content = '<h4><strong>Defenses This Round</strong></h4><table class="sm-table">';
-            for (let c of this.combatants)
-                content += `<tr><td><strong>${c.name}</strong></td><td>Defense ${this.chase_label(c.actor)}</td><td>Willpower ${this.chase_label(c.actor, true)}</td></tr>`;
-            content += '</table>';
+            content = '<h4><strong>Defenses This Round</strong></h4>';
+            const dispositions = [
+                { name: 'Friendly', value: 1 },
+                { name: 'Neutral', value: 0 },
+                { name: 'Hostile', value: -1 },
+                { name: 'Secret', value: -2 }
+            ];
+            for (const disposition of dispositions) {
+                const group = this.combatants.filter(c => c.token?.disposition === disposition.value);
+                if (!group.length) continue;
+                content += `<h5>${disposition.name}</h5><table class="sm-table"><thead><tr><th>Name</th><th>Defense</th><th>Willpower</th></tr></thead><tbody>`;
+                for (let c of group)
+                    content += `<tr><td><strong>${c.name}</strong></td><td>${this.chase_label(c.actor)}</td><td>${this.chase_label(c.actor, true)}</td></tr>`;
+                content += '</tbody></table>';
+            }
             await ChatMessage.create({
                 content: content,
                 whisper: game.users.filter(u => u.isGM).map(u => u.id)
