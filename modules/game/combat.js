@@ -54,6 +54,42 @@ export class SagaMachineCombat extends Combat {
     /**
      * @inheritDoc
      * @override
+     */
+    setupTurns() {
+        const result = super.setupTurns();
+
+        // Apply custom combatant ordering within initiative groups
+        const customOrder = this.getFlag('saga-machine', 'combatantOrder') || [];
+        if (customOrder.length === 0) return result;
+
+        // Remember current combatant before re-sorting
+        const currentId = (this.turn != null && this.turns[this.turn]) ? this.turns[this.turn].id : null;
+
+        // Re-sort: group by initiative (FAST > NPC > SLOW), then by custom order within each group
+        this.turns.sort((a, b) => {
+            const ia = Number.isNumeric(a.initiative) ? a.initiative : -Infinity;
+            const ib = Number.isNumeric(b.initiative) ? b.initiative : -Infinity;
+            if (ia !== ib) return ib - ia;
+            const orderA = customOrder.indexOf(a.id);
+            const orderB = customOrder.indexOf(b.id);
+            if (orderA === -1 && orderB === -1) return (a.id > b.id ? 1 : -1);
+            if (orderA === -1) return 1;
+            if (orderB === -1) return -1;
+            return orderA - orderB;
+        });
+
+        // Fix turn index to continue tracking the same combatant
+        if (currentId != null && this.turn != null) {
+            const newIndex = this.turns.findIndex(t => t.id === currentId);
+            if (newIndex !== -1) this.turn = newIndex;
+        }
+
+        return this.turns;
+    }
+
+    /**
+     * @inheritDoc
+     * @override
      * @param ids
      * @param formula
      * @param updateTurn
@@ -234,7 +270,13 @@ export class SagaMachineCombat extends Combat {
 }
 
 /**
- * Hook to modify combat tracker with a fast/slow turn toggle
+ * Track the currently dragged combatant ID for drag-and-drop reordering
+ * @type {string|null}
+ */
+let _draggedCombatantId = null;
+
+/**
+ * Hook to modify combat tracker with a fast/slow turn toggle and drag-and-drop reordering
  *
  */
 Hooks.on('renderCombatTracker', (app, element) => {
@@ -274,6 +316,88 @@ Hooks.on('renderCombatTracker', (app, element) => {
                 }
             });
         });
+
+        // Drag-and-drop reordering within initiative groups (GM only)
+        if (game.user.isGM) {
+            nodes.forEach((el) => {
+                el.setAttribute('draggable', 'true');
+
+                el.addEventListener('dragstart', (ev) => {
+                    _draggedCombatantId = el.getAttribute('data-combatant-id');
+                    ev.dataTransfer.effectAllowed = 'move';
+                    el.classList.add('sm-dragging');
+                });
+
+                el.addEventListener('dragend', () => {
+                    _draggedCombatantId = null;
+                    el.classList.remove('sm-dragging');
+                    root.querySelectorAll('.sm-drag-over').forEach(n => n.classList.remove('sm-drag-over'));
+                });
+
+                el.addEventListener('dragover', (ev) => {
+                    if (!_draggedCombatantId) return;
+                    const targetId = el.getAttribute('data-combatant-id');
+                    if (_draggedCombatantId === targetId) return;
+
+                    const draggedCombatant = combatants.get(_draggedCombatantId);
+                    const targetCombatant = combatants.get(targetId);
+                    if (!draggedCombatant || !targetCombatant) return;
+
+                    // Only allow reordering within the same initiative group
+                    if (draggedCombatant.initiative !== targetCombatant.initiative) return;
+
+                    ev.preventDefault();
+                    ev.dataTransfer.dropEffect = 'move';
+                    el.classList.add('sm-drag-over');
+                });
+
+                el.addEventListener('dragleave', () => {
+                    el.classList.remove('sm-drag-over');
+                });
+
+                el.addEventListener('drop', async (ev) => {
+                    ev.preventDefault();
+                    el.classList.remove('sm-drag-over');
+
+                    const draggedId = _draggedCombatantId;
+                    const targetId = el.getAttribute('data-combatant-id');
+                    if (!draggedId || draggedId === targetId) return;
+
+                    const combat = app.viewed;
+                    if (!combat) return;
+
+                    const draggedCombatant = combatants.get(draggedId);
+                    const targetCombatant = combatants.get(targetId);
+                    if (!draggedCombatant || !targetCombatant) return;
+
+                    // Only allow reordering within the same initiative group
+                    if (draggedCombatant.initiative !== targetCombatant.initiative) return;
+
+                    // Build new order from current turns
+                    const currentOrder = combat.turns.map(t => t.id);
+
+                    // Remove dragged from current position
+                    const fromIndex = currentOrder.indexOf(draggedId);
+                    if (fromIndex === -1) return;
+                    currentOrder.splice(fromIndex, 1);
+
+                    // Determine drop position based on mouse position relative to target element
+                    const rect = el.getBoundingClientRect();
+                    const midY = rect.top + rect.height / 2;
+                    let toIndex = currentOrder.indexOf(targetId);
+                    if (toIndex === -1) return;
+                    if (ev.clientY > midY) toIndex += 1;
+
+                    // Insert at new position
+                    currentOrder.splice(toIndex, 0, draggedId);
+
+                    // Save the new order and refresh turns
+                    await combat.setFlag('saga-machine', 'combatantOrder', currentOrder);
+                    combat.setupTurns();
+                    app.render();
+                });
+            });
+        }
     } catch (err) {
         console.error('SagaMachine renderCombatTracker hook error:', err);
     }
