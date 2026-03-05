@@ -67,8 +67,8 @@ export class SagaMachineCombat extends Combat {
 
         // Re-sort: group by initiative (FAST > NPC > SLOW), then by custom order within each group
         this.turns.sort((a, b) => {
-            const ia = Number.isNumeric(a.initiative) ? a.initiative : -Infinity;
-            const ib = Number.isNumeric(b.initiative) ? b.initiative : -Infinity;
+            const ia = Number.isFinite(a.initiative) ? a.initiative : -Infinity;
+            const ib = Number.isFinite(b.initiative) ? b.initiative : -Infinity;
             if (ia !== ib) return ib - ia;
             const orderA = customOrder.indexOf(a.id);
             const orderB = customOrder.indexOf(b.id);
