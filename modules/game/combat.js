@@ -259,6 +259,13 @@ Hooks.on('renderCombatTracker', (app, element) => {
             // Add turn complete visual indicator
             if (combatant.getFlag('saga-machine', 'turnComplete')) {
                 el.classList.add('turn-complete');
+                const tokenImage = el.querySelector('.token-image');
+                if (tokenImage && !el.querySelector('.turn-complete-indicator')) {
+                    const overlay = document.createElement('div');
+                    overlay.classList.add('turn-complete-indicator');
+                    overlay.innerHTML = '<i class="fas fa-check"></i>';
+                    tokenImage.parentElement.insertBefore(overlay, tokenImage.nextSibling);
+                }
             }
         });
 
