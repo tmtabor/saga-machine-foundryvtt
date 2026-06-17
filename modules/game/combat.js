@@ -234,7 +234,7 @@ export class SagaMachineCombat extends Combat {
 }
 
 /**
- * Hook to modify combat tracker with a fast/slow turn toggle
+ * Hook to modify combat tracker with a fast/slow turn toggle and turn complete indicator
  *
  */
 Hooks.on('renderCombatTracker', (app, element) => {
@@ -254,6 +254,18 @@ Hooks.on('renderCombatTracker', (app, element) => {
             const tokenInit = el.querySelector('.token-initiative');
             if (tokenInit) {
                 tokenInit.innerHTML = `<a class="combatant-control dlturnorder" title="Change Turn">${initiative}</a>`;
+            }
+
+            // Add turn complete visual indicator
+            if (combatant.getFlag('saga-machine', 'turnComplete')) {
+                el.classList.add('turn-complete');
+                const tokenImage = el.querySelector('.token-image');
+                if (tokenImage && !el.querySelector('.turn-complete-indicator')) {
+                    const overlay = document.createElement('div');
+                    overlay.classList.add('turn-complete-indicator');
+                    overlay.innerHTML = '<i class="fas fa-check"></i>';
+                    tokenImage.parentElement.insertBefore(overlay, tokenImage.nextSibling);
+                }
             }
         });
 
@@ -277,4 +289,37 @@ Hooks.on('renderCombatTracker', (app, element) => {
     } catch (err) {
         console.error('SagaMachine renderCombatTracker hook error:', err);
     }
+});
+
+/**
+ * Hook to add Mark Turn Complete / Mark Turn Incomplete context menu options to the combat tracker
+ *
+ */
+Hooks.on('getCombatTrackerEntryContext', (html, options) => {
+    options.push(
+        {
+            name: 'Mark Turn Complete',
+            icon: '<i class="fas fa-check"></i>',
+            condition: li => {
+                const combatant = game.combat?.combatants?.get(li.data('combatant-id'));
+                return combatant && !combatant.getFlag('saga-machine', 'turnComplete');
+            },
+            callback: async li => {
+                const combatant = game.combat?.combatants?.get(li.data('combatant-id'));
+                if (combatant) await combatant.setFlag('saga-machine', 'turnComplete', true);
+            }
+        },
+        {
+            name: 'Mark Turn Incomplete',
+            icon: '<i class="fas fa-undo"></i>',
+            condition: li => {
+                const combatant = game.combat?.combatants?.get(li.data('combatant-id'));
+                return combatant && !!combatant.getFlag('saga-machine', 'turnComplete');
+            },
+            callback: async li => {
+                const combatant = game.combat?.combatants?.get(li.data('combatant-id'));
+                if (combatant) await combatant.unsetFlag('saga-machine', 'turnComplete');
+            }
+        }
+    );
 });

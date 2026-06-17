@@ -1361,3 +1361,23 @@ div.app.dialog img.item-img {
   width: calc(100% - 2px);
   min-width: 20px;
 }
+
+/* Combat Tracker: Turn Complete Indicator */
+.combatant.turn-complete .token-image {
+  opacity: 0.5;
+}
+
+.combatant.turn-complete .turn-complete-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: rgba(0, 200, 0, 0.8);
+  text-shadow: 0 0 4px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+}
