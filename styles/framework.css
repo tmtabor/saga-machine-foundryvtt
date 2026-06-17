@@ -214,3 +214,15 @@
   justify-content: center;
   text-align: center;
 }
+
+/*
+  COMBAT TRACKER DRAG-AND-DROP
+*/
+
+.combatant.sm-dragging {
+  opacity: 0.4;
+}
+
+.combatant.sm-drag-over {
+  border-top: 2px solid #7a7971;
+}
